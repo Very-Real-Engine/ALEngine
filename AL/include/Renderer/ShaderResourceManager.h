@@ -14,7 +14,8 @@ class AL_API ShaderResourceManager
 public:
 	static std::unique_ptr<ShaderResourceManager> createGeometryPassShaderResourceManager(Model* model);
 	static std::unique_ptr<ShaderResourceManager> createLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView);
+	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler);
+	static std::unique_ptr<ShaderResourceManager> createShadowMapShaderResourceManager();
 	~ShaderResourceManager() {}
 	void cleanup();
 
@@ -38,10 +39,15 @@ private:
 
 
 	void initLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView);
+	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler);
 	void createLightingPassUniformBuffers();
 	void createLightingPassDescriptorSets(VkDescriptorSetLayout descriptorSetLayout, 
-	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView);
+	VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler);
+
+	void initShadowMapShaderResourceManager();
+	void createShadowMapUniformBuffers();
+	void createShadowMapDescriptorSets();
+
 };
 
 } // namespace ale

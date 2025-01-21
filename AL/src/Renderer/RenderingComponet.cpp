@@ -13,6 +13,7 @@ void RenderingComponent::initRenderingComponent(std::shared_ptr<Model> model) {
     m_model = model;
     m_materials = m_model->getMaterials();
     m_shaderResourceManager = ShaderResourceManager::createGeometryPassShaderResourceManager(m_model.get());
+    m_shadowMapResourceManager = ShaderResourceManager::createShadowMapShaderResourceManager();
 }
 
 void RenderingComponent::updateMaterial(std::vector<std::shared_ptr<Material>> materials) {
@@ -29,6 +30,9 @@ void RenderingComponent::draw(DrawInfo& drawInfo) {
     m_model->draw(drawInfo);
 }
 
-
+void RenderingComponent::drawShadow(ShadowMapDrawInfo& drawInfo) {
+    drawInfo.shaderResourceManager = m_shadowMapResourceManager.get();
+    m_model->drawShadow(drawInfo);
+}
 
 }

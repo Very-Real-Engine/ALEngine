@@ -98,9 +98,34 @@ class AL_API Renderer
 	std::vector<VkFence> inFlightFences;
 	uint32_t currentFrame = 0;
 
+
+	std::unique_ptr<RenderPass> m_shadowMapRenderPass;
+	VkRenderPass shadowMapRenderPass;
+
+	std::unique_ptr<Pipeline> m_shadowMapPipeline;
+	VkPipelineLayout shadowMapPipelineLayout;
+	VkPipeline shadowMapGraphicsPipeline;
+
+	std::unique_ptr<FrameBuffers> m_shadowMapFrameBuffers;
+	std::vector<VkFramebuffer> shadowMapFramebuffers;
+
+	std::unique_ptr<DescriptorSetLayout> m_shadowMapDescriptorSetLayout;
+	VkDescriptorSetLayout shadowMapDescriptorSetLayout;
+
+	std::unique_ptr<ShaderResourceManager> m_shadowMapShaderResourceManager;
+	std::vector<VkDescriptorSet> shadowMapDescriptorSets;
+	std::vector< std::shared_ptr<UniformBuffer> > shadowMapUniformBuffers;
+	VkSampler shadowMapSampler;
+
+	std::unique_ptr<CommandBuffers> m_shadowMapCommandBuffers;
+	std::vector<VkCommandBuffer> shadowMapCommandBuffers;
+
+
+
 	void init(GLFWwindow* window);
 	void recordCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	void recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	void recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer);
 };
 } // namespace ale
 

@@ -6,6 +6,8 @@ layout(input_attachment_index = 2, binding = 2) uniform subpassInput albedoAttac
 layout(input_attachment_index = 3, binding = 3) uniform subpassInput pbrAttachment;
 
 struct Light {
+    mat4 view;
+    mat4 proj;
     vec3 position;
     vec3 direction;
     vec3 color;
@@ -21,6 +23,8 @@ layout(binding = 4) uniform LightingInfo {
     uint numLights;
     float ambientStrength;
 };
+
+layout(binding = 5) uniform sampler2DShadow shadowMap;
 
 layout(location = 0) in vec2 fragTexCoord;
 layout(location = 0) out vec4 outColor;
@@ -70,6 +74,8 @@ void main() {
     vec3 ambient = ambientStrength * albedo * ao;
     finalColor += ambient;
 
+    float shadowFactor = 1.0;
+
     for (uint i = 0; i < numLights; ++i) {
         vec3 L;
         float attenuation = 1.0;
@@ -93,6 +99,19 @@ void main() {
             float theta = dot(L, normalize(-lights[i].direction));
             float epsilon = max(lights[i].innerCutoff - lights[i].outerCutoff, 0.001);
             attenuation *= clamp((theta - lights[i].outerCutoff) / epsilon, 0.0, 1.0);
+
+            // Shadow Mapping (Spotlight만)
+            mat4 lightViewProj = lights[i].proj * lights[i].view;
+            vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
+            vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
+            shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;
+
+            float closestDepth = texture(shadowMap, shadowCoord);
+            float currentDepth = shadowCoord.z;
+            float bias = 0.005;
+            shadowFactor = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+
+            attenuation *= shadowFactor;
         }
         else { // Directional Light
             L = normalize(-lights[i].direction);

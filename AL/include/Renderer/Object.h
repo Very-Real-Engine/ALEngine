@@ -18,6 +18,7 @@ public:
 	~Object() {}
 
 	void draw(DrawInfo& drawInfo);
+	void drawShadow(ShadowMapDrawInfo& drawInfo);
 
 	glm::mat4 getModelMatrix();
 

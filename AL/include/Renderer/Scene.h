@@ -92,6 +92,11 @@ private:
 	std::shared_ptr<Model> m_plant2Model;
 	std::shared_ptr<Object> m_plant2Object;
 
+	// tmp plane object
+	std::shared_ptr<Object> m_tmpPlaneObject;
+
+
+
 
 	std::shared_ptr<Material> m_defaultMaterial;
 

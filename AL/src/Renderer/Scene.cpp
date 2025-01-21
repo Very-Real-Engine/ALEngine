@@ -74,36 +74,38 @@ void Scene::initScene() {
     m_cameraYaw = 0.0f;
 
 
-    // Light light1 {
-    //     glm::vec3(0.0f, 0.0f, 0.0f),
-    //     glm::vec3(0.0f, -1.0f, 0.0f),
-    //     glm::vec3(1.0f, 1.0f, 1.0f),
-    //     1.0f,
-    //     glm::cos(glm::radians(12.5f)),
-    //     glm::cos(glm::radians(17.5f)),
-    //     1
-    // };
-    // m_lights.push_back(light1);
-    // m_numLights = m_lights.size();
+    Light light1 {
+        glm::mat4(1.0f),
+        glm::mat4(1.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        1.0f,
+        glm::cos(glm::radians(12.5f)),
+        glm::cos(glm::radians(17.5f)),
+        1
+    };
+    m_lights.push_back(light1);
+    m_numLights = m_lights.size();
 
-    std::random_device rd;                              // 시드 생성
-    std::mt19937 gen(rd());                             // 난수 생성기
-    std::uniform_real_distribution<float> posDist(-3.0f, 3.0f); // 위치는 -5 ~ 5 사이
-    std::uniform_real_distribution<float> colorDist(0.0f, 1.0f); // 색상은 0 ~ 1 사이
+    // std::random_device rd;                              // 시드 생성
+    // std::mt19937 gen(rd());                             // 난수 생성기
+    // std::uniform_real_distribution<float> posDist(-3.0f, 3.0f); // 위치는 -5 ~ 5 사이
+    // std::uniform_real_distribution<float> colorDist(0.0f, 1.0f); // 색상은 0 ~ 1 사이
 
-    for (size_t i = 0; i < 16; ++i) {
-        Light light {
-            glm::vec3(posDist(gen), posDist(gen), posDist(gen)), // 랜덤 위치
-            glm::vec3(0.0f, -1.0f, 0.0f),                      // 방향은 고정
-            glm::vec3(colorDist(gen), colorDist(gen), colorDist(gen)), // 랜덤 색상
-            1.0f,                                              // 강도 (기본값)
-            0.0f,                                              // Inner Cutoff
-            0.0f,                                              // Outer Cutoff
-            0                                                 // 점광원 (type = 0)
-        };
-        m_lights.push_back(light);
-    }
-    m_numLights = m_lights.size(); // 광원 개수 설정
+    // for (size_t i = 0; i < 16; ++i) {
+    //     Light light {
+    //         glm::vec3(posDist(gen), posDist(gen), posDist(gen)), // 랜덤 위치
+    //         glm::vec3(0.0f, -1.0f, 0.0f),                      // 방향은 고정
+    //         glm::vec3(colorDist(gen), colorDist(gen), colorDist(gen)), // 랜덤 색상
+    //         1.0f,                                              // 강도 (기본값)
+    //         0.0f,                                              // Inner Cutoff
+    //         0.0f,                                              // Outer Cutoff
+    //         0                                                 // 점광원 (type = 0)
+    //     };
+    //     m_lights.push_back(light);
+    // }
+    // m_numLights = m_lights.size(); // 광원 개수 설정
 
 
     m_boxModel = Model::createBoxModel(m_defaultMaterial);
@@ -131,19 +133,25 @@ void Scene::initScene() {
     );
 
 
+    m_tmpPlaneObject = Object::createObject("tmpPlane", m_planeModel, 
+    Transform{glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    m_objects.push_back(m_tmpPlaneObject);
+
+
     m_floorObject = Object::createObject("floor", m_planeModel, 
     Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f)});
     m_objects.push_back(m_floorObject);
 
-    m_cameraModel = Model::createModel("Models/Camera_01_2k.gltf/Camera_01_2k.gltf", m_defaultMaterial);
-    m_cameraObject = Object::createObject("camera", m_cameraModel, 
-    Transform{glm::vec3(0.1f, -1.2f, 0.1f), glm::vec3(0.0f, -50.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_cameraObject);
 
     m_tableModel = Model::createModel("Models/coffee_table_round_01_4k.gltf/coffee_table_round_01_4k.gltf", m_defaultMaterial);
     m_tableObject = Object::createObject("table", m_tableModel, 
     Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
     m_objects.push_back(m_tableObject);
+
+    m_cameraModel = Model::createModel("Models/Camera_01_2k.gltf/Camera_01_2k.gltf", m_defaultMaterial);
+    m_cameraObject = Object::createObject("camera", m_cameraModel, 
+    Transform{glm::vec3(0.1f, -1.2f, 0.1f), glm::vec3(0.0f, -50.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    m_objects.push_back(m_cameraObject);
 
     m_sofaModel = Model::createModel("Models/Sofa_01_4k.gltf/Sofa_01_4k.gltf", m_defaultMaterial);
     m_sofaObject = Object::createObject("sofa", m_sofaModel, 

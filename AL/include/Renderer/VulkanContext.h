@@ -27,8 +27,10 @@ public:
 	VkDescriptorPool getDescriptorPool() { return descriptorPool; }
 	uint32_t getQueueFamily();
 	VkDescriptorSetLayout getGeometryPassDescriptorSetLayout() { return geometryPassDescriptorSetLayout; }
+	VkDescriptorSetLayout getShadowMapDescriptorSetLayout() { return shadowMapDescriptorSetLayout; }
 
 	void setGeometryPassDescriptorSetLayout(VkDescriptorSetLayout descriptorSetLayout) { geometryPassDescriptorSetLayout = descriptorSetLayout; }
+	void setShadowMapDescriptorSetLayout(VkDescriptorSetLayout descriptorSetLayout) { shadowMapDescriptorSetLayout = descriptorSetLayout; }
 private:
 	VulkanContext() { }
 	VulkanContext(VulkanContext const&) = delete;
@@ -45,6 +47,7 @@ private:
 	VkQueue presentQueue;
 	VkDescriptorPool descriptorPool;
 	VkDescriptorSetLayout geometryPassDescriptorSetLayout;
+	VkDescriptorSetLayout shadowMapDescriptorSetLayout;
 
 	void createInstance();
 	bool checkValidationLayerSupport();

@@ -74,6 +74,23 @@ void Model::draw(DrawInfo& drawInfo)
 	}
 }
 
+void Model::drawShadow(ShadowMapDrawInfo& drawInfo)
+{
+	auto& descriptorSets = drawInfo.shaderResourceManager->getDescriptorSets();
+	auto& uniformBuffers = drawInfo.shaderResourceManager->getUniformBuffers();
+	for (uint32_t i = 0; i < m_meshes.size(); i++)
+	{
+		uint32_t index = drawInfo.currentFrame;
+		vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0, 1, &descriptorSets[index], 0, nullptr);
+		ShadowMapUniformBufferObject shadowMapUbo{};
+		shadowMapUbo.model = drawInfo.model;
+		shadowMapUbo.view = drawInfo.view;
+		shadowMapUbo.proj = drawInfo.projection;
+		uniformBuffers[index]->updateUniformBuffer(&shadowMapUbo, sizeof(shadowMapUbo));
+		m_meshes[i]->draw(drawInfo.commandBuffer);
+	}
+}
+
 void Model::initModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
 	loadModel(path, defaultMaterial);

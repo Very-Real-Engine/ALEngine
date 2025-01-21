@@ -24,6 +24,16 @@ struct DrawInfo {
 	uint32_t currentFrame;
 };
 
+struct ShadowMapDrawInfo {
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
+	ShaderResourceManager* shaderResourceManager;
+	VkCommandBuffer commandBuffer;
+	VkPipelineLayout pipelineLayout;
+	uint32_t currentFrame;
+};
+
 class AL_API Model
 {
   public:
@@ -35,6 +45,7 @@ class AL_API Model
 	void cleanup();
 
 	void draw(DrawInfo& drawInfo);
+	void drawShadow(ShadowMapDrawInfo& drawInfo);
 	size_t getMeshCount() {return m_meshes.size();}
 	std::vector<std::shared_ptr<Mesh>>& getMeshes() {return m_meshes;}
 	std::vector<std::shared_ptr<Material>>& getMaterials() {return m_materials;}

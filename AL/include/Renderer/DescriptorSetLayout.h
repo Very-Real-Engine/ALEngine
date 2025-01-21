@@ -13,6 +13,7 @@ class AL_API DescriptorSetLayout
 	static std::unique_ptr<DescriptorSetLayout> createDescriptorSetLayout();
 	static std::unique_ptr<DescriptorSetLayout> createGeometryPassDescriptorSetLayout();
 	static std::unique_ptr<DescriptorSetLayout> createLightingPassDescriptorSetLayout();
+	static std::unique_ptr<DescriptorSetLayout> createShadowMapDescriptorSetLayout();
 	~DescriptorSetLayout()
 	{
 	}
@@ -29,6 +30,7 @@ class AL_API DescriptorSetLayout
 	void initDescriptorSetLayout();
 	void initGeometryPassDescriptorSetLayout();
 	void initLightingPassDescriptorSetLayout();
+	void initShadowMapDescriptorSetLayout();
 };
 } // namespace ale
 #endif

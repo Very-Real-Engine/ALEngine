@@ -298,17 +298,17 @@ void ShaderResourceManager::updateDescriptorSets(Model* model, std::vector<std::
 }
 
 std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
     std::unique_ptr<ShaderResourceManager> shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
-    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView);
+    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageView, shadowMapSampler);
     return shaderResourceManager;
 }
 
 
 void ShaderResourceManager::initLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
     createLightingPassUniformBuffers();
-    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView);
+    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageView, shadowMapSampler);
 }
 
 void ShaderResourceManager::createLightingPassUniformBuffers() {
@@ -329,7 +329,7 @@ void ShaderResourceManager::createLightingPassUniformBuffers() {
 }
 
 void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
     auto& context = VulkanContext::getContext();
     VkDevice device = context.getDevice();
     VkDescriptorPool descriptorPool = context.getDescriptorPool();
@@ -370,12 +370,17 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         pbrImageInfo.imageView = pbrImageView;
         pbrImageInfo.sampler = VK_NULL_HANDLE;
 
+        VkDescriptorImageInfo shadowMapImageInfo{};
+        shadowMapImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        shadowMapImageInfo.imageView = shadowMapImageView;
+        shadowMapImageInfo.sampler = shadowMapSampler;
+
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.buffer = m_fragmentUniformBuffers[i]->getBuffer();
         bufferInfo.offset = 0;
         bufferInfo.range = sizeof(LightingPassUniformBufferObject);
 
-        std::array<VkWriteDescriptorSet, 5> descriptorWrites{};
+        std::array<VkWriteDescriptorSet, 6> descriptorWrites{};
 
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrites[0].dstSet = descriptorSets[i];
@@ -412,9 +417,72 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         descriptorWrites[4].descriptorCount = 1;
         descriptorWrites[4].pBufferInfo = &bufferInfo;
 
+        // Shadow Map Descriptor
+        descriptorWrites[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[5].dstSet = descriptorSets[i];
+        descriptorWrites[5].dstBinding = 5;
+        descriptorWrites[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[5].descriptorCount = 1;
+        descriptorWrites[5].pImageInfo = &shadowMapImageInfo;
+
         vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }
 }
 
+
+std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createShadowMapShaderResourceManager() {
+    std::unique_ptr<ShaderResourceManager> shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+    shaderResourceManager->initShadowMapShaderResourceManager();
+    return shaderResourceManager;
+}
+
+void ShaderResourceManager::initShadowMapShaderResourceManager() {
+    createShadowMapUniformBuffers();
+    createShadowMapDescriptorSets();
+}
+
+void ShaderResourceManager::createShadowMapUniformBuffers() {
+    VkDeviceSize bufferSize = sizeof(ShadowMapUniformBufferObject);
+    m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        m_uniformBuffers[i] = UniformBuffer::createUniformBuffer(bufferSize);
+    }
+}
+
+void ShaderResourceManager::createShadowMapDescriptorSets() {
+    auto& context = VulkanContext::getContext();
+    VkDevice device = context.getDevice();
+    VkDescriptorPool descriptorPool = context.getDescriptorPool();
+    VkDescriptorSetLayout descriptorSetLayout = context.getShadowMapDescriptorSetLayout();
+
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    allocInfo.pSetLayouts = layouts.data();
+
+    descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+    if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to allocate shadow map descriptor sets!");
+    }
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        VkDescriptorBufferInfo bufferInfo{};
+        bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(ShadowMapUniformBufferObject);
+
+        VkWriteDescriptorSet descriptorWrite{};
+        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrite.dstSet = descriptorSets[i];
+        descriptorWrite.dstBinding = 0;
+        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrite.descriptorCount = 1;
+        descriptorWrite.pBufferInfo = &bufferInfo;
+
+        vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+    }
+}
 
 } // namespace ale

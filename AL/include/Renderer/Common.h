@@ -165,6 +165,8 @@ struct GeometryPassFragmentUniformBufferObject {
 };
 
 struct Light {
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
 	alignas(16) glm::vec3 position;      // 광원의 위치 (점광원, 스포트라이트)
     alignas(16) glm::vec3 direction;     // 광원의 방향 (스포트라이트, 방향성 광원)
     alignas(16) glm::vec3 color;         // 광원의 색상
@@ -183,15 +185,11 @@ struct LightingPassUniformBufferObject {
 };
 
 
-// struct LightingPassUniformBufferObject {
-//     alignas(16) glm::vec3 lightPos;       // 16바이트
-//     alignas(16) glm::vec3 lightDirection; // 16바이트
-//     alignas(16) glm::vec3 lightColor;     // 16바이트
-//     alignas(16) glm::vec3 cameraPos;      // 16바이트
-//     alignas(4) float intensity;           // 4바이트
-//     alignas(4) float ambientStrength;     // 4바이트
-//     alignas(8) glm::vec2 padding;         // 8바이트 (패딩)
-// };
+struct ShadowMapUniformBufferObject {
+	alignas(16) glm::mat4 proj;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 model;
+};
 
 } // namespace ale
 

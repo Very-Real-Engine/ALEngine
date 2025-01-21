@@ -168,7 +168,7 @@ void ImGuiLayer::renderDrawData(Scene* scene, VkCommandBuffer commandBuffer)
     }
 
 	auto& objects = scene->getObjects();
-    for (uint32_t index = 1; index < objects.size(); index++) {
+    for (uint32_t index = 0; index < objects.size(); index++) {
         std::string label = "Object: " + objects[index]->getName();
 
         if (ImGui::TreeNode(label.c_str())) {
