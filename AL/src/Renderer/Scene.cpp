@@ -132,12 +132,6 @@ void Scene::initScene() {
         {0.0f, m_defaultTextures.height, false}
     );
 
-
-    m_tmpPlaneObject = Object::createObject("tmpPlane", m_planeModel, 
-    Transform{glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_tmpPlaneObject);
-
-
     m_floorObject = Object::createObject("floor", m_planeModel, 
     Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f)});
     m_objects.push_back(m_floorObject);

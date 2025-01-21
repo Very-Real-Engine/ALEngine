@@ -123,7 +123,6 @@ class AL_API Renderer
 
 
 	void init(GLFWwindow* window);
-	void recordCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	void recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	void recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer);
 };
