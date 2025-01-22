@@ -109,7 +109,7 @@ private:
 	// lighting
 	std::vector<Light> m_lights;
 	uint32_t m_numLights { 0 };
-	float m_ambientStrength { 0.2f };
+	float m_ambientStrength { 0.01f };
 	std::vector<std::shared_ptr<Object>> m_lightObjects;
 	
 

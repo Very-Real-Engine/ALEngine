@@ -298,17 +298,17 @@ void ShaderResourceManager::updateDescriptorSets(Model* model, std::vector<std::
 }
 
 std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
     std::unique_ptr<ShaderResourceManager> shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
-    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageView, shadowMapSampler);
+    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageViews, shadowMapSamplers);
     return shaderResourceManager;
 }
 
 
 void ShaderResourceManager::initLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
     createLightingPassUniformBuffers();
-    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageView, shadowMapSampler);
+    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageViews, shadowMapSamplers);
 }
 
 void ShaderResourceManager::createLightingPassUniformBuffers() {
@@ -329,7 +329,7 @@ void ShaderResourceManager::createLightingPassUniformBuffers() {
 }
 
 void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, VkImageView shadowMapImageView, VkSampler shadowMapSampler) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
     auto& context = VulkanContext::getContext();
     VkDevice device = context.getDevice();
     VkDescriptorPool descriptorPool = context.getDescriptorPool();
@@ -370,15 +370,31 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         pbrImageInfo.imageView = pbrImageView;
         pbrImageInfo.sampler = VK_NULL_HANDLE;
 
-        VkDescriptorImageInfo shadowMapImageInfo{};
-        shadowMapImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        shadowMapImageInfo.imageView = shadowMapImageView;
-        shadowMapImageInfo.sampler = shadowMapSampler;
-
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.buffer = m_fragmentUniformBuffers[i]->getBuffer();
         bufferInfo.offset = 0;
         bufferInfo.range = sizeof(LightingPassUniformBufferObject);
+
+        // VkDescriptorImageInfo shadowMapImageInfo{};
+        // shadowMapImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        // shadowMapImageInfo.imageView = shadowMapImageView;
+        // shadowMapImageInfo.sampler = shadowMapSampler;
+
+        std::array<VkDescriptorImageInfo, 4> shadowMapInfos{};
+        for (size_t j = 0; j < shadowMapImageViews.size(); ++j) {
+            shadowMapInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            shadowMapInfos[j].imageView = shadowMapImageViews[j];
+            shadowMapInfos[j].sampler = shadowMapSamplers;
+        }
+
+        if (shadowMapImageViews.size() < 4) {
+            for (size_t j = shadowMapImageViews.size(); j < 4; ++j) {
+                shadowMapInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                shadowMapInfos[j].imageView = VK_NULL_HANDLE;
+                shadowMapInfos[j].sampler = VK_NULL_HANDLE;
+            }
+        }
+
 
         std::array<VkWriteDescriptorSet, 6> descriptorWrites{};
 
@@ -422,8 +438,8 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         descriptorWrites[5].dstSet = descriptorSets[i];
         descriptorWrites[5].dstBinding = 5;
         descriptorWrites[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrites[5].descriptorCount = 1;
-        descriptorWrites[5].pImageInfo = &shadowMapImageInfo;
+        descriptorWrites[5].descriptorCount = static_cast<uint32_t>(shadowMapInfos.size());
+        descriptorWrites[5].pImageInfo = shadowMapInfos.data();
 
         vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }

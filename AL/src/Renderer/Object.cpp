@@ -15,10 +15,10 @@ void Object::draw(DrawInfo& drawInfo)
 	m_renderingComponent->draw(drawInfo);
 }
 
-void Object::drawShadow(ShadowMapDrawInfo& drawInfo)
+void Object::drawShadow(ShadowMapDrawInfo& drawInfo, uint32_t index)
 {
 	drawInfo.model = getModelMatrix();
-	m_renderingComponent->drawShadow(drawInfo);
+	m_renderingComponent->drawShadow(drawInfo, index);
 }
 
 glm::mat4 Object::getModelMatrix()

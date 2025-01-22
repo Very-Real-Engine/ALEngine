@@ -173,7 +173,10 @@ struct Light {
     alignas(4) float intensity;          // 광원의 강도
     alignas(4) float innerCutoff;        // 스포트라이트 내부 각도 (cosine 값)
     alignas(4) float outerCutoff;        // 스포트라이트 외부 각도 (cosine 값)
-    alignas(4) uint32_t type;                 // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
+    alignas(4) uint32_t type;            // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
+	alignas(4) uint32_t onShadowMap;
+	alignas(4) uint32_t padding;
+	alignas(8) glm::vec2 padding2;
 };
 
 struct LightingPassUniformBufferObject {
@@ -181,7 +184,7 @@ struct LightingPassUniformBufferObject {
     alignas(16) glm::vec3 cameraPos;       // 카메라 위치
     alignas(4) uint32_t numLights;              // 활성화된 광원 개수
     alignas(4) float ambientStrength;      // 주변광 강도
-	alignas(8) glm::vec2 padding;         // 8바이트 (패딩)
+	alignas(8) glm::vec2 padding;
 };
 
 

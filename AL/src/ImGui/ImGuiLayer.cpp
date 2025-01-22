@@ -163,6 +163,10 @@ void ImGuiLayer::renderDrawData(Scene* scene, VkCommandBuffer commandBuffer)
 					lights[i].outerCutoff = glm::cos(glm::radians(outerCutoffDegree));
 				}
 			}
+
+			uint32_t& onShadowMap = lights[i].onShadowMap;
+			if (ImGui::Checkbox((lightLabelPrefix + " On Shadow Map").c_str(), reinterpret_cast<bool*>(&onShadowMap))) {
+			}
             ImGui::TreePop();
         }
     }

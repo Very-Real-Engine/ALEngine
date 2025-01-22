@@ -118,14 +118,10 @@ void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMateri
 {
 	// gltf, obj 구별해서 로드하자
 	if (path.find(".gltf") != std::string::npos) {
-		std::cout << "load gltf model" << std::endl;
 		loadGLTFModel(path, defaultMaterial);
-		std::cout << "mesh size: " << m_meshes.size() << std::endl;
 	}
 	else if (path.find(".obj") != std::string::npos) {
-		std::cout << "load obj model" << std::endl;
 		loadOBJModel(path, defaultMaterial);
-		std::cout << "mesh size: " << m_meshes.size() << std::endl;
 	}
 }
 
@@ -146,7 +142,6 @@ void Model::loadGLTFModel(std::string path, std::shared_ptr<Material>& defaultMa
 
 	// material부터 처리
 	std::vector<std::shared_ptr<Material>> materials(scene->mNumMaterials);
-	std::cout << "materials size: " << materials.size() << std::endl;
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 		materials[i] = processGLTFMaterial(scene->mMaterials[i], defaultMaterial, path);
 	}
@@ -183,14 +178,12 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
     float value;
 	
 	if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-		std::cout << "color: " << color.r << ", " << color.g << ", " << color.b << ", " << color.a << std::endl;
 		albedo.albedo = glm::vec3(color.r, color.g, color.b);
 	}
 	else {
 		albedo.albedo = defaultMaterial->getAlbedo().albedo;
 	}
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
-		std::cout << "texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		albedo.albedoTexture = Texture::createTexture(getMaterialPath(path, texturePath.C_Str()));
 		albedo.flag = true;
 	}
@@ -200,23 +193,19 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 	}
 
     if (material->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS) {
-		std::cout << "normal texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		normalMap.normalTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
         normalMap.flag = true;
     } else {
-		std::cout << "default normal texture" << std::endl;
         normalMap.normalTexture = defaultMaterial->getNormalMap().normalTexture;
         normalMap.flag = false;
     }
 
 	// Roughness Texture
     if (material->GetTexture(aiTextureType_UNKNOWN, 0, &texturePath) == AI_SUCCESS) {
-        std::cout << "roughness texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		roughness.roughnessTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
         roughness.flag = true;
 		roughness.roughness = 0.5f;
     } else {
-		std::cout << "default roughness texture" << std::endl;
         roughness.roughnessTexture = defaultMaterial->getRoughness().roughnessTexture;
         roughness.flag = false;
 		roughness.roughness = defaultMaterial->getRoughness().roughness;
@@ -224,12 +213,10 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// Metallic Texture
 	if (material->GetTexture(aiTextureType_UNKNOWN, 0, &texturePath) == AI_SUCCESS) {
-		std::cout << "metallic texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		metallic.metallicTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
 		metallic.flag = true;
 		metallic.metallic = defaultMaterial->getMetallic().metallic; // 기본 메탈릭 값 설정
 	} else {
-		std::cout << "default metallic texture" << std::endl;
 		metallic.metallicTexture = defaultMaterial->getMetallic().metallicTexture;
 		metallic.flag = false;
 		metallic.metallic = defaultMaterial->getMetallic().metallic; // 기본 메탈릭 값
@@ -237,12 +224,10 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// Ambient Occlusion Texture
 	if (material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath) == AI_SUCCESS) {
-		std::cout << "AO texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		ao.aoTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
 		ao.flag = true;
 		ao.ao = 1.0f; // 기본 AO 값 설정
 	} else {
-		std::cout << "default AO texture" << std::endl;
 		ao.aoTexture = defaultMaterial->getAOMap().aoTexture;
 		ao.flag = false;
 		ao.ao = defaultMaterial->getAOMap().ao; // 기본 AO 값
@@ -250,12 +235,10 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// HeightMap Texture
 	if (material->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS) {
-		std::cout << "height texture path: " << getMaterialPath(path, texturePath.C_Str()) << std::endl;
 		heightMap.heightTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
 		heightMap.flag = true;
 		heightMap.height = 0.0f; // 기본 Height 값 설정
 	} else {
-		std::cout << "default height texture" << std::endl;
 		heightMap.heightTexture = defaultMaterial->getHeightMap().heightTexture;
 		heightMap.flag = false;
 		heightMap.height = defaultMaterial->getHeightMap().height; // 기본 Height 값
@@ -269,7 +252,6 @@ void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std:
 	{
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		uint32_t materialIndex = mesh->mMaterialIndex;
-		std::cout << "material index: " << materialIndex << std::endl;
 		m_meshes.push_back(std::move(processGLTFMesh(mesh, scene, materials[materialIndex])));
 	}
 
@@ -293,7 +275,6 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 		}
 		else
 		{
-			std::cout << "no normal" << std::endl;
 			vertex.normal = {0.0f, 0.0f, 0.0f};
 		}
 		if (mesh->mTextureCoords[0])

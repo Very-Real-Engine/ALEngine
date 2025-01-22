@@ -140,7 +140,7 @@ void DescriptorSetLayout::initLightingPassDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding shadowMapBinding{};
     shadowMapBinding.binding = 5;
     shadowMapBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    shadowMapBinding.descriptorCount = 1;
+    shadowMapBinding.descriptorCount = 4;
     shadowMapBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     shadowMapBinding.pImmutableSamplers = nullptr;
 

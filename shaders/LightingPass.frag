@@ -15,6 +15,9 @@ struct Light {
     float innerCutoff;
     float outerCutoff;
     uint type;
+    uint onShadowMap;
+    uint padding;
+    vec2 padding2;
 };
 
 layout(binding = 4) uniform LightingInfo {
@@ -22,9 +25,10 @@ layout(binding = 4) uniform LightingInfo {
     vec3 cameraPos;
     uint numLights;
     float ambientStrength;
+    vec2 padding;
 };
 
-layout(binding = 5) uniform sampler2DShadow shadowMap;
+layout(binding = 5) uniform sampler2DShadow shadowMap[4];
 
 layout(location = 0) in vec2 fragTexCoord;
 layout(location = 0) out vec4 outColor;
@@ -76,6 +80,8 @@ void main() {
 
     float shadowFactor = 1.0;
 
+    uint shadowMapIndex = 0;
+
     for (uint i = 0; i < numLights; ++i) {
         vec3 L;
         float attenuation = 1.0;
@@ -100,22 +106,41 @@ void main() {
             float epsilon = max(lights[i].innerCutoff - lights[i].outerCutoff, 0.001);
             attenuation *= clamp((theta - lights[i].outerCutoff) / epsilon, 0.0, 1.0);
 
-            // Shadow Mapping (Spotlight만)
-            mat4 lightViewProj = lights[i].proj * lights[i].view;
-            vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
-            vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
-            shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;
 
-            float closestDepth = texture(shadowMap, shadowCoord);
-            float currentDepth = shadowCoord.z;
-            float bias = 0.005;
-            shadowFactor = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+            if (lights[i].onShadowMap == 1 && shadowMapIndex < 4) {
+                mat4 lightViewProj = lights[i].proj * lights[i].view;
+                vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
+                vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
+                shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;
 
-            attenuation *= shadowFactor;
+                float closestDepth = texture(shadowMap[shadowMapIndex], shadowCoord);
+                float currentDepth = shadowCoord.z;
+                float bias = 0.005;
+                shadowFactor = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+
+                attenuation *= shadowFactor;
+
+                shadowMapIndex++;
+            }
         }
         else { // Directional Light
             L = normalize(-lights[i].direction);
             attenuation = 1.0;
+
+            if (lights[i].onShadowMap == 1 && shadowMapIndex < 4) {
+                mat4 lightViewProj = lights[i].proj * lights[i].view;
+                vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
+                vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
+                shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;
+
+                float closestDepth = texture(shadowMap[shadowMapIndex], shadowCoord);
+                float currentDepth = shadowCoord.z;
+                float bias = 0.005;
+                shadowFactor = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+
+                attenuation *= shadowFactor;
+                shadowMapIndex++;
+            }
         }
 
         vec3 H = normalize(V + L);

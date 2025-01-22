@@ -98,33 +98,25 @@ class AL_API Renderer
 	std::vector<VkFence> inFlightFences;
 	uint32_t currentFrame = 0;
 
+	std::vector<std::unique_ptr<RenderPass>> m_shadowMapRenderPass;
+	std::vector<VkRenderPass> shadowMapRenderPass;
 
-	std::unique_ptr<RenderPass> m_shadowMapRenderPass;
-	VkRenderPass shadowMapRenderPass;
+	std::vector<std::unique_ptr<Pipeline>> m_shadowMapPipeline;
+	std::vector<VkPipelineLayout> shadowMapPipelineLayout;
+	std::vector<VkPipeline> shadowMapGraphicsPipeline;
 
-	std::unique_ptr<Pipeline> m_shadowMapPipeline;
-	VkPipelineLayout shadowMapPipelineLayout;
-	VkPipeline shadowMapGraphicsPipeline;
-
-	std::unique_ptr<FrameBuffers> m_shadowMapFrameBuffers;
-	std::vector<VkFramebuffer> shadowMapFramebuffers;
+	std::vector<std::unique_ptr<FrameBuffers>> m_shadowMapFrameBuffers;
+	std::vector<std::vector<VkFramebuffer>> shadowMapFramebuffers;
+	std::vector<VkImageView> shadowMapImageViews;
 
 	std::unique_ptr<DescriptorSetLayout> m_shadowMapDescriptorSetLayout;
 	VkDescriptorSetLayout shadowMapDescriptorSetLayout;
 
-	std::unique_ptr<ShaderResourceManager> m_shadowMapShaderResourceManager;
-	std::vector<VkDescriptorSet> shadowMapDescriptorSets;
-	std::vector< std::shared_ptr<UniformBuffer> > shadowMapUniformBuffers;
 	VkSampler shadowMapSampler;
 
-	std::unique_ptr<CommandBuffers> m_shadowMapCommandBuffers;
-	std::vector<VkCommandBuffer> shadowMapCommandBuffers;
-
-
-
 	void init(GLFWwindow* window);
-	void recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex);
-	void recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer);
+	void recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex, uint32_t shadowMapIndex);
+	void recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex);
 };
 } // namespace ale
 

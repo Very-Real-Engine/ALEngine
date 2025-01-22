@@ -83,29 +83,38 @@ void Scene::initScene() {
         1.0f,
         glm::cos(glm::radians(12.5f)),
         glm::cos(glm::radians(17.5f)),
-        1
+        1,
+        1,
+        0,
+        glm::vec2(0.0f, 0.0f)
     };
     m_lights.push_back(light1);
     m_numLights = m_lights.size();
 
-    // std::random_device rd;                              // 시드 생성
-    // std::mt19937 gen(rd());                             // 난수 생성기
-    // std::uniform_real_distribution<float> posDist(-3.0f, 3.0f); // 위치는 -5 ~ 5 사이
-    // std::uniform_real_distribution<float> colorDist(0.0f, 1.0f); // 색상은 0 ~ 1 사이
+    std::random_device rd;                              // 시드 생성
+    std::mt19937 gen(rd());                             // 난수 생성기
+    std::uniform_real_distribution<float> posDist(-3.0f, 3.0f); // 위치는 -5 ~ 5 사이
+    std::uniform_real_distribution<float> colorDist(0.0f, 1.0f); // 색상은 0 ~ 1 사이
+    std::uniform_real_distribution<float> dirDist(-1.0f, 1.0f); // 방향은 -1 ~ 1 사이
 
-    // for (size_t i = 0; i < 16; ++i) {
-    //     Light light {
-    //         glm::vec3(posDist(gen), posDist(gen), posDist(gen)), // 랜덤 위치
-    //         glm::vec3(0.0f, -1.0f, 0.0f),                      // 방향은 고정
-    //         glm::vec3(colorDist(gen), colorDist(gen), colorDist(gen)), // 랜덤 색상
-    //         1.0f,                                              // 강도 (기본값)
-    //         0.0f,                                              // Inner Cutoff
-    //         0.0f,                                              // Outer Cutoff
-    //         0                                                 // 점광원 (type = 0)
-    //     };
-    //     m_lights.push_back(light);
-    // }
-    // m_numLights = m_lights.size(); // 광원 개수 설정
+    for (size_t i = 0; i < 4; ++i) {
+        Light light {
+            glm::mat4(1.0f),
+            glm::mat4(1.0f),
+            glm::vec3(posDist(gen), 0.0f, posDist(gen)), // 랜덤 위치
+            glm::vec3(dirDist(gen), -1.0f, dirDist(gen)),                      // 방향은 고정
+            glm::vec3(colorDist(gen), colorDist(gen), colorDist(gen)), // 랜덤 색상
+            1.0f,                                              // 강도 (기본값)
+            glm::cos(glm::radians(12.5f)),
+            glm::cos(glm::radians(17.5f)),
+            1,                                                 // 점광원 (type = 0)
+            1,
+            0,
+            glm::vec2(0.0f, 0.0f)
+        };
+        m_lights.push_back(light);
+    }
+    m_numLights = m_lights.size(); // 광원 개수 설정
 
 
     m_boxModel = Model::createBoxModel(m_defaultMaterial);
