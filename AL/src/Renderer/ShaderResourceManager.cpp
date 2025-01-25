@@ -298,17 +298,24 @@ void ShaderResourceManager::updateDescriptorSets(Model* model, std::vector<std::
 }
 
 std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, 
+    VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers,
+    std::vector<VkImageView> &shadowCubeMapImageViews, VkSampler shadowCubeMapSampler) {
     std::unique_ptr<ShaderResourceManager> shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
-    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageViews, shadowMapSamplers);
+    shaderResourceManager->initLightingPassShaderResourceManager(descriptorSetLayout, positionImageView, normalImageView, 
+    albedoImageView, pbrImageView, shadowMapImageViews, shadowMapSamplers, shadowCubeMapImageViews, shadowCubeMapSampler);
     return shaderResourceManager;
 }
 
 
 void ShaderResourceManager::initLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, 
+    VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers,
+    std::vector<VkImageView> &shadowCubeMapImageViews, VkSampler shadowCubeMapSampler) {
     createLightingPassUniformBuffers();
-    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, albedoImageView, pbrImageView, shadowMapImageViews, shadowMapSamplers);
+    createLightingPassDescriptorSets(descriptorSetLayout, positionImageView, normalImageView, 
+    albedoImageView, pbrImageView, shadowMapImageViews, 
+    shadowMapSamplers, shadowCubeMapImageViews, shadowCubeMapSampler);
 }
 
 void ShaderResourceManager::createLightingPassUniformBuffers() {
@@ -329,7 +336,9 @@ void ShaderResourceManager::createLightingPassUniformBuffers() {
 }
 
 void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayout descriptorSetLayout, 
-    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers) {
+    VkImageView positionImageView, VkImageView normalImageView, VkImageView albedoImageView, 
+    VkImageView pbrImageView, std::vector<VkImageView> &shadowMapImageViews, VkSampler shadowMapSamplers,
+    std::vector<VkImageView> &shadowCubeMapImageViews, VkSampler shadowCubeMapSampler) {
     auto& context = VulkanContext::getContext();
     VkDevice device = context.getDevice();
     VkDescriptorPool descriptorPool = context.getDescriptorPool();
@@ -375,17 +384,13 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         bufferInfo.offset = 0;
         bufferInfo.range = sizeof(LightingPassUniformBufferObject);
 
-        // VkDescriptorImageInfo shadowMapImageInfo{};
-        // shadowMapImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        // shadowMapImageInfo.imageView = shadowMapImageView;
-        // shadowMapImageInfo.sampler = shadowMapSampler;
-
         std::array<VkDescriptorImageInfo, 4> shadowMapInfos{};
         for (size_t j = 0; j < shadowMapImageViews.size(); ++j) {
             shadowMapInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             shadowMapInfos[j].imageView = shadowMapImageViews[j];
             shadowMapInfos[j].sampler = shadowMapSamplers;
         }
+
 
         if (shadowMapImageViews.size() < 4) {
             for (size_t j = shadowMapImageViews.size(); j < 4; ++j) {
@@ -395,8 +400,22 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
             }
         }
 
+        std::array<VkDescriptorImageInfo, 4> shadowCubeMapInfos{};
+        for (size_t j = 0; j < 4; ++j) {
+            shadowCubeMapInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            shadowCubeMapInfos[j].imageView = shadowCubeMapImageViews[j];
+            shadowCubeMapInfos[j].sampler = shadowCubeMapSampler;
+        }
 
-        std::array<VkWriteDescriptorSet, 6> descriptorWrites{};
+        if (shadowCubeMapImageViews.size() < 4) {
+            for (size_t j = shadowCubeMapImageViews.size(); j < 4; ++j) {
+                shadowCubeMapInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                shadowCubeMapInfos[j].imageView = VK_NULL_HANDLE;
+                shadowCubeMapInfos[j].sampler = VK_NULL_HANDLE;
+            }
+        }
+
+        std::array<VkWriteDescriptorSet, 7> descriptorWrites{};
 
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrites[0].dstSet = descriptorSets[i];
@@ -440,6 +459,13 @@ void ShaderResourceManager::createLightingPassDescriptorSets(VkDescriptorSetLayo
         descriptorWrites[5].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         descriptorWrites[5].descriptorCount = static_cast<uint32_t>(shadowMapInfos.size());
         descriptorWrites[5].pImageInfo = shadowMapInfos.data();
+
+        descriptorWrites[6].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[6].dstSet = descriptorSets[i];
+        descriptorWrites[6].dstBinding = 6;
+        descriptorWrites[6].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[6].descriptorCount = static_cast<uint32_t>(shadowCubeMapInfos.size());
+        descriptorWrites[6].pImageInfo = shadowCubeMapInfos.data();
 
         vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }
@@ -500,5 +526,84 @@ void ShaderResourceManager::createShadowMapDescriptorSets() {
         vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
     }
 }
+
+std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createShadowCubeMapShaderResourceManager() {
+    std::unique_ptr<ShaderResourceManager> shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+    shaderResourceManager->initShadowCubeMapShaderResourceManager();
+    return shaderResourceManager;
+}
+
+void ShaderResourceManager::initShadowCubeMapShaderResourceManager() {
+    createShadowCubeMapUniformBuffers();
+    createShadowCubeMapDescriptorSets();
+}
+
+void ShaderResourceManager::createShadowCubeMapUniformBuffers() {
+    VkDeviceSize uniformBufferSize = sizeof(ShadowCubeMapUniformBufferObject);
+    VkDeviceSize layerIndexBufferSize = sizeof(ShadowCubeMapLayerIndex);
+    m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    m_layerIndexUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * 6);
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        m_uniformBuffers[i] = UniformBuffer::createUniformBuffer(uniformBufferSize);
+        for (size_t j = 0; j < 6; j++) {
+            m_layerIndexUniformBuffers[i * 6 + j] = UniformBuffer::createUniformBuffer(layerIndexBufferSize);
+        }
+    }   
+}
+
+void ShaderResourceManager::createShadowCubeMapDescriptorSets() {
+    auto& context = VulkanContext::getContext();
+    VkDevice device = context.getDevice();
+    VkDescriptorPool descriptorPool = context.getDescriptorPool();
+    VkDescriptorSetLayout descriptorSetLayout = context.getShadowCubeMapDescriptorSetLayout();
+
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 6, descriptorSetLayout);
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * 6);
+    allocInfo.pSetLayouts = layouts.data();
+
+    descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * 6);
+    if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to allocate shadow cube map descriptor sets!");
+    }
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (size_t j = 0; j < 6; j++) {
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(ShadowCubeMapUniformBufferObject);
+
+            VkDescriptorBufferInfo layerIndexBufferInfo{};
+            layerIndexBufferInfo.buffer = m_layerIndexUniformBuffers[i * 6 + j]->getBuffer();
+            layerIndexBufferInfo.offset = 0;
+            layerIndexBufferInfo.range = sizeof(ShadowCubeMapLayerIndex);
+
+            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet = descriptorSets[i * 6 + j];
+            descriptorWrites[0].dstBinding = 0;
+            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[1].dstSet = descriptorSets[i * 6 + j];
+            descriptorWrites[1].dstBinding = 1;
+            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[1].descriptorCount = 1;
+            descriptorWrites[1].pBufferInfo = &layerIndexBufferInfo;
+
+            vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+        }
+    }
+}
+
+
+
 
 } // namespace ale

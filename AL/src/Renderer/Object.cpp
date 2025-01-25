@@ -21,6 +21,11 @@ void Object::drawShadow(ShadowMapDrawInfo& drawInfo, uint32_t index)
 	m_renderingComponent->drawShadow(drawInfo, index);
 }
 
+void Object::drawShadowCubeMap(ShadowCubeMapDrawInfo& drawInfo, uint32_t index) {
+	drawInfo.model = getModelMatrix();
+	m_renderingComponent->drawShadowCubeMap(drawInfo, index);
+}
+
 glm::mat4 Object::getModelMatrix()
 {
 	glm::mat4 model = glm::mat4(1.0f);

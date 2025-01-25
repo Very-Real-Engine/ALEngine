@@ -144,13 +144,22 @@ void DescriptorSetLayout::initLightingPassDescriptorSetLayout() {
     shadowMapBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     shadowMapBinding.pImmutableSamplers = nullptr;
 
-    std::array<VkDescriptorSetLayoutBinding, 6> bindings = {
+    // Shadow Cube Map Sampler
+    VkDescriptorSetLayoutBinding shadowCubeMapBinding{};
+    shadowCubeMapBinding.binding = 6; // 새롭게 추가된 binding
+    shadowCubeMapBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    shadowCubeMapBinding.descriptorCount = 4;
+    shadowCubeMapBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shadowCubeMapBinding.pImmutableSamplers = nullptr;
+
+    std::array<VkDescriptorSetLayoutBinding, 7> bindings = {
         positionAttachmentBinding,
         normalAttachmentBinding,
         albedoAttachmentBinding,
         pbrAttachmentBinding,
         lightingUBOBinding,
-        shadowMapBinding
+        shadowMapBinding,
+        shadowCubeMapBinding
     };
 
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
@@ -193,5 +202,41 @@ void DescriptorSetLayout::initShadowMapDescriptorSetLayout() {
     }
 }
 
+std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::createShadowCubeMapDescriptorSetLayout() {
+    std::unique_ptr<DescriptorSetLayout> descriptorSetLayout = std::unique_ptr<DescriptorSetLayout>(new DescriptorSetLayout());
+    descriptorSetLayout->initShadowCubeMapDescriptorSetLayout();
+    return descriptorSetLayout;
+}
+
+void DescriptorSetLayout::initShadowCubeMapDescriptorSetLayout() {
+    auto& context = VulkanContext::getContext();
+    VkDevice device = context.getDevice();
+
+    // Uniform buffer binding for ShadowUniformBufferObject
+    VkDescriptorSetLayoutBinding shadowUBOLayoutBinding{};
+    shadowUBOLayoutBinding.binding = 0; // Matches shader binding
+    shadowUBOLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    shadowUBOLayoutBinding.descriptorCount = 1;
+    shadowUBOLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT; // Used in vertex shader
+    shadowUBOLayoutBinding.pImmutableSamplers = nullptr;
+
+    VkDescriptorSetLayoutBinding layerIndexBinding{};   
+    layerIndexBinding.binding = 1;
+    layerIndexBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    layerIndexBinding.descriptorCount = 1;
+    layerIndexBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    layerIndexBinding.pImmutableSamplers = nullptr;
+
+    std::array<VkDescriptorSetLayoutBinding, 2> bindings = {shadowUBOLayoutBinding, layerIndexBinding};
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo{};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+    layoutInfo.pBindings = bindings.data();
+
+    if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create shadow pass descriptor set layout!");
+    }
+}
 
 } // namespace ale

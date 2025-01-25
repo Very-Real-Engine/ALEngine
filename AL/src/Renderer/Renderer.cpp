@@ -43,10 +43,19 @@ void Renderer::init(GLFWwindow* window) {
         shadowMapRenderPass.push_back(m_shadowMapRenderPass[i]->getRenderPass());
     }
 
+    for (size_t i = 0; i < 4; i++) {
+        m_shadowCubeMapRenderPass.push_back(RenderPass::createShadowMapRenderPass());
+        shadowCubeMapRenderPass.push_back(m_shadowCubeMapRenderPass[i]->getRenderPass());
+    }
+
 
     m_shadowMapDescriptorSetLayout = DescriptorSetLayout::createShadowMapDescriptorSetLayout();
     shadowMapDescriptorSetLayout = m_shadowMapDescriptorSetLayout->getDescriptorSetLayout();
     context.setShadowMapDescriptorSetLayout(shadowMapDescriptorSetLayout);
+
+    m_shadowCubeMapDescriptorSetLayout = DescriptorSetLayout::createShadowCubeMapDescriptorSetLayout();
+    shadowCubeMapDescriptorSetLayout = m_shadowCubeMapDescriptorSetLayout->getDescriptorSetLayout();
+    context.setShadowCubeMapDescriptorSetLayout(shadowCubeMapDescriptorSetLayout);
 
     for (size_t i = 0; i < 4; i++) {
         m_shadowMapFrameBuffers.push_back(FrameBuffers::createShadowMapFrameBuffers(shadowMapRenderPass[i]));
@@ -54,7 +63,14 @@ void Renderer::init(GLFWwindow* window) {
         shadowMapImageViews.push_back(m_shadowMapFrameBuffers[i]->getDepthImageView());
     }
 
+    for (size_t i = 0; i < 4; i++) {
+        m_shadowCubeMapFrameBuffers.push_back(FrameBuffers::createShadowCubeMapFrameBuffers(shadowCubeMapRenderPass[i]));
+        shadowCubeMapFramebuffers.push_back(m_shadowCubeMapFrameBuffers[i]->getFramebuffers());
+        shadowCubeMapImageViews.push_back(m_shadowCubeMapFrameBuffers[i]->getDepthImageView());
+    }
+
     shadowMapSampler = Texture::createShadowMapSampler();
+    shadowCubeMapSampler = Texture::createShadowCubeMapSampler();
 
     for (size_t i = 0; i < 4; i++) {
         m_shadowMapPipeline.push_back(Pipeline::createShadowMapPipeline(shadowMapRenderPass[i], shadowMapDescriptorSetLayout));
@@ -62,6 +78,11 @@ void Renderer::init(GLFWwindow* window) {
         shadowMapGraphicsPipeline.push_back(m_shadowMapPipeline[i]->getPipeline());
     }
 
+    for (size_t i = 0; i < 4; i++) {
+        m_shadowCubeMapPipeline.push_back(Pipeline::createShadowCubeMapPipeline(shadowCubeMapRenderPass[i], shadowCubeMapDescriptorSetLayout));
+        shadowCubeMapPipelineLayout.push_back(m_shadowCubeMapPipeline[i]->getPipelineLayout());
+        shadowCubeMapGraphicsPipeline.push_back(m_shadowCubeMapPipeline[i]->getPipeline());
+    }
 
     m_deferredRenderPass = RenderPass::createDeferredRenderPass(swapChainImageFormat);
     deferredRenderPass = m_deferredRenderPass->getRenderPass();
@@ -77,7 +98,8 @@ void Renderer::init(GLFWwindow* window) {
     lightingPassDescriptorSetLayout = m_lightingPassDescriptorSetLayout->getDescriptorSetLayout();
     
     m_lightingPassShaderResourceManager = ShaderResourceManager::createLightingPassShaderResourceManager(lightingPassDescriptorSetLayout, 
-    m_swapChainFrameBuffers->getPositionImageView(), m_swapChainFrameBuffers->getNormalImageView(), m_swapChainFrameBuffers->getAlbedoImageView(), m_swapChainFrameBuffers->getPbrImageView(), shadowMapImageViews, shadowMapSampler);
+    m_swapChainFrameBuffers->getPositionImageView(), m_swapChainFrameBuffers->getNormalImageView(), m_swapChainFrameBuffers->getAlbedoImageView(), 
+    m_swapChainFrameBuffers->getPbrImageView(), shadowMapImageViews, shadowMapSampler, shadowCubeMapImageViews, shadowCubeMapSampler);
     lightingPassDescriptorSets = m_lightingPassShaderResourceManager->getDescriptorSets();
     lightingPassFragmentUniformBuffers = m_lightingPassShaderResourceManager->getFragmentUniformBuffers();
     m_geometryPassPipeline = Pipeline::createGeometryPassPipeline(deferredRenderPass, geometryPassDescriptorSetLayout);
@@ -158,10 +180,12 @@ void Renderer::drawFrame(Scene* scene) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
     
+
     uint32_t shadowMapIndex = 0;
     for (size_t i = 0; i < scene->getLights().size() && shadowMapIndex < 4; i++) {
         if (scene->getLights()[i].onShadowMap == 1) {
             recordShadowMapCommandBuffer(scene, commandBuffers[currentFrame], i, shadowMapIndex);
+            recordShadowCubeMapCommandBuffer(scene, commandBuffers[currentFrame], i, shadowMapIndex);
             shadowMapIndex++;
         }
     }
@@ -275,7 +299,8 @@ void Renderer::recreateSwapChain() {
     lightingPassGraphicsPipeline = m_lightingPassPipeline->getPipeline();
 
     m_lightingPassShaderResourceManager = ShaderResourceManager::createLightingPassShaderResourceManager(lightingPassDescriptorSetLayout,
-    m_swapChainFrameBuffers->getPositionImageView(), m_swapChainFrameBuffers->getNormalImageView(), m_swapChainFrameBuffers->getAlbedoImageView(), m_swapChainFrameBuffers->getPbrImageView(), shadowMapImageViews, shadowMapSampler);
+    m_swapChainFrameBuffers->getPositionImageView(), m_swapChainFrameBuffers->getNormalImageView(), m_swapChainFrameBuffers->getAlbedoImageView(), 
+    m_swapChainFrameBuffers->getPbrImageView(), shadowMapImageViews, shadowMapSampler, shadowCubeMapImageViews, shadowCubeMapSampler);
     lightingPassDescriptorSets = m_lightingPassShaderResourceManager->getDescriptorSets();
     lightingPassFragmentUniformBuffers = m_lightingPassShaderResourceManager->getFragmentUniformBuffers();
 }
@@ -360,6 +385,7 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuff
 
     std::memset(&lightingPassUbo, 0, sizeof(lightingPassUbo));
     auto& lights = scene->getLights();
+    uint32_t index = 0;
     for (size_t i = 0; i < lights.size(); i++) {
         glm::vec3 lightPos = lights[i].position;
         glm::vec3 lightDir = glm::normalize(lights[i].direction);
@@ -367,41 +393,52 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuff
         lightingPassUbo.lights[i] = lights[i];
         glm::vec3 up = (glm::abs(lightDir.y) > 0.99f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
 
-        if (lights[i].type == 1) {
-            lightingPassUbo.lights[i].view = glm::lookAt(
-                lightPos,
-                lightPos + lightDir,
-                up
-            );
-            lightingPassUbo.lights[i].proj = glm::perspective(
-                glm::acos(outerCutoff) * 2.0f,
-                1.0f,
-                0.1f,
-                100.0f
-            );
-            lightingPassUbo.lights[i].proj[1][1] *= -1;
-        }
-        else if (lights[i].type == 2) {
-            lightPos = glm::vec3(0.0f) - lightDir * 10.0f;
-            lightingPassUbo.lights[i].view = glm::lookAt(
-                lightPos,
-                glm::vec3(0.0f),
-                up
-            );
-            float orthoSize = 10.0f;
-            lightingPassUbo.lights[i].proj = glm::ortho(
-                -orthoSize, orthoSize,
-                -orthoSize, orthoSize,
-                -10.0f, 20.0f
-            );
-            lightingPassUbo.lights[i].proj[1][1] *= -1;
+        if (lights[i].onShadowMap == 1 && index < shadowMapIndex) {
+            if (lights[i].type == 0) {
+                lightingPassUbo.view[index][0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+                lightingPassUbo.view[index][1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+                lightingPassUbo.view[index][2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+                lightingPassUbo.view[index][3] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+                lightingPassUbo.view[index][4] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+                lightingPassUbo.view[index][5] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+                lightingPassUbo.proj[index] = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+                // lightingPassUbo.proj[index][1][1] *= -1;
+            }
+            else if (lights[i].type == 1) {
+                lightingPassUbo.view[index][0] = glm::lookAt(
+                    lightPos,
+                    lightPos + lightDir,
+                    up
+                );
+                lightingPassUbo.proj[index] = glm::perspective(
+                    glm::acos(outerCutoff) * 2.0f,
+                    1.0f,
+                    0.1f,
+                    100.0f
+                );
+                lightingPassUbo.proj[index][1][1] *= -1;
+            }
+            else if (lights[i].type == 2) {
+                lightPos = glm::vec3(0.0f) - lightDir * 10.0f;
+                lightingPassUbo.view[index][0] = glm::lookAt(
+                    lightPos,
+                    glm::vec3(0.0f),
+                    up
+                );
+                float orthoSize = 10.0f;
+                lightingPassUbo.proj[index] = glm::ortho(
+                    -orthoSize, orthoSize,
+                    -orthoSize, orthoSize,
+                    -10.0f, 20.0f
+                );
+                lightingPassUbo.proj[index][1][1] *= -1;
+            }
+            index++;
         }
     }
     lightingPassUbo.numLights = static_cast<uint32_t>(lights.size());
     lightingPassUbo.cameraPos = scene->getCamPos();
     lightingPassUbo.ambientStrength = scene->getAmbientStrength();
-
-
     lightingPassFragmentUniformBuffers[currentFrame]->updateUniformBuffer(&lightingPassUbo, sizeof(lightingPassUbo));
     vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 
@@ -433,6 +470,30 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuff
             1, &barrierToDepthWrite
         );
     }
+
+
+    VkImageMemoryBarrier barrierToDepthWrite{};
+    barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    barrierToDepthWrite.image = m_shadowCubeMapFrameBuffers[0]->getDepthImage();
+    barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
+    barrierToDepthWrite.subresourceRange.levelCount = 1;
+    barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
+    barrierToDepthWrite.subresourceRange.layerCount = 1;
+
+    vkCmdPipelineBarrier(
+        commandBuffer,
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrierToDepthWrite
+    );
 }
 
 void Renderer::recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex) {
@@ -543,6 +604,97 @@ void Renderer::recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer comman
     barrierToShaderRead.subresourceRange.levelCount = 1;
     barrierToShaderRead.subresourceRange.baseArrayLayer = 0;
     barrierToShaderRead.subresourceRange.layerCount = 1;
+
+    vkCmdPipelineBarrier(
+        commandBuffer,
+        VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrierToShaderRead
+    );
+
+}
+
+void Renderer::recordShadowCubeMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex) {
+
+    VkClearValue clearValue{};
+    clearValue.depthStencil = {1.0f, 0};
+
+    // Render Pass 시작 정보 설정
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = shadowCubeMapRenderPass[shadowMapIndex]; // Shadow Map 전용 RenderPass
+    renderPassInfo.framebuffer = shadowCubeMapFramebuffers[shadowMapIndex][currentFrame]; // 첫 번째 Framebuffer
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = {2048, 2048}; // 고정된 Shadow Map 크기
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearValue;
+
+    // Render Pass 시작
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    // Shadow Map 파이프라인 바인딩
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowCubeMapGraphicsPipeline[shadowMapIndex]);
+
+    // Viewport 및 Scissor 설정
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = 2048.0f;
+    viewport.height = 2048.0f;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+    VkRect2D scissor{};
+    scissor.offset = {0, 0};
+    scissor.extent = {2048, 2048};
+    vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+    // Depth Bias 설정
+    vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
+
+    auto& objects = scene->getObjects();
+    size_t objectCount = objects.size();
+    auto& Lights = scene->getLights();
+    auto& lightInfo = Lights[lightIndex];
+
+    glm::vec3 lightPos = lightInfo.position;
+    glm::mat4 lightProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+    // lightProj[1][1] *= -1;
+    
+    ShadowCubeMapDrawInfo drawInfo;
+    drawInfo.view[0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    drawInfo.view[1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+    drawInfo.view[2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+    drawInfo.view[3] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+    drawInfo.view[4] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+    drawInfo.view[5] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+    drawInfo.projection = lightProj;
+    drawInfo.commandBuffer = commandBuffer;
+    drawInfo.pipelineLayout = shadowCubeMapPipelineLayout[shadowMapIndex];
+    drawInfo.currentFrame = currentFrame;
+    for (size_t i = 0; i < objectCount; i++) {
+        objects[i]->drawShadowCubeMap(drawInfo, shadowMapIndex);
+    }
+
+    // Render Pass 종료
+    vkCmdEndRenderPass(commandBuffer);
+
+    VkImageMemoryBarrier barrierToShaderRead{};
+    barrierToShaderRead.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrierToShaderRead.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    barrierToShaderRead.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrierToShaderRead.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    barrierToShaderRead.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrierToShaderRead.image = m_shadowCubeMapFrameBuffers[shadowMapIndex]->getDepthImage();
+    barrierToShaderRead.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    barrierToShaderRead.subresourceRange.baseMipLevel = 0;
+    barrierToShaderRead.subresourceRange.levelCount = 1;
+    barrierToShaderRead.subresourceRange.baseArrayLayer = 0;
+    barrierToShaderRead.subresourceRange.layerCount = 6;
 
     vkCmdPipelineBarrier(
         commandBuffer,

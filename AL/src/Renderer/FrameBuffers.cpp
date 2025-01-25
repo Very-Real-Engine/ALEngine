@@ -160,4 +160,43 @@ void FrameBuffers::initShadowMapFrameBuffers(VkRenderPass renderPass) {
     }
 }
 
+std::unique_ptr<FrameBuffers> FrameBuffers::createShadowCubeMapFrameBuffers(VkRenderPass renderPass) {
+    std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
+    frameBuffers->initShadowCubeMapFrameBuffers(renderPass);
+    return frameBuffers;
+}
+
+void FrameBuffers::initShadowCubeMapFrameBuffers(VkRenderPass renderPass) {
+    auto& context = VulkanContext::getContext();
+    VkDevice device = context.getDevice();
+
+    // 고정된 크기 설정 (Cube Map의 크기)
+    const uint32_t shadowMapSize = 2048;
+
+    // Cube Map 깊이 이미지 생성
+    VulkanUtil::createCubeMapImage(
+        shadowMapSize, shadowMapSize, 1, VK_SAMPLE_COUNT_1_BIT,
+        VK_FORMAT_D32_SFLOAT, VK_IMAGE_TILING_OPTIMAL,
+        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+
+    depthImageView = VulkanUtil::createCubeMapImageView(depthImage, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
+
+    framebuffers.resize(2);
+    for (size_t i = 0; i < 2; i++) {
+        // 프레임버퍼 생성 (Cube Map 자체에 대해 단일 프레임버퍼 생성)
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = &depthImageView;
+        framebufferInfo.width = shadowMapSize;
+        framebufferInfo.height = shadowMapSize;
+        framebufferInfo.layers = 6;
+        
+        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create point light shadow map framebuffer!");
+        }
+    }
+}
 } // namespace ale

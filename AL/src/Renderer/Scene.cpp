@@ -73,10 +73,12 @@ void Scene::initScene() {
     m_cameraPitch = 0.0f;
     m_cameraYaw = 0.0f;
 
-
+    glm::mat4 view[6];
+    for (int i = 0; i < 6; i++) {
+        view[i] = glm::mat4(1.0f);
+    }
+    glm::mat4 proj = glm::mat4(1.0f);
     Light light1 {
-        glm::mat4(1.0f),
-        glm::mat4(1.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, -1.0f, 0.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
@@ -99,8 +101,6 @@ void Scene::initScene() {
 
     for (size_t i = 0; i < 4; ++i) {
         Light light {
-            glm::mat4(1.0f),
-            glm::mat4(1.0f),
             glm::vec3(posDist(gen), 0.0f, posDist(gen)), // 랜덤 위치
             glm::vec3(dirDist(gen), -1.0f, dirDist(gen)),                      // 방향은 고정
             glm::vec3(colorDist(gen), colorDist(gen), colorDist(gen)), // 랜덤 색상

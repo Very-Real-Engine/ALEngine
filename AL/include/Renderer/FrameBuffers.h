@@ -13,11 +13,13 @@ class AL_API FrameBuffers
 public:
 	static std::unique_ptr<FrameBuffers> createSwapChainFrameBuffers(SwapChain* swapChain, VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createShadowMapFrameBuffers(VkRenderPass renderPass);
+	static std::unique_ptr<FrameBuffers> createShadowCubeMapFrameBuffers(VkRenderPass renderPass);
 	~FrameBuffers() {}
 	void cleanup();
 
 	void initSwapChainFrameBuffers(SwapChain* swapChain, VkRenderPass renderPass);
 	void initShadowMapFrameBuffers(VkRenderPass renderPass);
+	void initShadowCubeMapFrameBuffers(VkRenderPass renderPass);
 
 	std::vector<VkFramebuffer>& getFramebuffers() { return framebuffers; }
 	VkImage& getDepthImage() { return depthImage; }

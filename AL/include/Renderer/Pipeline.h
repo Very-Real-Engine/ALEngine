@@ -14,6 +14,7 @@ public:
 	static std::unique_ptr<Pipeline> createGeometryPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	static std::unique_ptr<Pipeline> createLightingPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	static std::unique_ptr<Pipeline> createShadowMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
+	static std::unique_ptr<Pipeline> createShadowCubeMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	~Pipeline() {}
 	void cleanup();
 
@@ -28,7 +29,7 @@ private:
 	void initGeometryPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	void initLightingPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	void initShadowMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
-
+	void initShadowCubeMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 };
 } // namespace ale

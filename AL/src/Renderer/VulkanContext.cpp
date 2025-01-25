@@ -52,7 +52,7 @@ void VulkanContext::createInstance() {
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.pEngineName = "No Engine";
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
+    appInfo.apiVersion = VK_API_VERSION_1_2;
 
     // 인스턴스 생성을 위한 정보를 담은 구조체
     VkInstanceCreateInfo createInfo{};
@@ -126,7 +126,6 @@ std::vector<const char*> VulkanContext::getRequiredExtensions() {
     if (enableValidationLayers) {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
-    
     return extensions;
 }
 
@@ -218,6 +217,7 @@ void VulkanContext::createLogicalDevice() {
     VkPhysicalDeviceFeatures deviceFeatures{};
     deviceFeatures.samplerAnisotropy = VK_TRUE;		// 이방성 필터링 사용 설정
     deviceFeatures.sampleRateShading = VK_TRUE; 	// 디바이스에 샘플 셰이딩 기능 활성화
+    deviceFeatures.multiViewport = VK_TRUE;     // gl_Layer를 활성화하기 위해 추가
 
     // 논리적 장치 생성을 위한 정보 등록
     VkDeviceCreateInfo createInfo{};

@@ -281,4 +281,40 @@ VkSampler Texture::createShadowMapSampler() {
 	return depthMapSampler;
 }
 
+VkSampler Texture::createShadowCubeMapSampler() {
+    auto& context = VulkanContext::getContext();
+    auto device = context.getDevice();
+    auto physicalDevice = context.getPhysicalDevice();
+
+    // GPU의 속성 정보를 가져오는 구조체
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+    // 큐브맵 샘플러 생성 정보
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR; // 확대 시 선형 필터링
+    samplerInfo.minFilter = VK_FILTER_LINEAR; // 축소 시 선형 필터링
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE; // U축 클램핑
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE; // V축 클램핑
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE; // W축 클램핑
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE; // 경계 색상
+    samplerInfo.anisotropyEnable = VK_TRUE; // 이방성 필터링 활성화
+    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy; // 디바이스에서 지원하는 최대 이방성 값
+    samplerInfo.compareEnable = VK_TRUE; // 깊이 비교 샘플링 활성화
+    samplerInfo.compareOp = VK_COMPARE_OP_LESS; // 깊이 비교 연산
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR; // Mipmap 보간 모드
+    samplerInfo.minLod = 0.0f; // 최소 LOD
+    samplerInfo.maxLod = 0.0f; // 최대 LOD (Mipmap 미사용)
+    samplerInfo.mipLodBias = 0.0f; // Mipmap Bias 비활성화
+    samplerInfo.unnormalizedCoordinates = VK_FALSE; // 정규화된 텍스처 좌표 사용
+
+    VkSampler cubeMapSampler;
+    if (vkCreateSampler(device, &samplerInfo, nullptr, &cubeMapSampler) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create cube map sampler in Texture::createCubeMapSampler");
+    }
+
+    return cubeMapSampler;
+}
+
 } // namespace ale

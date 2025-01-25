@@ -91,6 +91,31 @@ void Model::drawShadow(ShadowMapDrawInfo& drawInfo)
 	}
 }
 
+void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo& drawInfo) {
+	auto& descriptorSets = drawInfo.shaderResourceManager->getDescriptorSets();
+	auto& uniformBuffers = drawInfo.shaderResourceManager->getUniformBuffers();
+	auto& layerIndexUniformBuffers = drawInfo.shaderResourceManager->getLayerIndexUniformBuffers();
+	uint32_t currentFrame = drawInfo.currentFrame;
+	ShadowCubeMapUniformBufferObject shadowCubeMapUbo{};
+	shadowCubeMapUbo.model = drawInfo.model;
+	shadowCubeMapUbo.proj = drawInfo.projection;
+	for (uint32_t i = 0; i < 6; i++) {
+		shadowCubeMapUbo.view[i] = drawInfo.view[i];
+	}
+
+	for (uint32_t i = 0; i < 6; i++) {
+		uint32_t index = currentFrame * 6 + i;
+		for (uint32_t j = 0; j < m_meshes.size(); j++) {
+			vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0, 1, &descriptorSets[index], 0, nullptr);
+			uniformBuffers[currentFrame]->updateUniformBuffer(&shadowCubeMapUbo, sizeof(shadowCubeMapUbo));
+			ShadowCubeMapLayerIndex layerIndexUbo{};
+			layerIndexUbo.layerIndex = i;
+			layerIndexUniformBuffers[index]->updateUniformBuffer(&layerIndexUbo, sizeof(layerIndexUbo));
+			m_meshes[j]->draw(drawInfo.commandBuffer);
+		}
+	}
+}
+
 void Model::initModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
 	loadModel(path, defaultMaterial);

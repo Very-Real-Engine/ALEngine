@@ -33,7 +33,7 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
 // 스왑 체인 확장
-const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_SHADER_VIEWPORT_INDEX_LAYER_EXTENSION_NAME };
 
 // 디버그 모드시 검증 레이어 사용
 #ifdef NDEBUG
@@ -165,8 +165,6 @@ struct GeometryPassFragmentUniformBufferObject {
 };
 
 struct Light {
-	alignas(16) glm::mat4 view;
-	alignas(16) glm::mat4 proj;
 	alignas(16) glm::vec3 position;      // 광원의 위치 (점광원, 스포트라이트)
     alignas(16) glm::vec3 direction;     // 광원의 방향 (스포트라이트, 방향성 광원)
     alignas(16) glm::vec3 color;         // 광원의 색상
@@ -182,6 +180,8 @@ struct Light {
 struct LightingPassUniformBufferObject {
 	alignas(16) Light lights[16];  	// 최대 16개의 광원 정보
     alignas(16) glm::vec3 cameraPos;       // 카메라 위치
+	alignas(16) glm::mat4 view[4][6];
+	alignas(16) glm::mat4 proj[4];
     alignas(4) uint32_t numLights;              // 활성화된 광원 개수
     alignas(4) float ambientStrength;      // 주변광 강도
 	alignas(8) glm::vec2 padding;
@@ -192,6 +192,16 @@ struct ShadowMapUniformBufferObject {
 	alignas(16) glm::mat4 proj;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 model;
+};
+
+struct ShadowCubeMapUniformBufferObject {
+	alignas(16) glm::mat4 proj;
+	alignas(16) glm::mat4 view[6];
+	alignas(16) glm::mat4 model;
+};
+
+struct ShadowCubeMapLayerIndex {
+	alignas(4) uint32_t layerIndex;
 };
 
 } // namespace ale

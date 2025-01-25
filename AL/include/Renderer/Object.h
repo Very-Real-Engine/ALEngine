@@ -19,6 +19,7 @@ public:
 
 	void draw(DrawInfo& drawInfo);
 	void drawShadow(ShadowMapDrawInfo& drawInfo, uint32_t index);
+	void drawShadowCubeMap(ShadowCubeMapDrawInfo& drawInfo, uint32_t index);
 
 	glm::mat4 getModelMatrix();
 

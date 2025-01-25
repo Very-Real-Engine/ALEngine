@@ -6,8 +6,6 @@ layout(input_attachment_index = 2, binding = 2) uniform subpassInput albedoAttac
 layout(input_attachment_index = 3, binding = 3) uniform subpassInput pbrAttachment;
 
 struct Light {
-    mat4 view;
-    mat4 proj;
     vec3 position;
     vec3 direction;
     vec3 color;
@@ -23,12 +21,15 @@ struct Light {
 layout(binding = 4) uniform LightingInfo {
     Light lights[16];
     vec3 cameraPos;
+    mat4 view[4][6];
+    mat4 proj[4];
     uint numLights;
     float ambientStrength;
     vec2 padding;
 };
 
 layout(binding = 5) uniform sampler2DShadow shadowMap[4];
+layout(binding = 6) uniform samplerCube shadowCubeMap[4];
 
 layout(location = 0) in vec2 fragTexCoord;
 layout(location = 0) out vec4 outColor;
@@ -59,6 +60,26 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     float NdotL = max(dot(N, L), 0.0);
     return geometrySchlickGGX(NdotV, roughness) * geometrySchlickGGX(NdotL, roughness);
 }
+
+uint getCubeFace(vec3 L) {
+    vec3 absL = abs(L);
+    uint faceIndex;
+
+    if (absL.x > absL.y && absL.x > absL.z) {
+        // +X or -X
+        faceIndex = (L.x > 0.0) ? 0u : 1u;
+    } else if (absL.y > absL.x && absL.y > absL.z) {
+        // +Y or -Y
+        faceIndex = (L.y > 0.0) ? 2u : 3u;
+    } else {
+        // +Z or -Z
+        faceIndex = (L.z > 0.0) ? 4u : 5u;
+    }
+
+    return faceIndex;
+}
+
+
 
 void main() {
     vec3 fragPosition = subpassLoad(positionAttachment).rgb;
@@ -93,6 +114,24 @@ void main() {
             float linear = 0.09;
             float quadratic = 0.032;
             attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
+
+            // Shadow Cube Map 샘플링
+            if (lights[i].onShadowMap == 1) {
+                float closestDepth = texture(shadowCubeMap[shadowMapIndex], -L).r; // -L: light 방향
+                uint faceIndex = getCubeFace(-L);
+                mat4 lightView = view[shadowMapIndex][faceIndex];
+                mat4 lightProj = proj[shadowMapIndex];
+
+                mat4 lightViewProj = lightProj * lightView;
+
+                vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
+                float currentDepth = lightSpacePosition.z / lightSpacePosition.w;
+
+                float bias = 0.005;
+                shadowFactor = currentDepth - bias > closestDepth ? 0.0 : 1.0;  
+                attenuation *= shadowFactor;
+                shadowMapIndex++;
+            }
         }
         else if (lights[i].type == 1) { // Spot Light
             L = normalize(lights[i].position - fragPosition);
@@ -108,7 +147,7 @@ void main() {
 
 
             if (lights[i].onShadowMap == 1 && shadowMapIndex < 4) {
-                mat4 lightViewProj = lights[i].proj * lights[i].view;
+                mat4 lightViewProj = proj[shadowMapIndex] * view[shadowMapIndex][0];
                 vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
                 vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
                 shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;
@@ -128,7 +167,7 @@ void main() {
             attenuation = 1.0;
 
             if (lights[i].onShadowMap == 1 && shadowMapIndex < 4) {
-                mat4 lightViewProj = lights[i].proj * lights[i].view;
+                mat4 lightViewProj = proj[shadowMapIndex] * view[shadowMapIndex][0];
                 vec4 lightSpacePosition = lightViewProj * vec4(fragPosition, 1.0);
                 vec3 shadowCoord = lightSpacePosition.xyz / lightSpacePosition.w; // NDC 변환
                 shadowCoord.xy = shadowCoord.xy * 0.5 + 0.5;

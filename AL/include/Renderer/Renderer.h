@@ -111,12 +111,29 @@ class AL_API Renderer
 
 	std::unique_ptr<DescriptorSetLayout> m_shadowMapDescriptorSetLayout;
 	VkDescriptorSetLayout shadowMapDescriptorSetLayout;
-
 	VkSampler shadowMapSampler;
+
+	std::vector<std::unique_ptr<RenderPass>> m_shadowCubeMapRenderPass;
+	std::vector<VkRenderPass> shadowCubeMapRenderPass;
+
+	std::vector<std::unique_ptr<Pipeline>> m_shadowCubeMapPipeline;
+	std::vector<VkPipelineLayout> shadowCubeMapPipelineLayout;
+	std::vector<VkPipeline> shadowCubeMapGraphicsPipeline;
+
+	std::vector<std::unique_ptr<FrameBuffers>> m_shadowCubeMapFrameBuffers;
+	std::vector<std::vector<VkFramebuffer>> shadowCubeMapFramebuffers;
+	std::vector<VkImageView> shadowCubeMapImageViews;
+
+	std::unique_ptr<DescriptorSetLayout> m_shadowCubeMapDescriptorSetLayout;
+	VkDescriptorSetLayout shadowCubeMapDescriptorSetLayout;
+
+	VkSampler shadowCubeMapSampler;
 
 	void init(GLFWwindow* window);
 	void recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t imageIndex, uint32_t shadowMapIndex);
 	void recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex);
+	void recordShadowCubeMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex);
+
 };
 } // namespace ale
 
