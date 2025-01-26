@@ -141,50 +141,50 @@ void Scene::initScene() {
         {0.0f, m_defaultTextures.height, false}
     );
 
-    m_floorObject = Object::createObject("floor", m_planeModel, 
-    Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f)});
-    m_objects.push_back(m_floorObject);
+    // m_floorObject = Object::createObject("floor", m_planeModel, 
+    // Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(5.0f, 5.0f, 5.0f)});
+    // m_objects.push_back(m_floorObject);
 
 
-    m_tableModel = Model::createModel("Models/coffee_table_round_01_4k.gltf/coffee_table_round_01_4k.gltf", m_defaultMaterial);
-    m_tableObject = Object::createObject("table", m_tableModel, 
-    Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_tableObject);
+    // m_tableModel = Model::createModel("Models/coffee_table_round_01_4k.gltf/coffee_table_round_01_4k.gltf", m_defaultMaterial);
+    // m_tableObject = Object::createObject("table", m_tableModel, 
+    // Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_tableObject);
 
-    m_cameraModel = Model::createModel("Models/Camera_01_2k.gltf/Camera_01_2k.gltf", m_defaultMaterial);
-    m_cameraObject = Object::createObject("camera", m_cameraModel, 
-    Transform{glm::vec3(0.1f, -1.2f, 0.1f), glm::vec3(0.0f, -50.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_cameraObject);
+    // m_cameraModel = Model::createModel("Models/Camera_01_2k.gltf/Camera_01_2k.gltf", m_defaultMaterial);
+    // m_cameraObject = Object::createObject("camera", m_cameraModel, 
+    // Transform{glm::vec3(0.1f, -1.2f, 0.1f), glm::vec3(0.0f, -50.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_cameraObject);
 
-    m_sofaModel = Model::createModel("Models/Sofa_01_4k.gltf/Sofa_01_4k.gltf", m_defaultMaterial);
-    m_sofaObject = Object::createObject("sofa", m_sofaModel, 
-    Transform{glm::vec3(0.0f, -1.7f, -1.2f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_sofaObject);
+    // m_sofaModel = Model::createModel("Models/Sofa_01_4k.gltf/Sofa_01_4k.gltf", m_defaultMaterial);
+    // m_sofaObject = Object::createObject("sofa", m_sofaModel, 
+    // Transform{glm::vec3(0.0f, -1.7f, -1.2f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_sofaObject);
 
-    m_jugModel = Model::createModel("Models/jug_01_4k.gltf/jug_01_4k.gltf", m_defaultMaterial);
-    m_jugObject = Object::createObject("jug", m_jugModel, 
-    Transform{glm::vec3(-0.1f, -1.2f, -0.1f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_jugObject);
-
-
-    m_shelfModel = Model::createModel("Models/steel_frame_shelves_02_4k.gltf/steel_frame_shelves_02_4k.gltf", m_defaultMaterial);
-    m_shelfObject = Object::createObject("shelf", m_shelfModel, 
-    Transform{glm::vec3(-1.6f, -1.7f, -1.25f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_shelfObject);
+    // m_jugModel = Model::createModel("Models/jug_01_4k.gltf/jug_01_4k.gltf", m_defaultMaterial);
+    // m_jugObject = Object::createObject("jug", m_jugModel, 
+    // Transform{glm::vec3(-0.1f, -1.2f, -0.1f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_jugObject);
 
 
-    m_plant1Model = Model::createModel("Models/potted_plant_01_4k.gltf/potted_plant_01_4k.gltf", m_defaultMaterial);
-    m_plant1Object = Object::createObject("plant1", m_plant1Model, 
-    Transform{glm::vec3(1.5f, -1.7f, -0.8f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_plant1Object);
+    // m_shelfModel = Model::createModel("Models/steel_frame_shelves_02_4k.gltf/steel_frame_shelves_02_4k.gltf", m_defaultMaterial);
+    // m_shelfObject = Object::createObject("shelf", m_shelfModel, 
+    // Transform{glm::vec3(-1.6f, -1.7f, -1.25f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_shelfObject);
 
 
-    m_plant2Model = Model::createModel("Models/potted_plant_04_4k.gltf/potted_plant_04_4k.gltf", m_defaultMaterial);
-    m_plant2Object = Object::createObject("plant2", m_plant2Model, 
-    Transform{glm::vec3(-1.6f, -0.56f, -1.25f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
-    m_objects.push_back(m_plant2Object);
+    // m_plant1Model = Model::createModel("Models/potted_plant_01_4k.gltf/potted_plant_01_4k.gltf", m_defaultMaterial);
+    // m_plant1Object = Object::createObject("plant1", m_plant1Model, 
+    // Transform{glm::vec3(1.5f, -1.7f, -0.8f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_plant1Object);
 
-    m_bedModel = Model::createModel("Models/bed/Bed.glb", m_defaultMaterial);
+
+    // m_plant2Model = Model::createModel("Models/potted_plant_04_4k.gltf/potted_plant_04_4k.gltf", m_defaultMaterial);
+    // m_plant2Object = Object::createObject("plant2", m_plant2Model, 
+    // Transform{glm::vec3(-1.6f, -0.56f, -1.25f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    // m_objects.push_back(m_plant2Object);
+
+    m_bedModel = Model::createModel("Models/shapespark-example-room.gltf", m_defaultMaterial);
     m_bedObject = Object::createObject("bed", m_bedModel, 
     Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
     m_objects.push_back(m_bedObject);
@@ -199,7 +199,7 @@ void Scene::initScene() {
         lightObject->createRenderingComponent();
     }
 
-    m_floorObject->updateMaterial({m_floorMaterial});
+    // m_floorObject->updateMaterial({m_floorMaterial});
 
 }
 
