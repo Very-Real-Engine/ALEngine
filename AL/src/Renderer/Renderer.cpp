@@ -469,31 +469,33 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene* scene, VkCommandBuff
             0, nullptr,
             1, &barrierToDepthWrite
         );
+
+        barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        barrierToDepthWrite.image = m_shadowCubeMapFrameBuffers[i]->getDepthImage();
+        barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
+        barrierToDepthWrite.subresourceRange.levelCount = 1;
+        barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
+        barrierToDepthWrite.subresourceRange.layerCount = 6;
+
+        vkCmdPipelineBarrier(
+            commandBuffer,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &barrierToDepthWrite
+        );
+
+
     }
 
-
-    VkImageMemoryBarrier barrierToDepthWrite{};
-    barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-    barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-    barrierToDepthWrite.image = m_shadowCubeMapFrameBuffers[0]->getDepthImage();
-    barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-    barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
-    barrierToDepthWrite.subresourceRange.levelCount = 1;
-    barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
-    barrierToDepthWrite.subresourceRange.layerCount = 1;
-
-    vkCmdPipelineBarrier(
-        commandBuffer,
-        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &barrierToDepthWrite
-    );
+    
 }
 
 void Renderer::recordShadowMapCommandBuffer(Scene* scene, VkCommandBuffer commandBuffer, uint32_t lightIndex, uint32_t shadowMapIndex) {
