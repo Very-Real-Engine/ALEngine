@@ -201,7 +201,7 @@ void Renderer::drawFrame(Scene* scene) {
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
     // 작업 실행 신호를 받을 대기 세마포어 설정 (해당 세마포어가 signal 상태가 되기 전엔 대기)
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};				
+    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT}; 	
     submitInfo.waitSemaphoreCount = 1;														// 대기 세마포어 개수
     submitInfo.pWaitSemaphores = waitSemaphores;											// 대기 세마포어 등록

@@ -317,4 +317,17 @@ VkSampler Texture::createShadowCubeMapSampler() {
     return cubeMapSampler;
 }
 
+std::shared_ptr<Texture> Texture::createTextureFromMemory(const aiTexture* aiTexture) {
+	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture());
+	texture->initTextureFromMemory(aiTexture);
+	return texture;
+}
+
+void Texture::initTextureFromMemory(const aiTexture* aiTexture) {
+	m_imageBuffer = ImageBuffer::createImageBufferFromMemory(aiTexture);
+	mipLevels = m_imageBuffer->getMipLevels();
+	createMaterialTextureImageView();
+	createTextureSampler();
+}
+
 } // namespace ale

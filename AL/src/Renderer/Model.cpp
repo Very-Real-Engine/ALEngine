@@ -142,7 +142,7 @@ void Model::initPlaneModel(std::shared_ptr<Material> &defaultMaterial)
 void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
 	// gltf, obj 구별해서 로드하자
-	if (path.find(".gltf") != std::string::npos) {
+	if (path.find(".gltf") != std::string::npos || path.find(".glb") != std::string::npos) {
 		loadGLTFModel(path, defaultMaterial);
 	}
 	else if (path.find(".obj") != std::string::npos) {
@@ -168,7 +168,7 @@ void Model::loadGLTFModel(std::string path, std::shared_ptr<Material>& defaultMa
 	// material부터 처리
 	std::vector<std::shared_ptr<Material>> materials(scene->mNumMaterials);
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
-		materials[i] = processGLTFMaterial(scene->mMaterials[i], defaultMaterial, path);
+		materials[i] = processGLTFMaterial(scene, scene->mMaterials[i], defaultMaterial, path);
 	}
 
 	processGLTFNode(scene->mRootNode, scene, materials);
@@ -188,7 +188,7 @@ std::string Model::getMaterialPath(std::string &path, std::string materialPath) 
     return modelDirectory + materialPath;
 }
 
-std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::shared_ptr<Material> &defaultMaterial, std::string path) {
+std::shared_ptr<Material> Model::processGLTFMaterial(const aiScene* scene, aiMaterial *material, std::shared_ptr<Material> &defaultMaterial, std::string path) {
 
 	Albedo albedo;
 	NormalMap normalMap;
@@ -197,7 +197,6 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 	AOMap ao;
 	HeightMap heightMap;
 
-	
 	aiString texturePath;
     aiColor4D color;
     float value;
@@ -209,7 +208,12 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 		albedo.albedo = defaultMaterial->getAlbedo().albedo;
 	}
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) {
-		albedo.albedoTexture = Texture::createTexture(getMaterialPath(path, texturePath.C_Str()));
+		if (texturePath.C_Str()[0] == '*') {
+			albedo.albedoTexture = Texture::createTextureFromMemory(scene->mTextures[std::stoi(texturePath.C_Str() + 1)]);
+		}
+		else {
+			albedo.albedoTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		}
 		albedo.flag = true;
 	}
 	else {
@@ -218,8 +222,9 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 	}
 
     if (material->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS) {
-		normalMap.normalTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
-        normalMap.flag = true;
+		// normalMap.normalTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		normalMap.normalTexture = loadMaterialTexture(scene, material, path, texturePath);
+		normalMap.flag = true;
     } else {
         normalMap.normalTexture = defaultMaterial->getNormalMap().normalTexture;
         normalMap.flag = false;
@@ -227,7 +232,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// Roughness Texture
     if (material->GetTexture(aiTextureType_UNKNOWN, 0, &texturePath) == AI_SUCCESS) {
-		roughness.roughnessTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		// roughness.roughnessTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		roughness.roughnessTexture = loadMaterialTexture(scene, material, path, texturePath);
         roughness.flag = true;
 		roughness.roughness = 0.5f;
     } else {
@@ -238,7 +244,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// Metallic Texture
 	if (material->GetTexture(aiTextureType_UNKNOWN, 0, &texturePath) == AI_SUCCESS) {
-		metallic.metallicTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		// metallic.metallicTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		metallic.metallicTexture = loadMaterialTexture(scene, material, path, texturePath);
 		metallic.flag = true;
 		metallic.metallic = defaultMaterial->getMetallic().metallic; // 기본 메탈릭 값 설정
 	} else {
@@ -249,7 +256,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// Ambient Occlusion Texture
 	if (material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texturePath) == AI_SUCCESS) {
-		ao.aoTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		// ao.aoTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		ao.aoTexture = loadMaterialTexture(scene, material, path, texturePath);
 		ao.flag = true;
 		ao.ao = 1.0f; // 기본 AO 값 설정
 	} else {
@@ -260,7 +268,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(aiMaterial *material, std::
 
 	// HeightMap Texture
 	if (material->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS) {
-		heightMap.heightTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		// heightMap.heightTexture = Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
+		heightMap.heightTexture = loadMaterialTexture(scene, material, path, texturePath);
 		heightMap.flag = true;
 		heightMap.height = 0.0f; // 기본 Height 값 설정
 	} else {
@@ -403,6 +412,20 @@ void Model::updateMaterial(std::vector<std::shared_ptr<Material>> materials)
 {
 	for (size_t i = 0; i < m_materials.size() && i < materials.size(); i++) {
 		m_materials[i] = materials[i];
+	}
+}
+
+std::shared_ptr<Texture> Model::loadMaterialTexture(const aiScene* scene, aiMaterial *material, std::string path, aiString texturePath) {
+	if (texturePath.C_Str()[0] == '*') {
+		int textureIndex = std::stoi(texturePath.C_Str() + 1); // "*0" → 0
+		const aiTexture* embeddedTexture = scene->mTextures[textureIndex];
+		if (!embeddedTexture || !embeddedTexture->pcData) {
+			throw std::runtime_error("Invalid embedded texture!");
+		}
+		return Texture::createTextureFromMemory(embeddedTexture);
+	}
+	else {
+		return Texture::createMaterialTexture(getMaterialPath(path, texturePath.C_Str()));
 	}
 }
 

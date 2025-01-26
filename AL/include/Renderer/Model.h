@@ -77,12 +77,14 @@ class AL_API Model
 	void loadOBJModel(std::string path, std::shared_ptr<Material> &defaultMaterial);
 	
 	std::string getMaterialPath(std::string &path, std::string materialPath);
-	std::shared_ptr<Material> processGLTFMaterial(aiMaterial *material, std::shared_ptr<Material> &defaultMaterial, std::string path);
+	std::shared_ptr<Material> processGLTFMaterial(const aiScene* scene, aiMaterial *material, std::shared_ptr<Material> &defaultMaterial, std::string path);
 	void processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials);
 	std::shared_ptr<Mesh> processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material);
 
 	void processOBJNode(aiNode *node, const aiScene *scene, std::shared_ptr<Material> &defaultMaterial);
 	std::shared_ptr<Mesh> processOBJMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &defaultMaterial);
+
+	std::shared_ptr<Texture> loadMaterialTexture(const aiScene* scene, aiMaterial *material, std::string path, aiString texturePath);
 };
 
 } // namespace ale

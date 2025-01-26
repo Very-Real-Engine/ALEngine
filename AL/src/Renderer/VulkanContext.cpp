@@ -40,12 +40,10 @@ void VulkanContext::createSurface(GLFWwindow* window) {
 
 
 void VulkanContext::createInstance() {
-    // 디버그 모드에서 검증 레이어 적용 불가능시 예외 발생
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("validation layers requested, but not available!");
     }
 
-    // 애플리케이션 정보를 담은 구조체
     VkApplicationInfo appInfo{};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
@@ -54,7 +52,6 @@ void VulkanContext::createInstance() {
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_2;
 
-    // 인스턴스 생성을 위한 정보를 담은 구조체
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
@@ -63,23 +60,18 @@ void VulkanContext::createInstance() {
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
-    // 디버깅 메시지 객체 생성을 위한 정보 구조체
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 
     if (enableValidationLayers) {
-        // 디버그 모드시 구조체에 검증 레이어 포함
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
-        // 인스턴스 생성 및 파괴시에도 검증 가능
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = reinterpret_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
     } else {
-        // 디버그 모드 아닐 시 검증 레이어 x
         createInfo.enabledLayerCount = 0;		
         createInfo.pNext = nullptr;
     }
 
-    // 인스턴스 생성
     if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
         throw std::runtime_error("failed to create instance!");
     }

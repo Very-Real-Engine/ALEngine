@@ -92,6 +92,10 @@ private:
 	std::shared_ptr<Model> m_plant2Model;
 	std::shared_ptr<Object> m_plant2Object;
 
+	// bed
+	std::shared_ptr<Model> m_bedModel;
+	std::shared_ptr<Object> m_bedObject;
+
 
 	std::shared_ptr<Material> m_defaultMaterial;
 

@@ -184,6 +184,11 @@ void Scene::initScene() {
     Transform{glm::vec3(-1.6f, -0.56f, -1.25f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
     m_objects.push_back(m_plant2Object);
 
+    m_bedModel = Model::createModel("Models/bed/Bed.glb", m_defaultMaterial);
+    m_bedObject = Object::createObject("bed", m_bedModel, 
+    Transform{glm::vec3(0.0f, -1.7f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)});
+    m_objects.push_back(m_bedObject);
+
     m_objectCount = m_objects.size();
 
     for (auto& object : m_objects) {

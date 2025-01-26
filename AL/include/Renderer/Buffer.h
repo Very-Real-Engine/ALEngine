@@ -5,6 +5,7 @@
 #include "Renderer/Common.h"
 #include "Renderer/VulkanContext.h"
 #include "Renderer/VulkanUtil.h"
+#include "assimp/texture.h"
 
 namespace ale
 {
@@ -74,6 +75,7 @@ class ImageBuffer : public Buffer
   public:
 	static std::unique_ptr<ImageBuffer> createImageBuffer(std::string path, bool flipVertically = false);
 	static std::unique_ptr<ImageBuffer> createMaterialImageBuffer(std::string path, bool flipVertically = false);
+	static std::unique_ptr<ImageBuffer> createImageBufferFromMemory(const aiTexture* texture);
 	static std::unique_ptr<ImageBuffer> createDefaultImageBuffer(glm::vec4 color);
 	static std::unique_ptr<ImageBuffer> createDefaultSingleChannelImageBuffer(float value);
 	~ImageBuffer()
@@ -101,6 +103,7 @@ class ImageBuffer : public Buffer
 
 	void initImageBuffer(std::string path, bool flipVertically);
 	void initMaterialImageBuffer(std::string path, bool flipVertically);
+	void initImageBufferFromMemory(const aiTexture* texture);
 	void initDefaultImageBuffer(glm::vec4 color);
 	void initDefaultSingleChannelImageBuffer(float value);
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout,

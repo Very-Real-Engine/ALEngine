@@ -15,6 +15,7 @@ class AL_API Texture : public Buffer
 	static std::shared_ptr<Texture> createMaterialTexture(std::string path, bool flipVertically = false);
 	static std::shared_ptr<Texture> createDefaultTexture(glm::vec4 color);
 	static std::shared_ptr<Texture> createDefaultSingleChannelTexture(float value);
+	static std::shared_ptr<Texture> createTextureFromMemory(const aiTexture* aiTexture);
 	static VkSampler createShadowMapSampler();
 	static VkSampler createShadowCubeMapSampler();
 
@@ -57,6 +58,8 @@ class AL_API Texture : public Buffer
 	void initDefaultSingleChannelTexture(float value);
 	void createDefaultSingleChannelTextureImageView();
 	void createDefaultSingleChannelTextureSampler();
+
+	void initTextureFromMemory(const aiTexture* texture);
 };
 
 struct DefaultTextures {

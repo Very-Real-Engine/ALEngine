@@ -122,19 +122,19 @@ void VulkanUtil::createCubeMapImage(uint32_t width, uint32_t height, uint32_t mi
     // 큐브맵 이미지 객체를 만드는데 사용되는 구조체
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D; // 큐브맵은 2D 배열로 표현됩니다.
-    imageInfo.extent.width = width;         // 이미지의 너비 지정
-    imageInfo.extent.height = height;       // 이미지의 높이 지정
-    imageInfo.extent.depth = 1;             // 이미지의 깊이는 1
-    imageInfo.mipLevels = mipLevels;        // 생성할 mipLevel의 개수 지정
-    imageInfo.arrayLayers = 6;              // 큐브맵의 경우 6개의 레이어 필요
-    imageInfo.format = format;              // 이미지 포맷 지정
-    imageInfo.tiling = tiling;              // 메모리 레이아웃
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // 초기 레이아웃
-    imageInfo.usage = usage;                // 이미지의 용도 설정
-    imageInfo.samples = numSamples;         // 샘플 개수
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE; // 큐 공유 모드
-    imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT; // 큐브맵 호환 플래그 추가
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = mipLevels;
+    imageInfo.arrayLayers = 6;
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage = usage;
+    imageInfo.samples = numSamples;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 
     // 이미지 객체 생성
     if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
