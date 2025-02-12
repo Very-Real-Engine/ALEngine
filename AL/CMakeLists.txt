@@ -4,8 +4,8 @@ project(${PROJECT_NAME})
 
 # Set Macros
 set(WINDOW_NAME "ALEngine")
-set(WINDOW_WIDTH 1600)
-set(WINDOW_HEIGHT 900)
+set(WINDOW_WIDTH 1920)
+set(WINDOW_HEIGHT 1080)
 
 # 의존성 설정
 include(${CMAKE_SOURCE_DIR}/AL/Dependency.cmake)

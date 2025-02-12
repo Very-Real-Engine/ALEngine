@@ -50,7 +50,7 @@ void Renderer::init(GLFWwindow *window)
 	inFlightFences = m_syncObjects->getInFlightFences();
 #pragma endregion
 
-	m_sphericalMapTexture = Texture::createTexture("./textures/skybox_tmp.hdr");
+	m_sphericalMapTexture = Texture::createTexture("./Sandbox/Project/Assets/Skybox/rustig_koppie_puresky_8k.hdr");
 
 	m_sphericalMapRenderPass = RenderPass::createSphericalMapRenderPass();
 	sphericalMapRenderPass = m_sphericalMapRenderPass->getRenderPass();
@@ -814,7 +814,7 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 	}
 	else if (lightInfo.type == 2)
 	{												   // directional light
-		lightPos = glm::vec3(0.0f) - lightDir * 10.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
+		lightPos = glm::vec3(0.0f) - lightDir * 15.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
 		// View 행렬 계산
 		lightView = glm::lookAt(lightPos,		 // 광원이 가리키는 가상의 위치
 								glm::vec3(0.0f), // 광원이 비추는 중심 (월드 좌표계 원점)

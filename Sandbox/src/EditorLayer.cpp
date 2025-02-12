@@ -285,9 +285,9 @@ void EditorLayer::uiToolBar()
 	if (!toolbarEnabled)
 		tintColor.w = 0.5f;
 
-	float size = ImGui::GetWindowHeight() - 10.0f;
+	float size = ImGui::GetWindowHeight() / 2.0f;
 	ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-	ImGui::SetCursorPosY(size * 0.5f - 5.0f);
+	ImGui::SetCursorPosY(size * 0.5f + 10.5f);
 
 	bool isEditMode = (m_SceneState == ESceneState::EDIT);
 	bool isPlayMode = (m_SceneState == ESceneState::PLAY);

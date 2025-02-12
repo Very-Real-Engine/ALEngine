@@ -685,32 +685,32 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		}
 		auto &materials = rc->getMaterials();
 
-		if (materials.size() != 1)
-		{
-			std::shared_ptr<Material> material = materials[1];
-			Albedo &albedo = material->getAlbedo();
-			drawVec3Control("Albedo", albedo.albedo);
-			drawCheckBox("Albedo Flag", albedo.flag);
+		int i = 0;
+		ImGui::DragInt("##Materials", &i, 0, materials.size(), 0.0f, "%d");
 
-			NormalMap &normalMap = material->getNormalMap();
-			drawCheckBox("Normal Flag", normalMap.flag);
+		std::shared_ptr<Material> material = materials[i];
+		Albedo &albedo = material->getAlbedo();
+		drawVec3Control("Albedo", albedo.albedo);
+		drawCheckBox("Albedo Flag", albedo.flag);
 
-			Roughness &roughness = material->getRoughness();
-			drawFloatControl("Roughness", roughness.roughness);
-			drawCheckBox("Roughness Flag", roughness.flag);
+		NormalMap &normalMap = material->getNormalMap();
+		drawCheckBox("Normal Flag", normalMap.flag);
 
-			Metallic &metalic = material->getMetallic();
-			drawFloatControl("Metallic", metalic.metallic);
-			drawCheckBox("Metallic Flag", metalic.flag);
+		Roughness &roughness = material->getRoughness();
+		drawFloatControl("Roughness", roughness.roughness);
+		drawCheckBox("Roughness Flag", roughness.flag);
 
-			AOMap &aoMap = material->getAOMap();
-			drawFloatControl("AOMap", aoMap.ao);
-			drawCheckBox("AOMap Flag", aoMap.flag);
+		Metallic &metalic = material->getMetallic();
+		drawFloatControl("Metallic", metalic.metallic);
+		drawCheckBox("Metallic Flag", metalic.flag);
 
-			HeightMap &heightMap = material->getHeightMap();
-			drawFloatControl("HeightMap", heightMap.height);
-			drawCheckBox("HeightMap Flag", heightMap.flag);
-		}
+		AOMap &aoMap = material->getAOMap();
+		drawFloatControl("AOMap", aoMap.ao);
+		drawCheckBox("AOMap Flag", aoMap.flag);
+
+		HeightMap &heightMap = material->getHeightMap();
+		drawFloatControl("HeightMap", heightMap.height);
+		drawCheckBox("HeightMap Flag", heightMap.flag);
 	});
 
 	drawComponent<LightComponent>("Light", entity, [entity, scene = m_Context](auto &component) mutable {
