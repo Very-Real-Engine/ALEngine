@@ -84,6 +84,10 @@ class Scene
 	{
 		return m_planeModel;
 	}
+	std::shared_ptr<Model> &getGroundModel()
+	{
+		return m_groundModel;
+	}
 
 	std::shared_ptr<Model> getDefaultModel(int32_t idx);
 
@@ -138,6 +142,7 @@ class Scene
 	std::shared_ptr<Model> m_boxModel;
 	std::shared_ptr<Model> m_sphereModel;
 	std::shared_ptr<Model> m_planeModel;
+	std::shared_ptr<Model> m_groundModel;
 
 	World *m_World = nullptr;
 

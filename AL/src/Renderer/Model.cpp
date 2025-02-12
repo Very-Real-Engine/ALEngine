@@ -61,6 +61,20 @@ std::shared_ptr<Model> Model::createPlaneModel(std::shared_ptr<Material> &defaul
 	return model;
 }
 
+std::shared_ptr<Model> Model::createGroundModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	auto &renderer = App::get().getRenderer();
+	auto &modelsMap = renderer.getModelsMap();
+	if (modelsMap.find("ground") != modelsMap.end())
+	{
+		return modelsMap["ground"];
+	}
+	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
+	model->initGroundModel(defaultMaterial);
+	modelsMap["ground"] = model;
+	return model;
+}
+
 void Model::cleanup()
 {
 	for (auto &mesh : m_meshes)
@@ -174,6 +188,12 @@ void Model::initPlaneModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createPlane());
+}
+
+void Model::initGroundModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	m_materials.push_back(defaultMaterial);
+	m_meshes.push_back(Mesh::createGround());
 }
 
 void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial)

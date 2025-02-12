@@ -12,7 +12,6 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-
 namespace ale
 {
 class ShaderResourceManager;
@@ -60,7 +59,7 @@ class Model
 	static std::shared_ptr<Model> createBoxModel(std::shared_ptr<Material> &defaultMaterial);
 	static std::shared_ptr<Model> createSphereModel(std::shared_ptr<Material> &defaultMaterial);
 	static std::shared_ptr<Model> createPlaneModel(std::shared_ptr<Material> &defaultMaterial);
-	
+	static std::shared_ptr<Model> createGroundModel(std::shared_ptr<Material> &defaultMaterial);
 
 	~Model() = default;
 	void cleanup();
@@ -94,6 +93,7 @@ class Model
 	void initBoxModel(std::shared_ptr<Material> &defaultMaterial);
 	void initSphereModel(std::shared_ptr<Material> &defaultMaterial);
 	void initPlaneModel(std::shared_ptr<Material> &defaultMaterial);
+	void initGroundModel(std::shared_ptr<Material> &defaultMaterial);
 	void loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial);
 	void loadGLTFModel(std::string path, std::shared_ptr<Material> &defaultMaterial);
 	void loadOBJModel(std::string path, std::shared_ptr<Material> &defaultMaterial);

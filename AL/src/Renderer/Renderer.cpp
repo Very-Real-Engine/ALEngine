@@ -703,10 +703,10 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 			}
 			else if (light->type == 2)
 			{
-				lightPos = glm::vec3(0.0f) - lightDir * 10.0f;
+				lightPos = glm::vec3(0.0f) - lightDir * 15.0f;
 				lightingPassUbo.view[index][0] = glm::lookAt(lightPos, glm::vec3(0.0f), up);
-				float orthoSize = 10.0f;
-				lightingPassUbo.proj[index] = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -10.0f, 20.0f);
+				float orthoSize = 15.0f;
+				lightingPassUbo.proj[index] = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -15.0f, 30.0f);
 				lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			index++;
@@ -821,10 +821,10 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 								up				 // 카메라의 상단 방향
 		);
 		// Projection 행렬 계산 (Orthographic)
-		float orthoSize = 10.0f;					  // 광원의 영향을 받는 영역의 크기
+		float orthoSize = 15.0f;					  // 광원의 영향을 받는 영역의 크기
 		lightProj = glm::ortho(-orthoSize, orthoSize, // 좌/우 클립 경계
 							   -orthoSize, orthoSize, // 아래/위 클립 경계
-							   -10.0f, 20.0f		  // 근/원 클립 경계
+							   -15.0f, 30.0f		  // 근/원 클립 경계
 		);
 		// Vulkan 좌표계 보정
 		lightProj[1][1] *= -1;

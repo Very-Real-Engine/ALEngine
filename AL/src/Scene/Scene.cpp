@@ -338,6 +338,7 @@ void Scene::initScene()
 	m_boxModel = Model::createBoxModel(m_defaultMaterial);
 	m_sphereModel = Model::createSphereModel(m_defaultMaterial);
 	m_planeModel = Model::createPlaneModel(m_defaultMaterial);
+	m_groundModel = Model::createGroundModel(m_defaultMaterial);
 
 	m_cullTree.setScene(this);
 }
@@ -519,6 +520,8 @@ std::shared_ptr<Model> Scene::getDefaultModel(int32_t idx)
 		return m_sphereModel;
 	case 2:
 		return m_planeModel;
+	case 3:
+		return m_groundModel;
 	default:
 		return nullptr;
 	}

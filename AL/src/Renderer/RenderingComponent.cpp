@@ -36,6 +36,15 @@ void RenderingComponent::updateMaterial(std::vector<std::shared_ptr<Material>> m
 	m_shaderResourceManager->updateDescriptorSets(m_model.get(), materials);
 }
 
+void RenderingComponent::updateMaterial(std::shared_ptr<Model> model)
+{
+	for (size_t i = 0; i < m_materials.size() && i < model->getMaterials().size(); i++)
+	{
+		m_materials[i] = model->getMaterials()[i];
+	}
+	m_shaderResourceManager->updateDescriptorSets(m_model.get(), m_materials);
+}
+
 void RenderingComponent::draw(DrawInfo &drawInfo)
 {
 	drawInfo.shaderResourceManager = m_shaderResourceManager.get();

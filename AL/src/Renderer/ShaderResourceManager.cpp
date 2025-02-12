@@ -235,6 +235,7 @@ void ShaderResourceManager::updateDescriptorSets(Model *model, std::vector<std::
 	{
 		throw std::runtime_error("No meshes found in the model!");
 	}
+	vkDeviceWaitIdle(device);
 
 	for (size_t i = 0; i < meshCount; i++)
 	{

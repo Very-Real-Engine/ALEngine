@@ -624,7 +624,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		uint32_t meshType = component.type;
 		std::shared_ptr<RenderingComponent> rc = component.m_RenderingComponent;
 
-		const char *meshTypeStrings[] = {"Box", "Sphere", "Plane", "None", "Model"};
+		const char *meshTypeStrings[] = {"Box", "Sphere", "Plane", "Ground", "None", "Model"};
 		const char *currentMeshTypeString = meshTypeStrings[(int)meshType];
 
 		ImGui::Columns(2);
@@ -634,7 +634,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		ImGui::NextColumn();
 		if (ImGui::BeginCombo("##MeshTypeCombo", currentMeshTypeString))
 		{
-			for (int32_t i = 0; i < 4; ++i)
+			for (int32_t i = 0; i < 5; ++i)
 			{
 				bool isSelected = currentMeshTypeString == meshTypeStrings[i];
 
@@ -644,7 +644,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					// model 정보 바꾸기
 
 					component.type = i;
-					if (i == 3) // None
+					if (i == 4) // None
 					{
 					}
 					else
@@ -683,15 +683,35 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			}
 			ImGui::EndDragDropTarget();
 		}
+		ImGui::Button("Material", ImVec2(200.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t *path = (const wchar_t *)payload->Data;
+				std::filesystem::path filePath(path);
+				if (filePath.extension().string() == ".gltf" || filePath.extension().string() == ".glb" ||
+					filePath.extension().string() == ".obj")
+				{
+					// std::shared_ptr<Model> model = Model::createModel(filePath.string(),
+					// scene->getDefaultMaterial()); component.m_RenderingComponent =
+					// RenderingComponent::createRenderingComponent(model);
+
+					component.m_RenderingComponent->updateMaterial(
+						Model::createModel(filePath.string(), scene->getDefaultMaterial()));
+					component.type = 4;
+					component.path = filePath.string();
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
 		auto &materials = rc->getMaterials();
-
-		int i = 0;
-		ImGui::DragInt("##Materials", &i, 0, materials.size(), 0.0f, "%d");
-
-		std::shared_ptr<Material> material = materials[i];
-		Albedo &albedo = material->getAlbedo();
-		drawVec3Control("Albedo", albedo.albedo);
-		drawCheckBox("Albedo Flag", albedo.flag);
+		if (materials.size() != 1)
+		{
+			std::shared_ptr<Material> material = materials[1];
+			Albedo &albedo = material->getAlbedo();
+			drawVec3Control("Albedo", albedo.albedo);
+			drawCheckBox("Albedo Flag", albedo.flag);
 
 		NormalMap &normalMap = material->getNormalMap();
 		drawCheckBox("Normal Flag", normalMap.flag);
