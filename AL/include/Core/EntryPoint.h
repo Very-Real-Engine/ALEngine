@@ -1,8 +1,12 @@
-#ifndef ENTRYPOINT_H
-#define ENTRYPOINT_H
+#pragma once
 
 #include "Core/App.h"
 #include "Core/Base.h"
+
+/**
+ * @brief 게임 엔진의 시작 지점을 나타내는 헤더
+ * 
+ */
 
 #ifdef AL_PLATFORM_WINDOWS
 
@@ -28,6 +32,4 @@ int main(int argc, char **argv)
 		std::cerr << e.what() << '\n';
 	}
 }
-#endif
-
 #endif
