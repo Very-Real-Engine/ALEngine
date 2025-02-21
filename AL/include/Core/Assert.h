@@ -1,9 +1,13 @@
-#ifndef ASSERT_H
-#define ASSERT_H
+#pragma once
 
 #include "Core/Base.h"
 #include "Core/Log.h"
 #include <filesystem>
+
+/**
+ * @brief Assert 매크로 헤더
+ * 
+ */
 
 #ifdef AL_ENABLE_ASSERTS
 
@@ -35,6 +39,4 @@
 #else
 #define AL_ASSERT(...)
 #define AL_CORE_ASSERT(...)
-#endif
-
 #endif
