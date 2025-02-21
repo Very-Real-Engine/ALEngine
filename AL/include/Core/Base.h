@@ -1,15 +1,9 @@
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
-// #ifdef AL_PLATFORM_WINDOWS
-// #ifdef AL_BUILD_DLL
-// #define  __declspec(dllexport)
-// #else
-// #define  __declspec(dllimport)
-// #endif
-// #else
-// #error AL only support Windows!
-// #endif
+/**
+ * @brief 자주 사용하는 매크로 헤더 
+ * 
+ */
 
 #define AL_EXPAND_MACRO(x) x
 #define AL_STRINGIFY_MACRO(x) #x
@@ -18,5 +12,3 @@
 
 #define AL_BIND_EVENT_FN(fn)                                                                                           \
 	[this](auto &&...args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
-
-#endif
