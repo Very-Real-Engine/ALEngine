@@ -1,5 +1,9 @@
-#ifndef AL_H
-#define AL_H
+#pragma once
+
+/**
+ * @file AL.h
+ * @brief 애플리케이션의 핵심 기능, 입력 처리, UI, ECS 관련 헤더를 포함하는 통합 헤더 파일.
+ */
 
 // App
 #include "Core/App.h"
@@ -20,5 +24,3 @@
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
 #include "Scene/ScriptableEntity.h"
-
-#endif
