@@ -243,6 +243,39 @@ void Scene::onRuntimeStart()
 			Entity entity = {e, this};
 			ScriptingEngine::onCreateEntity(entity);
 		}
+
+		// init animation & start animation status:playing
+		auto viewSA = m_Registry.view<SkeletalAnimatorComponent>();
+
+		for (auto& e : viewSA)
+		{
+			auto& sa = m_Registry.get<SkeletalAnimatorComponent>(e);
+
+			Entity entity = {e, this};
+
+			// init state manager: connect methods from scriptcomponent;
+			if (m_Registry.try_get<ScriptComponent>(entity))
+			{
+				std::shared_ptr<AnimationStateManager>& stateManager = sa.sac->getStateManager();
+
+				auto methods = ScriptingEngine::getBooleanMethods(entity);
+				auto transitions = stateManager->getTransitions();
+
+				if (transitions.size() != 0)
+				{
+					for (auto& transition : transitions)
+					{
+						if (!transition.conditionName.empty() && 
+							methods.find(transition.conditionName) != methods.end())
+						{
+							transition.condition = methods[transition.conditionName];
+						}
+					}
+				}
+				stateManager->setTransitions(std::move(transitions));
+			}
+			sa.m_IsPlaying = true;
+		}
 	}
 }
 
@@ -253,7 +286,18 @@ void Scene::onRuntimeStop()
 	onPhysicsStop();
 
 	ScriptingEngine::onRuntimeStop();
+
+	// stop animation playing
+	auto& view = m_Registry.view<SkeletalAnimatorComponent>();
+
+	for (auto& e : view)
+	{
+		auto& sa = m_Registry.get<SkeletalAnimatorComponent>(e);
+		sa.m_IsPlaying = false;
+	}
 }
+
+
 
 void Scene::onUpdateEditor(EditorCamera &camera)
 {
@@ -321,6 +365,8 @@ void Scene::onUpdateRuntime(Timestep ts)
 				SAComponent *sac = sa.sac.get();
 				if (sa.m_IsPlaying)
 					sac->updateAnimation(ts * sa.m_SpeedFactor, 0);
+				else if (sa.m_IsTimelineDrag)
+					sac->updateAnimationWithoutTransition(ts * sa.m_SpeedFactor); // 배속이 필요하지 않음
 			}
 		}
 	}
@@ -358,6 +404,24 @@ void Scene::onUpdateRuntime(Timestep ts)
 	}
 
 	// imguilayer::renderDrawData
+}
+
+void Scene::preRenderEditor(const Timestep& ts)
+{
+		// update animations
+	{
+		auto view = m_Registry.view<SkeletalAnimatorComponent>();
+		
+		for (auto e : view)
+		{
+			Entity entity = {e, this};
+			auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+
+			SAComponent* sac = sa.sac.get();
+			if (sa.m_IsPlaying || sa.m_IsTimelineDrag)
+				sac->updateAnimationWithoutTransition(ts * sa.m_SpeedFactor);
+		}
+	}
 }
 
 void Scene::onViewportResize(uint32_t width, uint32_t height)
@@ -858,7 +922,9 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 
 		if (mr.m_RenderingComponent != nullptr)
 		{
-			component.sac->setModel(mr.m_RenderingComponent->getModel());
+			auto model = mr.m_RenderingComponent->getModel();
+			if (model)
+				component.sac->setModel(model);
 		}
 	}
 }

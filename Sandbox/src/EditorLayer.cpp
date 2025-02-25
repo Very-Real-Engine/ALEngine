@@ -81,6 +81,7 @@ void EditorLayer::onUpdate(Timestep ts)
 	case ESceneState::EDIT:
 
 		m_EditorCamera.onUpdate(ts);
+		m_ActiveScene->preRenderEditor(ts);
 		m_ActiveScene->onUpdateEditor(m_EditorCamera);
 		break;
 

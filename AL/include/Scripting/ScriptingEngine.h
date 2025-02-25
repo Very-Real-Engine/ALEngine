@@ -49,7 +49,8 @@ enum class EScriptFieldType
 	VECTOR2,
 	VECTOR3,
 	VECTOR4,
-	ENTITY
+	ENTITY,
+	STRING
 };
 
 /**
@@ -294,6 +295,18 @@ class ScriptingEngine
 
 namespace utils
 {
+/**
+ * @brief MonoString* 형식을 std::string으로 변환합니다.
+ * @param MonoString*
+ * @return std::string
+ */
+std::string monoStringToString2(MonoString *string);
+ /**
+ * @brief std::string 형식을 MonoString* 으로 변환합니다.
+ * @param std::string
+ * @return MonoString*
+ */
+MonoString* stringToMonoString(std::string& string);
 
 /**
  * @brief 스크립트 필드 유형을 문자열로 변환합니다.
@@ -338,6 +351,8 @@ inline const char *scriptFieldTypeToString(EScriptFieldType fieldType)
 		return "Vector4";
 	case EScriptFieldType::ENTITY:
 		return "Entity";
+	case EScriptFieldType::STRING:
+		return "String";
 	}
 	return "None";
 }
@@ -381,9 +396,12 @@ inline EScriptFieldType scriptFieldTypeFromString(std::string_view fieldType)
 		return EScriptFieldType::VECTOR4;
 	if (fieldType == "Entity")
 		return EScriptFieldType::ENTITY;
+	if (fieldType == "String")
+		return EScriptFieldType::STRING;
 
 	return EScriptFieldType::NONE;
 }
+
 } // namespace utils
 } // namespace ale
 

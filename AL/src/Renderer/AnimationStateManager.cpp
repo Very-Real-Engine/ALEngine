@@ -4,6 +4,12 @@
 namespace ale
 {
 
+AnimationStateManager::AnimationStateManager() :
+	inTransition(false),
+	isTransitionFinish(false)
+{
+}
+
 void AnimationStateManager::update(const Timestep& timestep)
 {
 	if (inTransition)
@@ -75,7 +81,7 @@ void AnimationStateManager::startTransition(const AnimationStateTransition& t)
 	prevState = currentState;
 	currentState = *getState(t.toState);
 
-	AL_INFO("[AnimationStateManager] Transition:" + prevState.stateName + "->" + currentState.stateName);
+	// AL_INFO("[AnimationStateManager] Transition:" + prevState.stateName + "->" + currentState.stateName);
 }
 
 void AnimationStateManager::finishTransition()
@@ -86,7 +92,7 @@ void AnimationStateManager::finishTransition()
 	transitionTime = 0.0f;
 	transitionDuration = 0.0f;
 
-	AL_INFO("[AnimationStateManager] Transition Finished:" + prevState.stateName + "->" + currentState.stateName);
+	// AL_INFO("[AnimationStateManager] Transition Finished:" + prevState.stateName + "->" + currentState.stateName);
 }
 
 AnimationState* AnimationStateManager::getState(const std::string& stateName)
@@ -135,5 +141,14 @@ std::unordered_map<std::string, AnimationState>& AnimationStateManager::getState
 	return m_States;
 }
 
+AnimationState* AnimationStateManager::getStateFromAnimName(const std::string& animationName)
+{
+	for (auto& it : m_States)
+	{
+		if (it.second.animationName == animationName)
+			return &(it.second);
+	}
+	return nullptr;
+}
 
 }; //namespace ale
