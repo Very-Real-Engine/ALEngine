@@ -1185,6 +1185,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					}
 					else
 					{
+						component.m_RenderingComponent->cleanup();
 						component.m_RenderingComponent =
 							RenderingComponent::createRenderingComponent(scene->getDefaultModel(i));
 						component.path.clear();
@@ -1215,6 +1216,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					filePath.extension().string() == ".obj")
 				{
 					std::shared_ptr<Model> model = Model::createModel(filePath.string(), scene->getDefaultMaterial());
+					component.m_RenderingComponent->cleanup();
 					component.m_RenderingComponent = RenderingComponent::createRenderingComponent(model);
 					component.type = 7;
 					component.path = filePath.string();
@@ -1532,6 +1534,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawVec3Control("Center", component.m_Center);
 		drawVec3Control("Size", component.m_Size);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
+		drawCheckBox("IsActive", component.m_IsActive);
 
 		// Runtime 중 수정 기능
 	});
@@ -1539,6 +1542,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawVec3Control("Center", component.m_Center);
 		drawFloatControl("Radius", component.m_Radius);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
+		drawCheckBox("IsActive", component.m_IsActive);
 
 		// Runtime 중 수정 기능
 	});
@@ -1547,6 +1551,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Radius", component.m_Radius);
 		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
+		drawCheckBox("IsActive", component.m_IsActive);
 
 		// Runtime 중 수정 기능
 	});
@@ -1555,7 +1560,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Radius", component.m_Radius);
 		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawCheckBox("IsActive", component.m_IsActive);
 		// Runtime 중 수정 기능
 	});
 }

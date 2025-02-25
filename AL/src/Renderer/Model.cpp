@@ -35,6 +35,20 @@ std::shared_ptr<Model> Model::createBoxModel(std::shared_ptr<Material> &defaultM
 	return model;
 }
 
+std::shared_ptr<Model> Model::createColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	auto &renderer = App::get().getRenderer();
+	auto &modelsMap = renderer.getModelsMap();
+	if (modelsMap.find("colliderBox") != modelsMap.end())
+	{
+		return modelsMap["colliderBox"];
+	}
+	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
+	model->initColliderBoxModel(defaultMaterial);
+	modelsMap["colliderBox"] = model;
+	return model;
+}
+
 std::shared_ptr<Model> Model::createSphereModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	auto &renderer = App::get().getRenderer();
@@ -241,6 +255,12 @@ void Model::initCylinderModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCylinder());
+}
+
+void Model::initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	m_materials.push_back(defaultMaterial);
+	m_meshes.push_back(Mesh::createColliderBox());
 }
 
 void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
@@ -728,8 +748,8 @@ void Model::loadBone(aiNode *node, int parentBoneIndex)
 	if (it != m_Skeleton->m_NodeNameToBoneIndex.end())
 	{
 		currentBoneIndex = it->second;
-    
-		auto& bone = m_Skeleton->m_Bones[currentBoneIndex];
+
+		auto &bone = m_Skeleton->m_Bones[currentBoneIndex];
 
 		bone.m_ParentBone = parentBoneIndex;
 
@@ -927,8 +947,14 @@ void Model::setShaderData(const std::vector<glm::mat4> &shaderData)
 	m_ShaderData.m_FinalBonesMatrices = shaderData;
 }
 
-std::shared_ptr<SkeletalAnimations>& Model::getAnimations()  { return m_Animations; }
-std::shared_ptr<Armature::Skeleton>& Model::getSkeleton() { return m_Skeleton; }
+std::shared_ptr<SkeletalAnimations> &Model::getAnimations()
+{
+	return m_Animations;
+}
+std::shared_ptr<Armature::Skeleton> &Model::getSkeleton()
+{
+	return m_Skeleton;
+}
 
 void Model::loadOBJModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
