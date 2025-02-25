@@ -2,7 +2,6 @@
 #define SKELETALANIMATIONS_H
 
 #include <map>
-
 #include "Renderer/Animation/SkeletalAnimation.h"
 
 namespace ale

@@ -21,6 +21,7 @@ class RenderingComponent
 	void drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo, uint32_t index);
 	void updateMaterial(std::vector<std::shared_ptr<Material>> materials);
 	void updateMaterial(std::shared_ptr<Model> model);
+	std::shared_ptr<Model> getModel() { return m_model; };
 
 	void cleanup();
 

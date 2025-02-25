@@ -4,6 +4,7 @@
 
 #include "Renderer/Model.h"
 #include "Renderer/Texture.h"
+#include "Renderer/SAComponent.h"
 
 #include "Scene/SceneCamera.h"
 
@@ -127,10 +128,26 @@ struct MeshRendererComponent
 	MeshRendererComponent(const MeshRendererComponent &) = default;
 };
 
+struct SkeletalAnimatorComponent
+{
+	std::shared_ptr<SAComponent> sac;
+
+	bool m_IsPlaying = false;
+	bool m_IsChanged = false;
+	float m_SpeedFactor = 1.0f;
+	std::vector<bool> m_Repeats;
+	std::map<std::string, std::function<bool()>> m_Methods;
+
+
+
+	SkeletalAnimatorComponent() = default;
+	SkeletalAnimatorComponent(const SkeletalAnimatorComponent &) = default;
+};
+
 /**
  * @struct LightComponent
  * @brief 빛 설정을 위한 컴포넌트.
- */
+*/
 struct LightComponent
 {
 	// Color
@@ -300,6 +317,6 @@ template <typename... Component> struct ComponentGroup
 using AllComponents =
 	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, TextureComponent, CameraComponent,
 				   ScriptComponent, LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
-				   CapsuleColliderComponent, CylinderColliderComponent>;
+				   CapsuleColliderComponent, CylinderColliderComponent, SkeletalAnimatorComponent>;
 
 } // namespace ale

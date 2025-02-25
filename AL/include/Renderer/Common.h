@@ -162,13 +162,13 @@ struct UniformBufferObject
 // };
   
 struct GeometryPassVertexUniformBufferObject {
-    alignas(16) glm::mat4 model;      // 64바이트
-    alignas(16) glm::mat4 view;       // 64바이트
-    alignas(16) glm::mat4 proj;       // 64바이트
-	  glm::mat4 finalBonesMatrices[MAX_BONES];
-    alignas(4) bool heightFlag;       // 4바이트
-    alignas(4) float heightScale;     // 4바이트
-    alignas(8) glm::vec2 padding;     // 8바이트 (패딩)
+	alignas(16) glm::mat4 model;      // 64바이트
+	alignas(16) glm::mat4 view;       // 64바이트
+	alignas(16) glm::mat4 proj;       // 64바이트
+	glm::mat4 finalBonesMatrices[MAX_BONES];
+	alignas(4) bool heightFlag;       // 4바이트
+	alignas(4) float heightScale;     // 4바이트
+	alignas(8) glm::vec2 padding;     // 8바이트 (패딩)
 };
 
 struct GeometryPassFragmentUniformBufferObject

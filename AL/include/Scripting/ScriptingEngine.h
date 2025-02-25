@@ -96,6 +96,7 @@ class ScriptClass
 	/// @param params 인자 포인터
 	/// @return MonoObject*
 	MonoObject *invokeMethod(MonoObject *instance, MonoMethod *method, void **params = nullptr);
+	std::vector<std::string> getAllMethods();
 
 	const std::map<std::string, ScriptField> &getFields() const
 	{
@@ -130,6 +131,7 @@ class ScriptInstance
 	/// @brief ScriptInstance의 OnUpdate 함수 실행.
 	/// @param ts 프레임 간격
 	void invokeOnUpdate(float ts);
+	std::map<std::string, std::function<bool()>> getAllBooleanMethods();
 
 	std::shared_ptr<ScriptClass> getScriptClass()
 	{
@@ -267,6 +269,7 @@ class ScriptingEngine
 	/// @param entity Entity.
 	/// @param ts 프레임간 간격. 
 	static void onUpdateEntity(Entity entity, Timestep ts);
+	static std::map<std::string, std::function<bool()>> getBooleanMethods(Entity entity);
 
 	static Scene *getSceneContext();
 	static MonoImage *getCoreAssemblyImage();

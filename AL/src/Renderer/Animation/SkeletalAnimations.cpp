@@ -128,15 +128,15 @@ void SkeletalAnimations::uploadData(SkeletalAnimation* animation, uint32_t frame
 
 void SkeletalAnimations::update(const Timestep& timestep, Armature::Skeleton& skeleton, uint16_t frameCounter)
 {
-	if (m_FrameCounter != frameCounter)
-	{
+	// if (m_FrameCounter != frameCounter)
+	// {
 		m_FrameCounter = frameCounter;
 
 		if (m_CurrentAnimation)
 		{
 			m_CurrentAnimation->update(timestep, skeleton);
 		}
-	}
+	// }
 }
 
 // range-based for loop auxiliary functions

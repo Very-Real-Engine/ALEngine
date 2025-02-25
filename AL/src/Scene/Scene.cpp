@@ -276,6 +276,21 @@ void Scene::onUpdateRuntime(Timestep ts)
 				tf.m_WorldTransform = tf.getTransform();
 			}
 		}
+
+		// update animations
+		{
+			auto view = m_Registry.view<SkeletalAnimatorComponent>();
+			
+			for (auto e : view)
+			{
+				Entity entity = {e, this};
+				auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+
+				SAComponent* sac = sa.sac.get();
+				if (sa.m_IsPlaying)
+					sac->updateAnimation(ts * sa.m_SpeedFactor, 0);
+			}
+		}
 	}
 
 	// find main camera
@@ -706,6 +721,16 @@ template <> void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraC
 template <> void Scene::onComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent &component)
 {
 	component.type = 0;
+
+	// 이미 SAC가 존재하는 경우 새로 생긴 모델 갱신
+	if (entity.hasComponent<SkeletalAnimatorComponent>())
+	{
+		auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+
+		auto* sac = sa.sac.get();
+		if (component.m_RenderingComponent != nullptr)
+			sac->setModel(component.m_RenderingComponent->getModel());
+	}
 }
 
 template <> void Scene::onComponentAdded<LightComponent>(Entity entity, LightComponent &component)
@@ -744,6 +769,22 @@ template <> void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptC
 {
 }
 
+template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entity, SkeletalAnimatorComponent &component)
+{
+	component.sac = std::make_shared<SAComponent>();
+	component.m_Repeats = component.sac->getRepeatAll();
+
+	if (entity.hasComponent<MeshRendererComponent>())
+	{
+		auto& mr = entity.getComponent<MeshRendererComponent>();
+
+		if (mr.m_RenderingComponent != nullptr)
+		{
+			component.sac->setModel(mr.m_RenderingComponent->getModel());
+		}
+	}
+}
+  
 void Scene::cleanup()
 {
 	// delete model

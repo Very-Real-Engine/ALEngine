@@ -218,6 +218,12 @@ class Scene
 		return m_Registry.get<Components...>(entity);
 	}
 
+	template <typename Component>
+	auto tryGet(entt::entity entity)
+	{
+		return m_Registry.try_get<Component>(entity);
+	}
+
 	// frustumCulling
 	void frustumCulling(const Frustum &frustum);
 	void initFrustumDrawFlag();

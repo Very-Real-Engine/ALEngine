@@ -1,0 +1,181 @@
+Scene: Animation
+Entities:
+  - Entity: 606118099047227836
+    TagComponent:
+      Tag: Light
+    TransformComponent:
+      Position: [13.8000002, 0.5, 15.1000004]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [13.8000002, 0.5, 15.1000004]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 1
+      InnerCutoff: 0.976296008
+      OuterCutoff: 0.953716934
+  - Entity: 16843205744615067385
+    TagComponent:
+      Tag: Mannequin
+    TransformComponent:
+      Position: [0, 1, 0]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      Path: ./projects\..\Sandbox\Project\Assets\Models\Mannequin.gltf\Mannequin.gltf
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 10000
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [0, 1, 0]
+      Size: [3, 3, 3]
+      IsTrigger: false
+    SkeletalAnimatorComponent:
+      SpeedFactor: 1
+      Repeats:
+        - true
+        - true
+        - true
+        - true
+        - true
+      AnimationStateManager:
+        AnimationStates:
+          FastRun:
+            stateName: FastRun
+            animationName: FastRun
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          Jumping:
+            stateName: Jumping
+            animationName: Jumping
+            looping: true
+            interruptible: true
+            defaultBlendTime: 0.25
+          Idle:
+            stateName: Idle
+            animationName: Idle
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          JumpingDown:
+            stateName: JumpingDown
+            animationName: JumpingDown
+            looping: true
+            interruptible: true
+            defaultBlendTime: 0.5
+          StartWalk:
+            stateName: StartWalk
+            animationName: StartWalk
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+        AnimationTransitions:
+          - fromState: Idle
+            toState: StartWalk
+            conditionName: isMoveForward
+            blendTime: 0.5
+            invertCondition: false
+          - fromState: StartWalk
+            toState: Idle
+            conditionName: isMoveForward
+            blendTime: 0.5
+            invertCondition: true
+  - Entity: 10739202330461065483
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Position: [0, -3.0999999, 0]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [50, 50, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 2
+    BoxColliderComponent:
+      Center: [0, 0, 0]
+      Size: [1, 1, 1]
+      IsTrigger: false
+  - Entity: 2187969428862952050
+    TagComponent:
+      Tag: Light
+    TransformComponent:
+      Position: [-0.200000003, 7.9000001, -0.100000001]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [-0.200000003, 7.9000001, -0.100000001]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 5.69999981
+      InnerCutoff: 0.976296008
+      OuterCutoff: 0.953716934
+  - Entity: 11822122333692858422
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Position: [0, 1.60000002, 4.4000001]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    CameraComponent:
+      Camera:
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 100
+      Primary: true
+      FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        - Name: RotSpeed
+          Type: Float
+          Data: 2
+        - Name: Speed
+          Type: Float
+          Data: 10
+  - Entity: 4345366896401850355
+    TagComponent:
+      Tag: TestScript
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    ScriptComponent:
+      ClassName: Sandbox.CustomMethod
+      ScriptFields:
+        []

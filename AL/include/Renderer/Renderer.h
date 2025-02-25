@@ -13,6 +13,7 @@
 #include "Renderer/SwapChain.h"
 #include "Renderer/SyncObjects.h"
 #include "Renderer/VulkanContext.h"
+#include "Renderer/SAComponent.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneCamera.h"

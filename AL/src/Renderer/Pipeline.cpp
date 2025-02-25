@@ -24,7 +24,7 @@ void Pipeline::initGeometryPassPipeline(VkRenderPass renderPass, VkDescriptorSet
 	auto &context = VulkanContext::getContext();
 	VkDevice device = context.getDevice();
 	// SPIR-V 파일 읽기
-	std::vector<char> vertShaderCode = VulkanUtil::readFile("./spvs/GeometryPass.vert.spv");
+	std::vector<char> vertShaderCode = VulkanUtil::readFile("./spvs/GeometryPassWithSA.vert.spv");
 	std::vector<char> fragShaderCode = VulkanUtil::readFile("./spvs/GeometryPass.frag.spv");
 
 	// shader module 생성

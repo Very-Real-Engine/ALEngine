@@ -3,6 +3,20 @@
 namespace ale
 {
 
+SAComponent::SAComponent() :
+	m_SpeedFactor(1.0f)
+{
+	m_CurrentAnimation = nullptr;
+	m_StateManager = std::make_shared<AnimationStateManager>();
+	// Init Keyframe Data
+	for (unsigned int i = 0; i < 2; ++i)
+	{
+		m_Data[i].m_CurrentKeyFrameTime = 0.0f;
+		m_Data[i].m_FirstKeyFrameTime = 0.0f;
+		m_Data[i].m_LastKeyFrameTime = 0.0f;
+	}
+}
+
 SAComponent::SAComponent(std::shared_ptr<Model>& model) :
 	m_SpeedFactor(1.0f)
 {
@@ -28,6 +42,45 @@ SAComponent::SAComponent(std::shared_ptr<Model>& model) :
 
 		if (m_Animations->size() > 0)
 			m_CurrentAnimation = &(*m_Animations)[0]; // basic animation init
+
+		//init state-animation
+		if (m_StateManager->getStates().size() == 0)
+			initStateManager();
+	}
+}
+
+void SAComponent::initStateManager()
+{
+	m_StateManager->addState({"All", "All", false, false, 0.5f});
+	for (size_t animationIndex = 0; animationIndex < m_Animations->size(); ++animationIndex)
+	{
+		std::string name = (*m_Animations)[animationIndex].getName();
+		m_StateManager->addState({
+			name,
+			name,
+			false,
+			false,
+			0.5f
+		});
+	}
+}
+
+void SAComponent::setModel(std::shared_ptr<Model>& model)
+{
+	m_Model = model;
+	if (m_Model->m_SkeletalAnimations)
+	{
+		m_Skeleton = model->getSkeleton();
+		m_Animations = model->getAnimations();
+
+		m_Repeats.resize(m_Animations->size());
+		for (size_t i = 0; i < m_Animations->size(); ++i)
+			m_Repeats[i] = false;
+
+		if (m_Animations->size() > 0)
+			m_CurrentAnimation = &(*m_Animations)[0]; // basic animation init
+
+		initStateManager();
 	}
 }
 
@@ -41,6 +94,20 @@ void SAComponent::start(size_t index)
 {
 	m_Animations->start(index);
 	init(&(*m_Animations)[index]);
+}
+
+void SAComponent::start()
+{
+	if (m_CurrentAnimation)
+		start(m_CurrentAnimation->getName());
+	else
+		start(0);
+}
+
+void SAComponent::stop()
+{
+	if (m_CurrentAnimation)
+		m_CurrentAnimation->stop();
 }
 
 void SAComponent::setRepeat(bool repeat, int index)
@@ -61,6 +128,20 @@ void SAComponent::setRepeatAll(bool repeat)
 {
 	for (size_t i = 0; i < m_Repeats.size(); ++i)
 		m_Repeats[i] = repeat;
+}
+
+void SAComponent::setCurrentRepeat(bool repeat)
+{
+	if (m_CurrentAnimation)
+	{
+		m_Repeats[getAnimIndex(m_CurrentAnimation->getName())] = repeat;
+	}
+}
+
+void SAComponent::setCurrentAnimation(SkeletalAnimation* animation)
+{
+	if (animation)
+		start(animation->getName());
 }
 
 void SAComponent::init(SkeletalAnimation* animation)
@@ -106,10 +187,10 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 		m_CurrentAnimation->uploadData(this->getData(),
 			m_Repeats[getAnimIndex(m_CurrentAnimation->getName())]);
 		m_Animations->uploadData(m_CurrentAnimation, m_FrameCounter);
-		m_Animations->update(timestep * m_SpeedFactor, *m_Skeleton, currentFrame);
+		m_Animations->update(timestep, *m_Skeleton, currentFrame);
 		m_Skeleton->update();
 
-		m_Model->setShaderData(m_Skeleton->m_ShaderData.m_FinalBonesMatrices);
+		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), 0);
 	}
 	m_StateManager->update(timestep);
@@ -155,8 +236,8 @@ void SAComponent::blendUpdate(
 
 	m_Skeleton->m_Bones = blendBones(poseTo, poseFrom, blendFactor);
 	m_Skeleton->update();
-	
-	m_Model->setShaderData(m_Skeleton->m_ShaderData.m_FinalBonesMatrices);
+
+	m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 }
 
 SAComponent::Bones SAComponent::blendBones(Bones& to, Bones& from, float blendFactor)
@@ -220,6 +301,55 @@ int SAComponent::getAnimIndex(const std::string& name)
 bool SAComponent::getAnimRepeat(SkeletalAnimation* animation)
 {
 	return m_Repeats[getAnimIndex(animation->getName())];
+}
+
+bool SAComponent::getRepeat(int index)
+{
+	if (index == -1)
+		return getAnimRepeat(m_CurrentAnimation);
+	return getAnimRepeat(&(*m_Animations)[index]);
+}
+
+float SAComponent::getDuration()
+{
+	if (m_CurrentAnimation)
+		return m_CurrentAnimation->getDuration();
+	return NON_CURRENT_ANIMATION_FLOAT;
+}
+
+float SAComponent::getCurrentTime()
+{
+	if (m_CurrentAnimation)
+		return m_CurrentAnimation->getCurrentTime();
+	return NON_CURRENT_ANIMATION_FLOAT;
+}
+
+std::string SAComponent::getCurrentAnimationName()
+{
+	if (m_CurrentAnimation)
+		return m_CurrentAnimation->getName();
+	return NON_CURRENT_ANIMATION_STRING;
+}
+
+bool SAComponent::isRunning() const
+{
+	if (m_CurrentAnimation)
+		return m_CurrentAnimation->isRunning();
+	return NON_CURRENT_ANIMATION_BOOL;
+}
+
+bool SAComponent::willExpire(const Timestep& timestep) const
+{
+	if (m_CurrentAnimation)
+		return m_CurrentAnimation->willExpire(timestep);
+	return NON_CURRENT_ANIMATION_BOOL;
+}
+
+int SAComponent::getCurrentAnimationIndex()
+{
+	if (m_CurrentAnimation)
+		return getAnimIndex(m_CurrentAnimation->getName());
+	return NON_CURRENT_ANIMATION_INT;
 }
 
 } //namespace ale

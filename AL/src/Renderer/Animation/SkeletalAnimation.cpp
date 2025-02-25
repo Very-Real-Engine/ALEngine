@@ -20,7 +20,7 @@ void SkeletalAnimation::update(const Timestep& timestep, Armature::Skeleton& ske
 {
 	if (!isRunning())
 	{
-		AL_INFO("SkeletalAnimation::update(): {0} Animation expired", m_Name);
+		// AL_INFO("SkeletalAnimation::update(): {0} Animation expired", m_Name);
 		return;
 	}
 	m_CurrentKeyFrameTime += timestep;

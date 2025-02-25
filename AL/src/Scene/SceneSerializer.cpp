@@ -1,6 +1,7 @@
 #include "alpch.h"
 
 #include "Renderer/RenderingComponent.h"
+#include "Renderer/SAComponent.h"
 
 #include "Scene/Component.h"
 #include "Scene/Entity.h"
@@ -99,6 +100,67 @@ template <> struct convert<ale::UUID>
 		return true;
 	}
 };
+
+template <> struct convert<ale::AnimationState>
+{
+	static Node encode(const ale::AnimationState &state)
+	{
+		Node node;
+
+		node["stateName"] = state.stateName;
+		node["animationName"] = state.animationName;
+		node["looping"] = state.looping;
+		node["interruptible"] = state.interruptible;
+		node["defaultBlendTime"] = state.defaultBlendTime;
+	
+		return node;
+	};
+
+	static bool decode(const Node &node, ale::AnimationState &state)
+	{
+		if (!node.IsMap())
+			return false;
+
+		state.stateName = node["stateName"].as<std::string>();
+		state.animationName = node["animationName"].as<std::string>();
+		state.looping = node["looping"].as<bool>();
+		state.interruptible = node["interruptible"].as<bool>();
+		state.defaultBlendTime = node["defaultBlendTime"].as<float>();
+
+		return true;
+	};
+};
+
+template <> struct convert<ale::AnimationStateTransition>
+{
+	static Node encode(const ale::AnimationStateTransition &transition)
+	{
+		Node node;
+
+		node["fromState"] = transition.fromState;
+		node["toState"] = transition.toState;
+		node["conditionName"] = transition.conditionName;
+		node["blendTime"] = transition.blendTime;
+		node["invertCondition"] = transition.invertCondition;
+	
+		return node;
+	};
+
+	static bool decode(const Node &node, ale::AnimationStateTransition &transition)
+	{
+		if (!node.IsMap())
+			return false;
+
+		transition.fromState = node["fromState"].as<std::string>();
+		transition.toState = node["toState"].as<std::string>();
+		transition.conditionName = node["conditionName"].as<std::string>();
+		transition.blendTime = node["blendTime"].as<float>();
+		transition.invertCondition = node["invertCondition"].as<bool>();
+
+		return true;
+	};
+};
+
 } // namespace YAML
 
 namespace ale
@@ -368,6 +430,34 @@ static void serializeEntity(YAML::Emitter &out, Entity entity, Scene *scene)
 		out << YAML::Key << "IsTrigger" << YAML::Value << cc.m_IsTrigger;
 		out << YAML::EndMap; // CylinderCollider
 	}
+	// SKeletalAnimatorComponent / SAComponent animation
+	if (entity.hasComponent<SkeletalAnimatorComponent>())
+	{
+		out << YAML::Key << "SkeletalAnimatorComponent";
+		out << YAML::BeginMap;
+		auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+
+		out << YAML::Key << "SpeedFactor" << YAML::Value << sa.m_SpeedFactor;
+		out << YAML::Key << "Repeats" << YAML::Value << sa.sac->getRepeatAll();
+
+		auto& stateManager = sa.sac->getStateManager();
+		out << YAML::Key << "AnimationStateManager";
+			out << YAML::BeginMap;
+			auto& states = stateManager->getStates();
+			auto& transitions = stateManager->getTransitions();
+
+			YAML::Node statesNode(YAML::NodeType::Map), transitionsNode(YAML::NodeType::Sequence);
+			for (const auto& pair : states)
+				statesNode[pair.first] = pair.second;
+
+			for (const auto& transition : transitions) 
+				transitionsNode.push_back(transition);
+
+			out << YAML::Key << "AnimationStates" << YAML::Value << statesNode;
+			out << YAML::Key << "AnimationTransitions" << YAML::Value << transitionsNode;
+			out << YAML::EndMap; // AnimationStateManager;
+		out << YAML::EndMap; // SkeletalAnimatorComponent;
+	}
 
 	out << YAML::EndMap; // End Serialize Entity
 }
@@ -601,6 +691,49 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 								READ_SCRIPT_FIELD(ENTITY, UUID);
 							}
 						}
+					}
+				}
+			}
+
+			// SkeletalAnimatorComponent / SAComponent animation
+			auto skeletalAnimatorComponent = entity["SkeletalAnimatorComponent"];
+			if (skeletalAnimatorComponent)
+			{
+				auto& sa = deserializedEntity.addComponent<SkeletalAnimatorComponent>();
+				sa.m_SpeedFactor = skeletalAnimatorComponent["SpeedFactor"].as<float>();
+				sa.m_Repeats	 = skeletalAnimatorComponent["Repeats"].as<std::vector<bool>>();
+			
+				for (size_t repeatIndex = 0; repeatIndex < sa.m_Repeats.size(); ++repeatIndex)
+				{
+					sa.sac->setRepeat(sa.m_Repeats[repeatIndex], repeatIndex);
+				}
+
+				auto animationStateManager = skeletalAnimatorComponent["AnimationStateManager"];
+				if (animationStateManager)
+				{
+					// AnimationStates 처리
+					auto statesNode = animationStateManager["AnimationStates"];
+					if (statesNode && statesNode.size() > 0)
+					{
+						auto& stateManager = sa.sac->getStateManager();
+						std::unordered_map<std::string, AnimationState> states;
+						for (auto it = statesNode.begin(); it != statesNode.end(); ++it)
+						{
+							std::string key = it->first.as<std::string>();
+							AnimationState state = it->second.as<AnimationState>();
+							states[key] = state;
+						}
+						stateManager->setStates(std::move(states));
+					}
+			
+					// AnimationTransitions 처리
+					auto transitionsNode = animationStateManager["AnimationTransitions"];
+					if (transitionsNode && transitionsNode.size() > 0)
+					{
+						auto& stateManager = sa.sac->getStateManager();
+						std::vector<AnimationStateTransition> transitions =
+							transitionsNode.as<std::vector<AnimationStateTransition>>();
+						stateManager->setTransitions(std::move(transitions));
 					}
 				}
 			}

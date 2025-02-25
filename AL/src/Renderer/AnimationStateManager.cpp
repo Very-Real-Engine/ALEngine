@@ -28,10 +28,11 @@ void AnimationStateManager::processRequests()
 
 		for (auto& t : m_Transitions)
 		{
-			if ((t.fromState == "*" || t.fromState == currentState.stateName) &&
+			if ((t.fromState == "All" || t.fromState == currentState.stateName) &&
 				t.toState == req.targetState)
 			{
-				if (t.condition || t.condition())
+				if ((!t.invertCondition && t.condition && t.condition()) ||
+					(t.invertCondition && t.condition && !t.condition()))
 				{
 					startTransition(t);
 					break;
@@ -47,12 +48,15 @@ void AnimationStateManager::processTransitions()
 
 	for (auto& t : m_Transitions)
 	{
-		if ((t.fromState == "*" || t.fromState == currentState.stateName) &&
-			t.toState != currentState.stateName &&
-			t.condition && t.condition())
+		if ((t.fromState == "All" || t.fromState == currentState.stateName) &&
+			t.toState != currentState.stateName)
 		{
-			startTransition(t);
-			break;
+			if ((!t.invertCondition && t.condition && t.condition()) ||
+				(t.invertCondition && t.condition && !t.condition()))
+			{
+				startTransition(t);
+				break;
+			}
 		}
 	}
 }
@@ -94,9 +98,42 @@ AnimationState* AnimationStateManager::getState(const std::string& stateName)
 	return nullptr;
 }
 
+void AnimationStateManager::deleteTransition(const AnimationStateTransition& t)
+{
+	for (auto it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
+	{
+		if (*it == t)
+		{
+			m_Transitions.erase(it);
+			break;
+		}
+	}
+}
+
 bool AnimationStateManager::hasNoTransitionFor(float seconds) const
 {
 	return (timeSinceLastTransition >= seconds);
 }
+
+void AnimationStateManager::setStates(std::unordered_map<std::string, AnimationState>& states)
+{
+	m_States = states;
+}
+
+void AnimationStateManager::setTransitions(std::vector<AnimationStateTransition>& transitions)
+{
+	m_Transitions = transitions;
+}
+
+std::vector<AnimationStateTransition>& AnimationStateManager::getTransitions()
+{
+	return m_Transitions;
+}
+
+std::unordered_map<std::string, AnimationState>& AnimationStateManager::getStates()
+{
+	return m_States;
+}
+
 
 }; //namespace ale

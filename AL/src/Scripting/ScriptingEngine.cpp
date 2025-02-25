@@ -312,6 +312,18 @@ void ScriptingEngine::onUpdateEntity(Entity entity, Timestep ts)
 	}
 }
 
+std::map<std::string, std::function<bool()>> ScriptingEngine::getBooleanMethods(Entity entity)
+{
+	UUID entityID = entity.getUUID();
+
+	if (s_Data->entityInstances.find(entityID) != s_Data->entityInstances.end())
+	{
+		std::shared_ptr<ScriptInstance> instance = s_Data->entityInstances[entityID];
+		return instance->getAllBooleanMethods();
+	}
+	return std::map<std::string, std::function<bool()>>();
+}
+
 Scene *ScriptingEngine::getSceneContext()
 {
 	return s_Data->sceneContext;
@@ -486,6 +498,26 @@ ScriptClass::ScriptClass(const std::string &classNamespace, const std::string &c
 									   m_ClassNamespace.c_str(), m_ClassName.c_str());
 }
 
+std::vector<std::string> ScriptClass::getAllMethods()
+{
+
+	void* iter = nullptr;
+	MonoMethod* method = nullptr;
+
+	std::vector<std::string> methods;
+
+	while ((method = mono_class_get_methods(m_MonoClass, &iter)) != nullptr)
+	{
+		MonoMethodSignature* sig = mono_method_signature(method);
+		MonoType* returnType = mono_signature_get_return_type(sig);
+
+		std::string methodName = mono_method_get_name(method);
+		std::string returnTypeName = mono_type_get_name(returnType);
+		methods.push_back(returnTypeName + "::" + methodName);
+	}
+	return methods;
+}
+
 MonoObject *ScriptClass::instantiate()
 {
 	return ScriptingEngine::instantiateClass(m_MonoClass);
@@ -556,6 +588,43 @@ bool ScriptInstance::setFieldValueInternal(const std::string &name, const void *
 	const ScriptField &field = it->second;
 	mono_field_set_value(m_Instance, field.m_ClassField, (void *)value);
 	return true;
+}
+
+std::map<std::string, std::function<bool()>> ScriptInstance::getAllBooleanMethods()
+{
+	std::map<std::string, std::function<bool()>> output;
+	std::string signature;
+	auto strMethods = m_ScriptClass->getAllMethods();
+
+	MonoMethod* method = nullptr;
+	for (auto it = strMethods.begin(); it != strMethods.end(); ++it)
+	{
+		signature = *it;
+		size_t pos = signature.find("::"); // "::"의 위치 찾기 (함수 이름과 앞부분을 구분하는 구분자)
+		if (pos == std::string::npos)
+			continue;
+		std::string leftPart = signature.substr(0, pos); // "::" 앞부분 추출 (예: "System.Void")
+		std::string name = signature.substr(pos + 2); // "::" 뒤부분 추출 (함수 이름, 예: "onUpdate")
+		
+		size_t dotPos = leftPart.rfind('.'); // 왼쪽 부분에서 마지막 '.'의 위치 찾기 (반환형은 마지막 '.' 뒤에 오는 부분)
+		if (dotPos == std::string::npos)
+			continue;
+		
+		std::string type = leftPart.substr(dotPos + 1); // 반환형 추출 (예: "Void")
+		if (type == "Boolean")
+		{
+			method = m_ScriptClass->getMethod(name, 0);
+			std::function<bool()> func = [this, method]() -> bool {
+				MonoObject* result = m_ScriptClass->invokeMethod(m_Instance, method);
+				
+				bool value = *(bool *)mono_object_unbox(result);
+				return value;
+			};
+
+			output[name] = func;
+		}
+	}
+	return output;
 }
 
 } // namespace ale
