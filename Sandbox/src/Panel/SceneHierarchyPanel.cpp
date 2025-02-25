@@ -701,9 +701,15 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	});
 
 	drawComponent<SkeletalAnimatorComponent>("Animator", entity, [this, &entity](auto &component) {
-		if (component.sac == nullptr)
+		if (!entity.hasComponent<MeshRendererComponent>())
 		{
 			ImGui::Text("Animator needs MeshRenderComponent");
+			return ;
+		}
+		auto& mr = entity.getComponent<MeshRendererComponent>();
+		if (!mr.m_RenderingComponent)
+		{
+			ImGui::Text("Animator needs Model on MeshRenderComponent");
 			return ;
 		}
 

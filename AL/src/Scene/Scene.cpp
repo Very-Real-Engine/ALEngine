@@ -852,7 +852,9 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 
 		if (mr.m_RenderingComponent != nullptr)
 		{
-			component.sac->setModel(mr.m_RenderingComponent->getModel());
+			auto model = mr.m_RenderingComponent->getModel();
+			if (model)
+				component.sac->setModel(model);
 		}
 	}
 }
