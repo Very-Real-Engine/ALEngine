@@ -551,7 +551,9 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction uiF
 		if (!std::is_same<T, TransformComponent>::value)
 		{
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			if (ImGui::Button("+", ImVec2{lineHeight, lineHeight}))
+			UUID uuid;
+			std::string label = "+##" + std::to_string((uint64_t)uuid);
+			if (ImGui::Button(label.c_str(), ImVec2{lineHeight, lineHeight}))
 			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
@@ -1532,14 +1534,16 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawVec3Control("Center", component.m_Center);
 		drawVec3Control("Size", component.m_Size);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<SphereColliderComponent>("SphereCollider", entity, [](auto &component) {
 		drawVec3Control("Center", component.m_Center);
 		drawFloatControl("Radius", component.m_Radius);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<CapsuleColliderComponent>("CapsuleCollider", entity, [](auto &component) {
@@ -1547,7 +1551,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Radius", component.m_Radius);
 		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<CylinderColliderComponent>("CylinderCollider", entity, [](auto &component) {
@@ -1555,7 +1560,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Radius", component.m_Radius);
 		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 }
