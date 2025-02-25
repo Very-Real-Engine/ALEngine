@@ -75,6 +75,7 @@ class ImageBuffer : public Buffer
 	static std::unique_ptr<ImageBuffer> createImageBufferFromMemory(const aiTexture *texture);
 	static std::unique_ptr<ImageBuffer> createDefaultImageBuffer(glm::vec4 color);
 	static std::unique_ptr<ImageBuffer> createDefaultSingleChannelImageBuffer(float value);
+	static std::unique_ptr<ImageBuffer> createHDRImageBuffer(std::string path);
 
 	~ImageBuffer() = default;
 
@@ -103,6 +104,7 @@ class ImageBuffer : public Buffer
 	void initImageBufferFromMemory(const aiTexture *texture);
 	void initDefaultImageBuffer(glm::vec4 color);
 	void initDefaultSingleChannelImageBuffer(float value);
+	bool initHDRImageBuffer(std::string path);
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout,
 							   uint32_t mipLevels);
 	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);

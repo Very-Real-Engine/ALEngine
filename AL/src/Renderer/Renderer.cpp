@@ -50,7 +50,7 @@ void Renderer::init(GLFWwindow *window)
 	inFlightFences = m_syncObjects->getInFlightFences();
 #pragma endregion
 
-	m_sphericalMapTexture = Texture::createTexture("./Sandbox/assets/defaultSkybox.hdr");
+	m_sphericalMapTexture = Texture::createHDRTexture("./Sandbox/assets/defaultSkybox.hdr");
 
 	m_sphericalMapRenderPass = RenderPass::createSphericalMapRenderPass();
 	sphericalMapRenderPass = m_sphericalMapRenderPass->getRenderPass();
@@ -415,8 +415,7 @@ void Renderer::updateSkybox(std::string path)
 	m_sphericalMapTexture->cleanup();
 
 	// 새로운 텍스쳐 로드
-	m_sphericalMapTexture->initTexture(path);
-
+	m_sphericalMapTexture->initHDRTexture(path);
 	m_sphericalMapRenderPass->initSphericalMapRenderPass();
 	sphericalMapRenderPass = m_sphericalMapRenderPass->getRenderPass();
 
@@ -895,7 +894,6 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	drawInfo.projection = projMatrix;
 	// drawInfo.projection = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	drawInfo.projection[1][1] *= -1;
-	
 	for (size_t i = 0; i < MAX_BONES; ++i) // 항등행렬 초기화
 		drawInfo.finalBonesMatrices[i] = glm::mat4(1.0f);
 
@@ -908,15 +906,14 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 			continue;
 		}
 		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
-		if (auto* sa = scene->tryGet<SkeletalAnimatorComponent>(entity)) //SA 컴포넌트 있으면 데이터 전달
+		if (auto *sa = scene->tryGet<SkeletalAnimatorComponent>(entity)) // SA 컴포넌트 있으면 데이터 전달
 		{
-			auto* sac = (SAComponent *)sa->sac.get();
+			auto *sac = (SAComponent *)sa->sac.get();
 			std::vector<glm::mat4> matrices = sac->getCurrentPose();
 
 			for (size_t i = 0; i < matrices.size(); ++i)
 				drawInfo.finalBonesMatrices[i] = matrices[i];
 		}
-		
 		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
 		if (meshRendererComponent.cullState == ECullState::RENDER)
 		{

@@ -16,11 +16,13 @@ class Texture : public Buffer
 	static std::shared_ptr<Texture> createDefaultTexture(glm::vec4 color);
 	static std::shared_ptr<Texture> createDefaultSingleChannelTexture(float value);
 	static std::shared_ptr<Texture> createTextureFromMemory(const aiTexture *aiTexture);
+	static std::shared_ptr<Texture> createHDRTexture(std::string path);
 	static VkSampler createShadowMapSampler();
 	static VkSampler createShadowCubeMapSampler();
 	static VkSampler createSphericalMapSampler();
 	static VkSampler createBackgroundSampler();
 	void initTexture(std::string path, bool flipVertically = false);
+	void initHDRTexture(std::string path);
 
 	~Texture() = default;
 
@@ -60,6 +62,9 @@ class Texture : public Buffer
 	void createDefaultSingleChannelTextureSampler();
 
 	void initTextureFromMemory(const aiTexture *texture);
+
+	void createHDRTextureImageView();
+	void createHDRTextureSampler();
 };
 
 struct DefaultTextures
