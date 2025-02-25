@@ -39,9 +39,26 @@ namespace ALEngine
 		internal extern static void RigidbodyComponent_addForce(ulong entityID, ref Vector3 force);
 		#endregion
 
+		#region ScriptComponent
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void ScriptComponent_getField(ulong entityID, string fieldName, out bool ret);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void ScriptComponent_setField(ulong entityID, string fieldName, ref bool boolean);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void ScriptComponent_activate(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void ScriptComponent_deactivate(ulong entityID);
+		#endregion
+
 		#region Input
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_isKeyDown(KeyCode keycode);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_isMouseLeftPressed();
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool Input_isMouseRightPressed();
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Input_getMousePos(out Vector2 pos);
 		#endregion
 	}
 }
