@@ -134,6 +134,7 @@ struct SkeletalAnimatorComponent
 	std::shared_ptr<SAComponent> sac;
 
 	bool m_IsPlaying = false;
+	bool m_IsTimelineDrag = false;
 	bool m_IsChanged = false;
 	float m_SpeedFactor = 1.0f;
 	std::vector<bool> m_Repeats;

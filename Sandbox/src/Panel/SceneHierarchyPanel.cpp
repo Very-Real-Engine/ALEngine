@@ -706,10 +706,16 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	});
 
 	drawComponent<SkeletalAnimatorComponent>("Animator", entity, [this, &entity](auto &component) {
-		if (component.sac == nullptr)
+		if (!entity.hasComponent<MeshRendererComponent>())
 		{
 			ImGui::Text("Animator needs MeshRenderComponent");
 			return;
+		}
+		auto& mr = entity.getComponent<MeshRendererComponent>();
+		if (!mr.m_RenderingComponent)
+		{
+			ImGui::Text("Animator needs Model on MeshRenderComponent");
+			return ;
 		}
 
 		SAComponent *sac = (SAComponent *)component.sac.get();
@@ -846,7 +852,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			// 진행률에 따른 현재시간 업데이트
 			keyframe.m_CurrentKeyFrameTime = keyframe.m_FirstKeyFrameTime + timelineProgress * totalDuration;
 			sac->setData(0, keyframe);
+			component.m_IsTimelineDrag = true;
 		}
+		if (ImGui::IsItemDeactivated())
+			component.m_IsTimelineDrag = false;
 
 		// 타임라인 버튼(원형)의 위치 계산
 		float buttonRadius = timelineHeight * 0.3f;
@@ -883,9 +892,17 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		if (entity.hasComponent<ScriptComponent>())
 		{
 			std::shared_ptr<AnimationStateManager> stateManager = sac->getStateManager();
-			auto &states = stateManager->getStates();
-			auto &transitions = stateManager->getTransitions();
+			auto& states = stateManager->getStates();
+			auto& transitions = stateManager->getTransitions();
 
+			// current transition
+			char currentTransitionName[128];
+			snprintf(currentTransitionName, 128, "%s -> %s",
+				stateManager->prevState.stateName.c_str(),
+				stateManager->currentState.stateName.c_str());
+			ImGui::Button(currentTransitionName, ImVec2(200, 30));
+			ImGui::Spacing();
+			
 			// 좌측: State 리스트
 			ImGui::BeginChild("StatesList", ImVec2(150, 150), true);
 			static std::string selectedStateKey;
@@ -1012,6 +1029,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					component.m_IsChanged = true;
 				ImGui::Columns(1);
 			}
+
+			if (!selectedStateKey.empty() &&
+				selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
+				ImGui::Separator();
 
 			// Transition 수정창
 			if (selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
@@ -1384,6 +1405,20 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 						if (ImGui::Checkbox(name.c_str(), &data))
 						{
 							scriptInstance->setFieldValue(name, data);
+						}
+					}
+					if (field.m_Type == EScriptFieldType::STRING)
+					{
+						char buffer[128];
+						memset(buffer, 0, sizeof(buffer));
+						MonoString* monoStr = (MonoString*)scriptInstance->getFieldValue<MonoString*>(name);
+						if (monoStr)
+						{
+							strncpy_s(buffer, sizeof(buffer), utils::monoStringToString2(monoStr).c_str(), sizeof(buffer));
+							if (ImGui::InputText(name.c_str(), buffer, sizeof(buffer)))
+							{
+								scriptInstance->setFieldValue(name, utils::stringToMonoString(std::string(buffer)));
+							}
 						}
 					}
 				}

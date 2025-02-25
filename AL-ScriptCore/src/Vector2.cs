@@ -2,9 +2,11 @@ using System;
 
 namespace ALEngine
 {
+	[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
 	public struct Vector2
 	{
-		public float X, Y;
+		public float X;
+		public float Y;
 
 		public static Vector2 Zero => new Vector2(0.0f);
 
