@@ -1,5 +1,9 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
+
+/**
+ * @file Common.h
+ * @brief 공통 헤더
+ */
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -47,26 +51,48 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+/**
+ * @brief 디버그 유틸 메시지 생성
+ * @param instance 인스턴스
+ * @param pCreateInfo 생성 정보
+ * @param pAllocator 할당 콜백
+ * @param pDebugMessenger 디버그 메시지
+ * @return VkResult
+ */
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
 									  const VkAllocationCallbacks *pAllocator,
 									  VkDebugUtilsMessengerEXT *pDebugMessenger);
 
+/**
+ * @brief 디버그 유틸 메시지 삭제
+ * @param instance 인스턴스
+ * @param debugMessenger 디버그 메시지
+ * @param pAllocator 할당 콜백
+ */
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
 								   const VkAllocationCallbacks *pAllocator);
 
-// 큐 패밀리 인덱스 관리 구조체
+/**
+ * @brief 큐 패밀리 인덱스 관리 구조체
+ */
 struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
 
+	/**
+	 * @brief 완료 여부 확인
+	 * @return 완료 여부
+	 */
 	bool isComplete()
 	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
 
-// GPU와 surface가 지원하는 SwapChain 지원 세부 정보 구조체
+/**
+ * @brief GPU와 surface가 지원하는 SwapChain 지원 세부 정보 구조체
+ */
 struct SwapChainSupportDetails
 {
 	VkSurfaceCapabilitiesKHR capabilities;
@@ -74,6 +100,9 @@ struct SwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+/**
+ * @brief 정점 구조체
+ */
 struct Vertex
 {
 	alglm::vec3 pos;
@@ -83,7 +112,10 @@ struct Vertex
 	alglm::ivec4 boneIds;
 	alglm::vec4 weights;
 
-	// 정점 데이터가 전달되는 방법을 알려주는 구조체 반환하는 함수
+	/**
+	 * @brief 정점 데이터가 전달되는 방법을 알려주는 구조체 반환하는 함수
+	 * @return VkVertexInputBindingDescription
+	 */
 	static VkVertexInputBindingDescription getBindingDescription()
 	{
 		// 파이프라인에 정점 데이터가 전달되는 방법을 알려주는 구조체
@@ -97,7 +129,10 @@ struct Vertex
 		return bindingDescription;
 	}
 
-	// 정점 속성별 데이터 형식과 위치를 지정하는 구조체 반환하는 함수
+	/**
+	 * @brief 정점 속성별 데이터 형식과 위치를 지정하는 구조체 반환하는 함수
+	 * @return std::array<VkVertexInputAttributeDescription, 6>
+	 */
 	static std::array<VkVertexInputAttributeDescription, 6> getAttributeDescriptions()
 	{
 		// 정점 속성의 데이터 형식과 위치를 지정하는 구조체
@@ -144,6 +179,9 @@ struct Vertex
 	}
 };
 
+/**
+ * @brief 유니폼 버퍼 객체
+ */
 struct UniformBufferObject
 {
 	ALIGN16 alglm::mat4 model;
@@ -151,17 +189,9 @@ struct UniformBufferObject
 	ALIGN16 alglm::mat4 proj;
 };
 
-// legacy
-// struct GeometryPassVertexUniformBufferObject
-// {
-// 	alignas(16 alglm::mat4 model;  // 64바이트
-// 	alignas(16 alglm::mat4 view;	  // 64바이트
-// 	alignas(16 alglm::mat4 proj;	  // 64바이트
-// 	alignas(4 bool heightFlag;	  // 4바이트
-// 	alignas(4 float heightScale; // 4바이트
-// 	alignas(8) alglm::vec2 padding; // 8바이트 (패딩)
-// };
-
+/**
+ * @brief Geometry Pass 정점 유니폼 버퍼 객체
+ */
 struct GeometryPassVertexUniformBufferObject
 {
 	ALIGN16 alglm::mat4 model; // 64바이트
@@ -174,6 +204,9 @@ struct GeometryPassVertexUniformBufferObject
 	ALIGN4 uint32_t padding2; // 8바이트 (패딩)
 };
 
+/**
+ * @brief Geometry Pass 프래그먼트 유니폼 버퍼 객체
+ */
 struct GeometryPassFragmentUniformBufferObject
 {
 	ALIGN16 alglm::vec4 albedoValue; // 16바이트 (정렬 우선순위)
@@ -190,6 +223,9 @@ struct GeometryPassFragmentUniformBufferObject
 	ALIGN4 uint32_t padding2; // 패딩 추가 (8바이트)
 };
 
+/**
+ * @brief 광원 구조체
+ */
 struct Light
 {
 	ALIGN4 float intensity;	  // 광원의 강도
@@ -205,13 +241,9 @@ struct Light
 	alglm::vec3 color;	   // 광원의 색상
 };
 
-// struct LightingPassUniformBufferObject
-// {
-// 	ALIGN16 alglm::vec3 lightPos;
-// 	ALIGN16 alglm::vec3 lightColor;
-// 	ALIGN16 alglm::vec3 cameraPos;
-// };
-
+/**
+ * @brief Lighting Pass 유니폼 버퍼 객체
+ */
 struct LightingPassUniformBufferObject
 {
 	ALIGN16 Light lights[16];	   // 최대 16개의 광원 정보
@@ -224,6 +256,9 @@ struct LightingPassUniformBufferObject
 	ALIGN4 uint32_t padding2;
 };
 
+/**
+ * @brief Shadow Map 유니폼 버퍼 객체
+ */
 struct ShadowMapUniformBufferObject
 {
 	ALIGN16 alglm::mat4 proj;
@@ -231,6 +266,9 @@ struct ShadowMapUniformBufferObject
 	ALIGN16 alglm::mat4 model;
 };
 
+/**
+ * @brief Shadow Cube Map 유니폼 버퍼 객체
+ */
 struct ShadowCubeMapUniformBufferObject
 {
 	ALIGN16 alglm::mat4 proj;
@@ -238,23 +276,35 @@ struct ShadowCubeMapUniformBufferObject
 	ALIGN16 alglm::mat4 model;
 };
 
+/**
+ * @brief Shadow Cube Map 레이어 인덱스 유니폼 버퍼 객체
+ */
 struct ShadowCubeMapLayerIndex
 {
 	ALIGN4 uint32_t layerIndex;
 };
 
+/**
+ * @brief Spherical Map 유니폼 버퍼 객체
+ */
 struct SphericalMapUniformBufferObject
 {
 	ALIGN16 alglm::mat4 transform;
 	ALIGN4 uint32_t layerIndex;
 };
 
+/**
+ * @brief Background 유니폼 버퍼 객체
+ */
 struct BackgroundUniformBufferObject
 {
 	ALIGN16 alglm::mat4 proj;
 	ALIGN16 alglm::mat4 view;
 };
 
+/**
+ * @brief Collider 유니폼 버퍼 객체
+ */
 struct ColliderUniformBufferObject
 {
 	alignas(16) alglm::mat4 model;
@@ -263,5 +313,3 @@ struct ColliderUniformBufferObject
 };
 
 } // namespace ale
-
-#endif
