@@ -1,10 +1,10 @@
 Scene: Untitled
 Entities:
-  - Entity: 6293343376024623722
+  - Entity: 12622555395035337900
     TagComponent:
-      Tag: Box_2_0_2
+      Tag: Sphere2
     TransformComponent:
-      Position: [2, 0, 2]
+      Position: [-3.79999995, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
@@ -12,235 +12,27 @@ Entities:
       Children:
         []
     MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
+      MeshType: 2
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.ShootObject
+      ScriptFields:
+        - Name: force
+          Type: Float
+          Data: 3000
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0
+      AngularDrag: 0
+      UseGravity: true
+    SphereColliderComponent:
       Center: [0, 0, 0]
-      Size: [1, 1, 1]
+      Radius: 0.5
       IsTrigger: false
-  - Entity: 803444354161059500
+  - Entity: 24453836486531026
     TagComponent:
-      Tag: Box_2_0_0
-    TransformComponent:
-      Position: [2, 0, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 5035355779366477212
-    TagComponent:
-      Tag: Box_2_0_1
-    TransformComponent:
-      Position: [2, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 14296718304309817607
-    TagComponent:
-      Tag: Box_1_0_2
-    TransformComponent:
-      Position: [1, 0, 2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 8734110070815036263
-    TagComponent:
-      Tag: Box_1_0_0
-    TransformComponent:
-      Position: [1, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 15276963487207332527
-    TagComponent:
-      Tag: Box_1_0_1
-    TransformComponent:
-      Position: [1, 0, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000009
-    TagComponent:
-      Tag: Box_0_2_2
-    TransformComponent:
-      Position: [0, 2, 2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000008
-    TagComponent:
-      Tag: Box_0_2_1
-    TransformComponent:
-      Position: [0, 2, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000007
-    TagComponent:
-      Tag: Box_0_2_0
-    TransformComponent:
-      Position: [0, 2, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000006
-    TagComponent:
-      Tag: Box_0_1_2
-    TransformComponent:
-      Position: [0, 1, 2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000005
-    TagComponent:
-      Tag: Box_0_1_1
-    TransformComponent:
-      Position: [0, 1, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000004
-    TagComponent:
-      Tag: Box_0_1_0
-    TransformComponent:
-      Position: [0, 1, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000003
-    TagComponent:
-      Tag: Box_0_0_2
-    TransformComponent:
-      Position: [0, 0, 2]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000002
-    TagComponent:
-      Tag: Box_0_0_1
-    TransformComponent:
-      Position: [0, 0, 1]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
-      Center: [0, 0, 0]
-      Size: [1, 1, 1]
-      IsTrigger: false
-  - Entity: 10000000000000000001
-    TagComponent:
-      Tag: Box_0_0_0
+      Tag: Sphere
     TransformComponent:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
@@ -250,16 +42,29 @@ Entities:
       Children:
         []
     MeshRendererComponent:
-      MeshType: 0
-    BoxColliderComponent:
+      MeshType: 2
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.ShootObject
+      ScriptFields:
+        - Name: force
+          Type: Float
+          Data: 3000
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: true
+    SphereColliderComponent:
       Center: [0, 0, 0]
-      Size: [1, 1, 1]
+      Radius: 0.5
       IsTrigger: false
-  - Entity: 606118099047227836
+  - Entity: 13031684749665374615
     TagComponent:
-      Tag: Light
+      Tag: Directional Light
     TransformComponent:
-      Position: [13.8000002, 0.5, 15.1000004]
+      Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
@@ -267,39 +72,19 @@ Entities:
       Children:
         []
     LightComponent:
-      Type: 0
+      Type: 2
       ShadowMap: 1
-      Position: [13.8000002, 0.5, 15.1000004]
-      Direction: [0, -1, 0]
+      Position: [0, 0, 0]
+      Direction: [0.200000003, -5.5999999, 0]
       Color: [1, 1, 1]
-      Intensity: 1
+      Intensity: 1.39999998
       InnerCutoff: 0.976296008
       OuterCutoff: 0.953716934
-  - Entity: 2187969428862952050
+  - Entity: 3406970704759287418
     TagComponent:
-      Tag: Light
+      Tag: Scene Camera
     TransformComponent:
-      Position: [-0.200000003, 7.9000001, -0.100000001]
-      Rotation: [0, 0, 0]
-      Scale: [0.100000001, 0.100000001, 0.100000001]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    LightComponent:
-      Type: 0
-      ShadowMap: 1
-      Position: [-0.200000003, 7.9000001, -0.100000001]
-      Direction: [0, -1, 0]
-      Color: [1, 1, 1]
-      Intensity: 5.69999981
-      InnerCutoff: 0.976296008
-      OuterCutoff: 0.953716934
-  - Entity: 11822122333692858422
-    TagComponent:
-      Tag: Camera
-    TransformComponent:
-      Position: [0, 0, 20]
+      Position: [0, 0, 15]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
@@ -309,8 +94,8 @@ Entities:
     CameraComponent:
       Camera:
         PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00999999978
-        PerspectiveFar: 100
+        PerspectiveNear: 0.00100000005
+        PerspectiveFar: 1000
       Primary: true
       FixedAspectRatio: false
     ScriptComponent:
@@ -318,52 +103,55 @@ Entities:
       ScriptFields:
         - Name: RotSpeed
           Type: Float
-          Data: 2
+          Data: 10
         - Name: Speed
           Type: Float
           Data: 10
-  - Entity: 3619305722777497448
+  - Entity: 16143175189520029819
     TagComponent:
-      Tag: Player
+      Tag: Plane
     TransformComponent:
-      Position: [9.89999962, 0.899999976, 10]
+      Position: [0, -3, 0]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [30, 30, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 3
+      MatPath: ""
+      IsMatChanged: false
+    RigidbodyComponent:
+      Mass: 5000000
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [0, 0, 0]
+      Size: [30, 30, 0.100000001]
+      IsTrigger: false
+  - Entity: 17996085891702050814
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Position: [0, 0, -15]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [30, 30, 1]
     RelationshipComponent:
       Parent: 0
       Children:
         []
     MeshRendererComponent:
       MeshType: 1
-    ScriptComponent:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 100000
+      MatPath: ""
+      IsMatChanged: false
     RigidbodyComponent:
-      Mass: 1
+      Mass: 100000
       Drag: 0.00100000005
       AngularDrag: 0.00100000005
       UseGravity: false
-    SphereColliderComponent:
-      Center: [0, 0, 0]
-      Radius: 1
-      IsTrigger: false
-  - Entity: 10000000000000000001
-    TagComponent:
-      Tag: Plane
-    TransformComponent:
-      Position: [0, -0.5, 0]
-      Rotation: [-1.57079637, 0, 0]
-      Scale: [50, 50, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 2
     BoxColliderComponent:
       Center: [0, 0, 0]
-      Size: [1, 1, 1]
+      Size: [30, 30, 1]
       IsTrigger: false

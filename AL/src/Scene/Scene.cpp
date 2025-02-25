@@ -479,8 +479,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = boxShape.clone();
-			fDef.friction = 0.7f;
-			fDef.restitution = 0.4f;
+			fDef.friction = bc.m_Friction;
+			fDef.restitution = bc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -505,8 +505,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = spShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.8f;
+			fDef.friction = sc.m_Friction;
+			fDef.restitution = sc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -544,8 +544,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = csShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -573,8 +573,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = cyShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -822,7 +822,7 @@ template <> void Scene::onComponentAdded<SphereColliderComponent>(Entity entity,
 	auto &tc = entity.getComponent<TransformComponent>();
 
 	float maxScale = std::max({tc.m_Scale.x, tc.m_Scale.y, tc.m_Scale.z});
-	component.m_Radius = maxScale;
+	component.m_Radius = maxScale / 2;
 }
 
 template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity, CapsuleColliderComponent &component)

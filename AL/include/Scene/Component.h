@@ -218,6 +218,9 @@ struct BoxColliderComponent
 	bool m_IsActive = true;
 	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
+	float m_Friction = 0.7f;
+	float m_Restitution = 0.4f;
+
 	BoxColliderComponent() = default;
 	BoxColliderComponent(const BoxColliderComponent &) = default;
 };
@@ -233,6 +236,9 @@ struct SphereColliderComponent
 	bool m_IsTrigger = false;
 	bool m_IsActive = true;
 	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
+
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.8f;
 
 	SphereColliderComponent() = default;
 	SphereColliderComponent(const SphereColliderComponent &) = default;
@@ -251,6 +257,9 @@ struct CapsuleColliderComponent
 	bool m_IsActive = true;
 	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.4f;
+
 	CapsuleColliderComponent() = default;
 	CapsuleColliderComponent(const CapsuleColliderComponent &) = default;
 };
@@ -267,6 +276,9 @@ struct CylinderColliderComponent
 	bool m_IsTrigger = false;
 	bool m_IsActive = true;
 	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
+
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.4f;
 
 	CylinderColliderComponent() = default;
 	CylinderColliderComponent(const CylinderColliderComponent &) = default;
