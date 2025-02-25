@@ -78,17 +78,11 @@ void SAComponent::initStateManager()
 	for (size_t animationIndex = 0; animationIndex < m_Animations->size(); ++animationIndex)
 	{
 		std::string name = (*m_Animations)[animationIndex].getName();
-		m_StateManager->addState({
-			name,
-			name,
-			false,
-			false,
-			0.5f
-		});
+		m_StateManager->addState({name, name, false, false, 0.5f});
 	}
 }
 
-void SAComponent::setModel(std::shared_ptr<Model>& model)
+void SAComponent::setModel(std::shared_ptr<Model> &model)
 {
 	m_Model = model;
 	if (m_Model->m_SkeletalAnimations)
@@ -112,7 +106,7 @@ void SAComponent::setModel(std::shared_ptr<Model>& model)
 	}
 }
 
-void SAComponent::start(std::string const& animation)
+void SAComponent::start(std::string const &animation)
 {
 	m_Animations->start(animation);
 	initAnimation(&(*m_Animations)[animation]);
@@ -166,7 +160,7 @@ void SAComponent::setCurrentRepeat(bool repeat)
 	}
 }
 
-void SAComponent::setCurrentAnimation(SkeletalAnimation* animation)
+void SAComponent::setCurrentAnimation(SkeletalAnimation *animation)
 {
 	if (animation)
 		start(animation->getName());
@@ -178,7 +172,7 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 	{
 		if (m_StateManager->currentState.animationName != m_CurrentAnimation->getName())
 		{
-			auto& prevAnim = (*m_Animations)[m_StateManager->prevState.animationName];
+			auto &prevAnim = (*m_Animations)[m_StateManager->prevState.animationName];
 			// if (!getAnimRepeat(&prevAnim))
 				// prevAnim.start();
 			setData(m_FrameCounter, prevAnim.getData(), getAnimIndex(prevAnim.getName()));
@@ -262,7 +256,7 @@ void SAComponent::blendUpdate(
 		poseFrom = m_Skeleton->m_Bones;
 		this->setData(m_FrameCounter, animA.getData(), animAIndex); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
 	}
-	else 
+	else
 	{
 		if (m_StateManager->transitionTime == 0.0f)
 		{
@@ -286,7 +280,7 @@ void SAComponent::blendUpdate(
 	flush();
 }
 
-SAComponent::Bones SAComponent::blendBones(Bones& to, Bones& from, float blendFactor)
+SAComponent::Bones SAComponent::blendBones(Bones &to, Bones &from, float blendFactor)
 {
 	if (to.size() != from.size())
 	{
@@ -298,17 +292,11 @@ SAComponent::Bones SAComponent::blendBones(Bones& to, Bones& from, float blendFa
 	for (size_t boneIndex = 0; boneIndex < numberOfBones; ++boneIndex)
 	{
 		to[boneIndex].m_DeformedNodeTranslation =
-			glm::mix(from[boneIndex].m_DeformedNodeTranslation,
-					 to[boneIndex].m_DeformedNodeTranslation,
-					 blendFactor);
-		to[boneIndex].m_DeformedNodeRotation =
-			glm::normalize(glm::slerp(from[boneIndex].m_DeformedNodeRotation,
-					 to[boneIndex].m_DeformedNodeRotation,
-					 blendFactor));
+			alglm::mix(from[boneIndex].m_DeformedNodeTranslation, to[boneIndex].m_DeformedNodeTranslation, blendFactor);
+		to[boneIndex].m_DeformedNodeRotation = alglm::normalize(
+			alglm::slerp(from[boneIndex].m_DeformedNodeRotation, to[boneIndex].m_DeformedNodeRotation, blendFactor));
 		to[boneIndex].m_DeformedNodeScale =
-			glm::mix(from[boneIndex].m_DeformedNodeScale,
-					 to[boneIndex].m_DeformedNodeScale,
-					 blendFactor);
+			alglm::mix(from[boneIndex].m_DeformedNodeScale, to[boneIndex].m_DeformedNodeScale, blendFactor);
 	}
 
 	return to;
@@ -319,7 +307,7 @@ struct SAData SAComponent::getData(unsigned int index) const
 	return m_Data[index];
 }
 
-void SAComponent::setData(uint16_t currentFrame, const SAData& data, unsigned int index)
+void SAComponent::setData(uint16_t currentFrame, const SAData &data, unsigned int index)
 {
 	m_FrameCounter = currentFrame; //??
 
@@ -333,12 +321,12 @@ void SAComponent::setDataAll(std::vector<SAData> datas)
 	m_Data = datas;
 }
 
-int SAComponent::getAnimIndex(const std::string& name)
+int SAComponent::getAnimIndex(const std::string &name)
 {
 	return m_Animations->getIndex(name);
 }
 
-bool SAComponent::getAnimRepeat(SkeletalAnimation* animation)
+bool SAComponent::getAnimRepeat(SkeletalAnimation *animation)
 {
 	return m_Repeats[getAnimIndex(animation->getName())];
 }
@@ -378,7 +366,7 @@ bool SAComponent::isRunning() const
 	return NON_CURRENT_ANIMATION_BOOL;
 }
 
-bool SAComponent::willExpire(const Timestep& timestep) const
+bool SAComponent::willExpire(const Timestep &timestep) const
 {
 	if (m_CurrentAnimation)
 		return m_CurrentAnimation->willExpire(timestep);

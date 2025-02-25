@@ -3,10 +3,10 @@
 
 #include "Core/Base.h"
 #include "Core/Timestep.h"
-#include "Renderer/Common.h"
-#include "Renderer/Model.h"
 #include "Renderer/Animation/SkeletalAnimations.h"
 #include "Renderer/AnimationStateManager.h"
+#include "Renderer/Common.h"
+#include "Renderer/Model.h"
 
 namespace ale
 {
@@ -14,11 +14,11 @@ namespace ale
 /** @brief 엔티티 애니메이션 인스턴스 관리 클래스 */
 class SAComponent
 {
-public:
-	#define NON_CURRENT_ANIMATION_STRING "NONE"
-	#define NON_CURRENT_ANIMATION_FLOAT -1.0f
-	#define NON_CURRENT_ANIMATION_INT -1
-	#define NON_CURRENT_ANIMATION_BOOL false
+  public:
+#define NON_CURRENT_ANIMATION_STRING "NONE"
+#define NON_CURRENT_ANIMATION_FLOAT -1.0f
+#define NON_CURRENT_ANIMATION_INT -1
+#define NON_CURRENT_ANIMATION_BOOL false
 
 	using Bones = std::vector<Armature::Bone>;
 

@@ -20,7 +20,7 @@ void BroadPhase::destroyProxy(int32_t proxyId)
 {
 }
 
-void BroadPhase::moveProxy(int32_t proxyId, const AABB &aabb, const glm::vec3 &displacement)
+void BroadPhase::moveProxy(int32_t proxyId, const AABB &aabb, const alglm::vec3 &displacement)
 {
 	bool buffer = m_tree.moveProxy(proxyId, aabb, displacement);
 	if (buffer)

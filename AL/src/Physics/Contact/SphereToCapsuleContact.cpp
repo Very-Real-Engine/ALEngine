@@ -12,16 +12,16 @@ Contact *SphereToCapsuleContact::create(Fixture *fixtureA, Fixture *fixtureB, in
 		SphereToCapsuleContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 SphereToCapsuleContact::supportA(const ConvexInfo &sphere, glm::vec3 dir)
+alglm::vec3 SphereToCapsuleContact::supportA(const ConvexInfo &sphere, alglm::vec3 dir)
 {
 	return sphere.center + dir * sphere.radius;
 }
 
-glm::vec3 SphereToCapsuleContact::supportB(const ConvexInfo &capsule, glm::vec3 dir)
+alglm::vec3 SphereToCapsuleContact::supportB(const ConvexInfo &capsule, alglm::vec3 dir)
 {
-	float dotResult = glm::dot(dir, capsule.axes[0]);
+	float dotResult = alglm::dot(dir, capsule.axes[0]);
 
-	glm::vec3 move(0.0f);
+	alglm::vec3 move(0.0f);
 
 	if (dotResult > 0)
 	{

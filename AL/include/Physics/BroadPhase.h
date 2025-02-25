@@ -25,7 +25,7 @@ class BroadPhase
 	// proxyId에 해당하는 node Destroy
 	void destroyProxy(int32_t proxyId);
 
-	void moveProxy(int32_t proxyId, const AABB &aabb, const glm::vec3 &displacement);
+	void moveProxy(int32_t proxyId, const AABB &aabb, const alglm::vec3 &displacement);
 
 	void bufferMove(int32_t proxyId);
 

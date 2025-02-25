@@ -25,18 +25,18 @@ int32_t BoxShape::getChildCount() const
 void BoxShape::computeAABB(AABB *aabb, const Transform &xf) const
 {
 	// update vertices
-	std::vector<glm::vec3> vertexVector(m_vertices.begin(), m_vertices.end());
-	glm::mat4 rotationMatrix = glm::toMat4(glm::normalize(xf.orientation));
-	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), xf.position);
-	glm::mat4 transformMatrix = translationMatrix * rotationMatrix;
+	std::vector<alglm::vec3> vertexVector(m_vertices.begin(), m_vertices.end());
+	alglm::mat4 rotationMatrix = alglm::toMat4(alglm::normalize(xf.orientation));
+	alglm::mat4 translationMatrix = alglm::translate(alglm::mat4(1.0f), xf.position);
+	alglm::mat4 transformMatrix = translationMatrix * rotationMatrix;
 
-	glm::vec3 upper(std::numeric_limits<float>::lowest());
-	glm::vec3 lower(std::numeric_limits<float>::max());
+	alglm::vec3 upper(std::numeric_limits<float>::lowest());
+	alglm::vec3 lower(std::numeric_limits<float>::max());
 
-	for (glm::vec3 &vertex : vertexVector)
+	for (alglm::vec3 &vertex : vertexVector)
 	{
-		glm::vec4 v = transformMatrix * glm::vec4(vertex, 1.0f);
-		vertex = glm::vec3(v.x, v.y, v.z);
+		alglm::vec4 v = transformMatrix * alglm::vec4(vertex, 1.0f);
+		vertex = alglm::vec3(v.x, v.y, v.z);
 
 		upper.x = std::max(upper.x, vertex.x);
 		upper.y = std::max(upper.y, vertex.y);
@@ -49,20 +49,20 @@ void BoxShape::computeAABB(AABB *aabb, const Transform &xf) const
 	// 최적화 여지 있음.
 	// std::sort(vertexVector.begin(), vertexVector.end(), Vec3Comparator());
 
-	// glm::vec3 upper = *std::prev(vertexVector.end());
-	// glm::vec3 lower = *vertexVector.begin();
+	// alglm::vec3 upper = *std::prev(vertexVector.end());
+	// alglm::vec3 lower = *vertexVector.begin();
 
 	// std::cout << "upper: " << upper.x << ", " << upper.y << ", " << upper.z << '\n';
 	// std::cout << "lower: " << lower.x << ", " << lower.y << ", " << lower.z << '\n';
 
-	aabb->upperBound = upper + glm::vec3(0.1f);
-	aabb->lowerBound = lower - glm::vec3(0.1f);
+	aabb->upperBound = upper + alglm::vec3(0.1f);
+	aabb->lowerBound = lower - alglm::vec3(0.1f);
 }
 
 // void BoxShape::setVertices(const std::vector<Vertex> &vertices)
 // {
-// 	glm::vec3 maxPos(std::numeric_limits<float>::lowest());
-// 	glm::vec3 minPos(std::numeric_limits<float>::max());
+// 	alglm::vec3 maxPos(std::numeric_limits<float>::lowest());
+// 	alglm::vec3 minPos(std::numeric_limits<float>::max());
 
 // 	for (const Vertex &vertex : vertices)
 // 	{
@@ -80,19 +80,19 @@ void BoxShape::computeAABB(AABB *aabb, const Transform &xf) const
 // 	m_halfSize = (maxPos - minPos) / 2.0f;
 // }
 
-void BoxShape::setVertices(const glm::vec3 &center, const glm::vec3 &size)
+void BoxShape::setVertices(const alglm::vec3 &center, const alglm::vec3 &size)
 {
-	glm::vec3 halfSize = size * 0.5f;
+	alglm::vec3 halfSize = size * 0.5f;
 
 	// 박스의 8개 꼭짓점 계산
-	std::vector<glm::vec3> vertices = {center + glm::vec3(-halfSize.x, -halfSize.y, -halfSize.z),
-									   center + glm::vec3(halfSize.x, -halfSize.y, -halfSize.z),
-									   center + glm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
-									   center + glm::vec3(halfSize.x, halfSize.y, -halfSize.z),
-									   center + glm::vec3(-halfSize.x, -halfSize.y, halfSize.z),
-									   center + glm::vec3(halfSize.x, -halfSize.y, halfSize.z),
-									   center + glm::vec3(-halfSize.x, halfSize.y, halfSize.z),
-									   center + glm::vec3(halfSize.x, halfSize.y, halfSize.z)};
+	std::vector<alglm::vec3> vertices = {center + alglm::vec3(-halfSize.x, -halfSize.y, -halfSize.z),
+										 center + alglm::vec3(halfSize.x, -halfSize.y, -halfSize.z),
+										 center + alglm::vec3(-halfSize.x, halfSize.y, -halfSize.z),
+										 center + alglm::vec3(halfSize.x, halfSize.y, -halfSize.z),
+										 center + alglm::vec3(-halfSize.x, -halfSize.y, halfSize.z),
+										 center + alglm::vec3(halfSize.x, -halfSize.y, halfSize.z),
+										 center + alglm::vec3(-halfSize.x, halfSize.y, halfSize.z),
+										 center + alglm::vec3(halfSize.x, halfSize.y, halfSize.z)};
 
 	// 정점 추가
 	for (const auto &vertex : vertices)
@@ -107,32 +107,32 @@ void BoxShape::setVertices(const glm::vec3 &center, const glm::vec3 &size)
 ConvexInfo BoxShape::getShapeInfo(const Transform &transform) const
 {
 	ConvexInfo box;
-	glm::mat4 matrix = transform.toMatrix();
+	alglm::mat4 matrix = transform.toMatrix();
 
-	box.center = matrix * glm::vec4(m_center, 1.0f);
+	box.center = matrix * alglm::vec4(m_center, 1.0f);
 	box.halfSize = m_halfSize;
 
 	box.pointsCount = 8;
 	void *memory;
-	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(sizeof(glm::vec3) * box.pointsCount);
-	box.points = static_cast<glm::vec3 *>(memory);
+	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(sizeof(alglm::vec3) * box.pointsCount);
+	box.points = static_cast<alglm::vec3 *>(memory);
 
-	box.points[0] = matrix * glm::vec4(m_center - m_halfSize, 1.0f);
-	box.points[1] = matrix * glm::vec4(m_center + glm::vec3(m_halfSize.x, -m_halfSize.y, -m_halfSize.z), 1.0f);
-	box.points[2] = matrix * glm::vec4(m_center + glm::vec3(-m_halfSize.x, m_halfSize.y, -m_halfSize.z), 1.0f);
-	box.points[3] = matrix * glm::vec4(m_center + glm::vec3(-m_halfSize.x, -m_halfSize.y, m_halfSize.z), 1.0f);
-	box.points[4] = matrix * glm::vec4(m_center + glm::vec3(m_halfSize.x, m_halfSize.y, -m_halfSize.z), 1.0f);
-	box.points[5] = matrix * glm::vec4(m_center + glm::vec3(m_halfSize.x, -m_halfSize.y, m_halfSize.z), 1.0f);
-	box.points[6] = matrix * glm::vec4(m_center + glm::vec3(-m_halfSize.x, m_halfSize.y, m_halfSize.z), 1.0f);
-	box.points[7] = matrix * glm::vec4(m_center + m_halfSize, 1.0f);
+	box.points[0] = matrix * alglm::vec4(m_center - m_halfSize, 1.0f);
+	box.points[1] = matrix * alglm::vec4(m_center + alglm::vec3(m_halfSize.x, -m_halfSize.y, -m_halfSize.z), 1.0f);
+	box.points[2] = matrix * alglm::vec4(m_center + alglm::vec3(-m_halfSize.x, m_halfSize.y, -m_halfSize.z), 1.0f);
+	box.points[3] = matrix * alglm::vec4(m_center + alglm::vec3(-m_halfSize.x, -m_halfSize.y, m_halfSize.z), 1.0f);
+	box.points[4] = matrix * alglm::vec4(m_center + alglm::vec3(m_halfSize.x, m_halfSize.y, -m_halfSize.z), 1.0f);
+	box.points[5] = matrix * alglm::vec4(m_center + alglm::vec3(m_halfSize.x, -m_halfSize.y, m_halfSize.z), 1.0f);
+	box.points[6] = matrix * alglm::vec4(m_center + alglm::vec3(-m_halfSize.x, m_halfSize.y, m_halfSize.z), 1.0f);
+	box.points[7] = matrix * alglm::vec4(m_center + m_halfSize, 1.0f);
 
 	box.axesCount = 3;
-	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(sizeof(glm::vec3) * box.axesCount);
-	box.axes = static_cast<glm::vec3 *>(memory);
+	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(sizeof(alglm::vec3) * box.axesCount);
+	box.axes = static_cast<alglm::vec3 *>(memory);
 
-	box.axes[0] = glm::normalize(box.points[1] - box.points[0]);
-	box.axes[1] = glm::normalize(box.points[2] - box.points[0]);
-	box.axes[2] = glm::normalize(box.points[3] - box.points[0]);
+	box.axes[0] = alglm::normalize(box.points[1] - box.points[0]);
+	box.axes[1] = alglm::normalize(box.points[2] - box.points[0]);
+	box.axes[2] = alglm::normalize(box.points[3] - box.points[0]);
 
 	return box;
 }

@@ -1,11 +1,14 @@
-#ifndef EVENT_H
-#define EVENT_H
+#pragma once
 
 #include "Core/Base.h"
 #include <sstream>
 
 namespace ale
 {
+/**
+ * @enum EEventType
+ * @brief 다양한 이벤트 타입을 정의하는 열거형.
+ */
 enum class EEventType
 {
 	NONE = 0,
@@ -26,6 +29,10 @@ enum class EEventType
 	MOUSE_SCROLLED // mouse
 };
 
+/**
+ * @enum EEventCategory
+ * @brief 이벤트의 카테고리를 정의하는 열거형.
+ */
 enum EEventCategory
 {
 	NONE = 0,
@@ -38,6 +45,11 @@ enum EEventCategory
 
 // instance 없이 type get
 // #은 매크로에서 토큰을 문자열로 변환하는 데 사용됨
+/**
+ * @def EVENT_CLASS_TYPE(type)
+ * @brief 이벤트 타입을 정의하는 매크로.
+ * @param type 이벤트 타입 (EEventType 열거형 값).
+ */
 #define EVENT_CLASS_TYPE(type)                                                                                         \
 	static EEventType getStaticType()                                                                                  \
 	{                                                                                                                  \
@@ -52,28 +64,62 @@ enum EEventCategory
 		return #type;                                                                                                  \
 	}
 
+/**
+ * @def EVENT_CLASS_CATEGORY(category)
+ * @brief 이벤트 카테고리를 정의하는 매크로.
+ * @param category 이벤트 카테고리 (EEventCategory 열거형 값).
+ */
 #define EVENT_CLASS_CATEGORY(category)                                                                                 \
 	virtual int getCategoryFlags() const override                                                                      \
 	{                                                                                                                  \
 		return category;                                                                                               \
 	}
 
-// Event base class
+/**
+ * @class Event
+ * @brief 모든 이벤트의 기본 클래스.
+ */
 class Event
 {
 	friend class EventDispatcher;
 
   public:
+	/// @brief 가상 소멸자.
 	virtual ~Event() = default;
 
+	/**
+	 * @brief 이벤트 타입을 반환합니다.
+	 * @return EEventType 이벤트 타입.
+	 */
 	virtual EEventType getEventType() const = 0;
+
+	/**
+	 * @brief 이벤트 이름을 반환합니다.
+	 * @return const char* 이벤트 이름.
+	 */
 	virtual const char *getName() const = 0;
+
+	/**
+	 * @brief 이벤트의 카테고리 플래그를 반환합니다.
+	 * @return int 이벤트 카테고리 플래그.
+	 */
 	virtual int getCategoryFlags() const = 0;
+
+	/**
+	 * @brief 이벤트 정보를 문자열로 변환합니다.
+	 * @return std::string 이벤트의 문자열 표현.
+	 */
 	virtual std::string toString() const
 	{
 		return getName();
 	}
 
+	/**
+	 * @brief 특정 카테고리에 속하는지 확인합니다.
+	 * @param category 확인할 이벤트 카테고리.
+	 * @return true 해당 카테고리에 속하는 경우.
+	 * @return false 해당 카테고리에 속하지 않는 경우.
+	 */
 	inline bool isInCategory(EEventCategory category)
 	{
 		return getCategoryFlags() & category;
@@ -82,15 +128,29 @@ class Event
 	bool m_Handled = false;
 };
 
-// 발생한 이벤트를 핸들하기 위한 클래스
+/**
+ * @class EventDispatcher
+ * @brief 발생한 이벤트를 처리하는 클래스.
+ */
 class EventDispatcher
 {
   public:
+	/**
+	 * @brief EventDispatcher 생성자.
+	 * @param event 처리할 이벤트.
+	 */
 	EventDispatcher(Event &event) : m_Event(event)
 	{
 	}
 
-	// 콜백 함수
+	/**
+	 * @brief 특정 이벤트 타입에 대해 핸들러 함수를 실행합니다.
+	 * @tparam T 이벤트 타입.
+	 * @tparam F 이벤트 핸들러 함수의 타입.
+	 * @param func 이벤트 핸들러 함수.
+	 * @return true 이벤트가 처리된 경우.
+	 * @return false 이벤트가 처리되지 않은 경우.
+	 */
 	template <typename T, typename F> bool dispatch(const F &func)
 	{
 		// F는 컴파일러에 의해 추론
@@ -106,6 +166,12 @@ class EventDispatcher
 	Event &m_Event;
 };
 
+/**
+ * @brief 이벤트를 출력 스트림에 출력합니다.
+ * @param os 출력 스트림.
+ * @param e 출력할 이벤트.
+ * @return std::ostream& 출력 스트림.
+ */
 inline std::ostream &operator<<(std::ostream &os, const Event &e)
 {
 	return os << e.toString();
@@ -113,4 +179,3 @@ inline std::ostream &operator<<(std::ostream &os, const Event &e)
 
 } // namespace ale
 
-#endif

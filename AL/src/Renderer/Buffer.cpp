@@ -413,14 +413,14 @@ void ImageBuffer::initImageBufferFromMemory(const aiTexture *texture)
 	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, mipLevels);
 }
 
-std::unique_ptr<ImageBuffer> ImageBuffer::createDefaultImageBuffer(glm::vec4 color)
+std::unique_ptr<ImageBuffer> ImageBuffer::createDefaultImageBuffer(alglm::vec4 color)
 {
 	std::unique_ptr<ImageBuffer> imageBuffer = std::unique_ptr<ImageBuffer>(new ImageBuffer());
 	imageBuffer->initDefaultImageBuffer(color);
 	return imageBuffer;
 }
 
-void ImageBuffer::initDefaultImageBuffer(glm::vec4 color)
+void ImageBuffer::initDefaultImageBuffer(alglm::vec4 color)
 {
 	auto &context = VulkanContext::getContext();
 	m_device = context.getDevice();
@@ -730,4 +730,57 @@ void UniformBuffer::initUniformBuffer(VkDeviceSize buffersize)
 				 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_buffer, m_bufferMemory);
 	vkMapMemory(m_device, m_bufferMemory, 0, buffersize, 0, &m_mappedMemory);
 }
+
+std::unique_ptr<ImageBuffer> ImageBuffer::createHDRImageBuffer(std::string path)
+{
+	std::unique_ptr<ImageBuffer> imageBuffer = std::unique_ptr<ImageBuffer>(new ImageBuffer());
+	if (!imageBuffer->initHDRImageBuffer(path))
+		return nullptr;
+	return imageBuffer;
+}
+
+bool ImageBuffer::initHDRImageBuffer(std::string path)
+{
+	auto &context = VulkanContext::getContext();
+	m_device = context.getDevice();
+	m_physicalDevice = context.getPhysicalDevice();
+	m_commandPool = context.getCommandPool();
+	m_graphicsQueue = context.getGraphicsQueue();
+
+	int texWidth, texHeight, texChannels;
+	float *pixels = stbi_loadf(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	if (!pixels)
+		return false;
+	VkDeviceSize imageSize = texWidth * texHeight * 4 * sizeof(float);
+
+	mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+				 stagingBufferMemory);
+
+	void *data;
+	vkMapMemory(m_device, stagingBufferMemory, 0, imageSize, 0, &data);
+	memcpy(data, pixels, static_cast<size_t>(imageSize));
+	vkUnmapMemory(m_device, stagingBufferMemory);
+
+	stbi_image_free(pixels);
+	VulkanUtil::createImage(
+		texWidth, texHeight, mipLevels, VK_SAMPLE_COUNT_1_BIT, VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+
+	transitionImageLayout(textureImage, VK_FORMAT_R32G32B32A32_SFLOAT, VK_IMAGE_LAYOUT_UNDEFINED,
+						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipLevels);
+	copyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+
+	vkDestroyBuffer(m_device, stagingBuffer, nullptr);
+	vkFreeMemory(m_device, stagingBufferMemory, nullptr);
+
+	generateMipmaps(textureImage, VK_FORMAT_R32G32B32A32_SFLOAT, texWidth, texHeight, mipLevels);
+	return true;
+}
+
 } // namespace ale

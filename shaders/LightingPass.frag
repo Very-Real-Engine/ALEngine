@@ -6,16 +6,17 @@ layout(input_attachment_index = 2, binding = 2) uniform subpassInput albedoAttac
 layout(input_attachment_index = 3, binding = 3) uniform subpassInput pbrAttachment;
 
 struct Light {
-    vec3 position;
-    vec3 direction;
-    vec3 color;
     float intensity;
     float innerCutoff;
     float outerCutoff;
     uint type;
     uint onShadowMap;
-    uint padding;
-    vec2 padding2;
+    uint padding1;
+    uint padding2;
+    uint padding3;
+    vec3 position;
+    vec3 direction;
+    vec3 color;
 };
 
 layout(binding = 4) uniform LightingInfo {
@@ -25,7 +26,8 @@ layout(binding = 4) uniform LightingInfo {
     mat4 proj[4];
     uint numLights;
     float ambientStrength;
-    vec2 padding;
+    uint padding1;
+    uint padding2;
 };
 
 layout(binding = 5) uniform sampler2DShadow shadowMap[4];

@@ -4,7 +4,8 @@
 namespace ale
 {
 
-std::unique_ptr<FrameBuffers> FrameBuffers::createViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+std::unique_ptr<FrameBuffers> FrameBuffers::createViewPortFrameBuffers(alglm::vec2 viewPortSize,
+																	   VkRenderPass renderPass)
 {
 	std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
 	frameBuffers->initViewPortFrameBuffers(viewPortSize, renderPass);
@@ -61,7 +62,7 @@ void FrameBuffers::cleanup()
 	}
 }
 
-void FrameBuffers::initViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+void FrameBuffers::initViewPortFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass)
 {
 	auto &context = VulkanContext::getContext();
 	VkDevice device = context.getDevice();
@@ -291,7 +292,7 @@ void FrameBuffers::initSphericalMapFrameBuffers(VkRenderPass renderPass)
 	}
 }
 
-std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(glm::vec2 viewPortSize,
+std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(alglm::vec2 viewPortSize,
 																		 VkRenderPass renderPass)
 {
 	std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
@@ -299,7 +300,7 @@ std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(glm::ve
 	return frameBuffers;
 }
 
-void FrameBuffers::initBackgroundFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+void FrameBuffers::initBackgroundFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass)
 {
 	auto &context = VulkanContext::getContext();
 	VkDevice device = context.getDevice();
@@ -332,4 +333,35 @@ void FrameBuffers::initBackgroundFrameBuffers(glm::vec2 viewPortSize, VkRenderPa
 	}
 }
 
+std::unique_ptr<FrameBuffers> FrameBuffers::createColliderFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass,
+																	   VkImageView viewPortImageView)
+{
+	std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
+	frameBuffers->initColliderFrameBuffers(viewPortSize, renderPass, viewPortImageView);
+	return frameBuffers;
+}
+
+void FrameBuffers::initColliderFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass,
+											VkImageView viewPortImageView)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	framebuffers.resize(1);
+	std::array<VkImageView, 1> attachments = {viewPortImageView};
+
+	VkFramebufferCreateInfo framebufferInfo{};
+	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	framebufferInfo.renderPass = renderPass;
+	framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+	framebufferInfo.pAttachments = attachments.data();
+	framebufferInfo.width = static_cast<uint32_t>(viewPortSize.x);
+	framebufferInfo.height = static_cast<uint32_t>(viewPortSize.y);
+	framebufferInfo.layers = 1;
+
+	if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &framebuffers[0]) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create collider framebuffer!");
+	}
+}
 } // namespace ale

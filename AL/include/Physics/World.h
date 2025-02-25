@@ -24,7 +24,7 @@ class World
 	void startFrame();
 	void runPhysics(float duration);
 	void solve(float duration);
-	void registerBodyForce(int32_t idx, const glm::vec3 &force);
+	void registerBodyForce(int32_t idx, const alglm::vec3 &force);
 
 	Rigidbody *createBody(BodyDef &bdDef);
 	Rigidbody *getBodyList()

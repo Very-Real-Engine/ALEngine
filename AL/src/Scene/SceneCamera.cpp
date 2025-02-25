@@ -4,7 +4,7 @@
 namespace ale
 {
 
-void SceneCamera::updateSceneCamera(glm::vec3 &pos, glm::vec3 &rot)
+void SceneCamera::updateSceneCamera(alglm::vec3 &pos, alglm::vec3 &rot)
 {
 	setPosition(pos);
 	setRotation(rot);

@@ -50,7 +50,7 @@ void Texture::loadTexture(std::string path, bool flipVertically)
 	m_imageBuffer = ImageBuffer::createImageBuffer(path, flipVertically);
 	if (!m_imageBuffer)
 	{
-		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		mipLevels = m_imageBuffer->getMipLevels();
 		createDefaultTextureImageView();
 		createDefaultTextureSampler();
@@ -68,7 +68,7 @@ void Texture::loadMaterialTexture(std::string path, bool flipVertically)
 	m_imageBuffer = ImageBuffer::createMaterialImageBuffer(path, flipVertically);
 	if (!m_imageBuffer)
 	{
-		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		mipLevels = m_imageBuffer->getMipLevels();
 		createDefaultTextureImageView();
 		createDefaultTextureSampler();
@@ -142,14 +142,14 @@ void Texture::createTextureSampler()
 	}
 }
 
-std::shared_ptr<Texture> Texture::createDefaultTexture(glm::vec4 color)
+std::shared_ptr<Texture> Texture::createDefaultTexture(alglm::vec4 color)
 {
 	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture());
 	texture->initDefaultTexture(color);
 	return texture;
 }
 
-void Texture::initDefaultTexture(glm::vec4 color)
+void Texture::initDefaultTexture(alglm::vec4 color)
 {
 	m_imageBuffer = ImageBuffer::createDefaultImageBuffer(color);
 	mipLevels = m_imageBuffer->getMipLevels();
@@ -428,6 +428,40 @@ void Texture::initTextureFromMemory(const aiTexture *aiTexture)
 	mipLevels = m_imageBuffer->getMipLevels();
 	createMaterialTextureImageView();
 	createTextureSampler();
+}
+
+std::shared_ptr<Texture> Texture::createHDRTexture(std::string path)
+{
+	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture());
+	texture->initHDRTexture(path);
+	return texture;
+}
+
+void Texture::initHDRTexture(std::string path)
+{
+	m_imageBuffer = ImageBuffer::createHDRImageBuffer(path);
+	if (!m_imageBuffer)
+	{
+		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		mipLevels = m_imageBuffer->getMipLevels();
+		createDefaultTextureImageView();
+		createDefaultTextureSampler();
+	}
+	else
+	{
+		mipLevels = m_imageBuffer->getMipLevels();
+		createHDRTextureImageView();
+		createTextureSampler();
+	}
+}
+
+void Texture::createHDRTextureImageView()
+{
+	auto &context = VulkanContext::getContext();
+	auto device = context.getDevice();
+
+	textureImageView = VulkanUtil::createImageView(m_imageBuffer->getImage(), VK_FORMAT_R32G32B32A32_SFLOAT,
+												   VK_IMAGE_ASPECT_COLOR_BIT, mipLevels);
 }
 
 } // namespace ale

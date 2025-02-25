@@ -23,6 +23,7 @@ namespace ale
 {
 Scene::~Scene()
 {
+	m_defaultMaterial->cleanup();
 }
 
 template <typename... Component>
@@ -94,7 +95,8 @@ std::shared_ptr<Scene> Scene::copyScene(std::shared_ptr<Scene> scene)
 		auto &mesh = dstRegistry.get<MeshRendererComponent>(entityHandle);
 		newScene->m_cullTree.changeEntityHandle(mesh.nodeId, static_cast<uint32_t>(entityHandle));
 	}
-	newScene->initScene();
+	// newScene->initScene();
+	newScene->m_cullTree.setScene(newScene.get());
 	return newScene;
 }
 
@@ -172,6 +174,36 @@ void Scene::destroyEntity(Entity entity)
 			if (it != parentRC.children.end())
 				parentRC.children.erase(it);
 		}
+	}
+
+	if (entity.hasComponent<MeshRendererComponent>())
+	{
+		auto &mesh = entity.getComponent<MeshRendererComponent>();
+		mesh.m_RenderingComponent->cleanup();
+	}
+
+	if (entity.hasComponent<BoxColliderComponent>())
+	{
+		auto &box = entity.getComponent<BoxColliderComponent>();
+		box.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<SphereColliderComponent>())
+	{
+		auto &sphere = entity.getComponent<SphereColliderComponent>();
+		sphere.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<CapsuleColliderComponent>())
+	{
+		auto &capsule = entity.getComponent<CapsuleColliderComponent>();
+		capsule.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<CylinderColliderComponent>())
+	{
+		auto &cylinder = entity.getComponent<CylinderColliderComponent>();
+		cylinder.m_colliderShaderResourceManager->cleanup();
 	}
 
 	removeEntityInCullTree(entity);
@@ -316,7 +348,7 @@ void Scene::onUpdateRuntime(Timestep ts)
 				Rigidbody *body = (Rigidbody *)rb.body;
 
 				tf.m_Position = body->getTransform().position;
-				tf.m_Rotation = glm::eulerAngles(body->getTransform().orientation);
+				tf.m_Rotation = alglm::eulerAngles(body->getTransform().orientation);
 				tf.m_WorldTransform = tf.getTransform();
 			}
 		}
@@ -324,13 +356,13 @@ void Scene::onUpdateRuntime(Timestep ts)
 		// update animations
 		{
 			auto view = m_Registry.view<SkeletalAnimatorComponent>();
-			
+
 			for (auto e : view)
 			{
 				Entity entity = {e, this};
-				auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+				auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-				SAComponent* sac = sa.sac.get();
+				SAComponent *sac = sa.sac.get();
 				if (sa.m_IsPlaying)
 					sac->updateAnimation(ts * sa.m_SpeedFactor, 0);
 				else if (sa.m_IsTimelineDrag)
@@ -425,15 +457,15 @@ void Scene::step(int32_t frames)
 
 void Scene::initScene()
 {
-	m_defaultTextures.albedo = Texture::createDefaultTexture(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_defaultTextures.normal = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_defaultTextures.roughness = Texture::createDefaultTexture(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	m_defaultTextures.metallic = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_defaultTextures.ao = Texture::createDefaultTexture(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_defaultTextures.height = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.albedo = Texture::createDefaultTexture(alglm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_defaultTextures.normal = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.roughness = Texture::createDefaultTexture(alglm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	m_defaultTextures.metallic = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.ao = Texture::createDefaultTexture(alglm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_defaultTextures.height = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	m_defaultMaterial = Material::createMaterial(
-		{glm::vec3(1.0f, 1.0f, 1.0f), m_defaultTextures.albedo, false}, {m_defaultTextures.normal, false},
+		{alglm::vec3(1.0f, 1.0f, 1.0f), m_defaultTextures.albedo, false}, {m_defaultTextures.normal, false},
 		{0.5f, m_defaultTextures.roughness, false}, {0.0f, m_defaultTextures.metallic, false},
 		{1.0f, m_defaultTextures.ao, false}, {0.0f, m_defaultTextures.height, false});
 
@@ -443,6 +475,7 @@ void Scene::initScene()
 	m_groundModel = Model::createGroundModel(m_defaultMaterial);
 	m_capsuleModel = Model::createCapsuleModel(m_defaultMaterial);
 	m_cylinderModel = Model::createCylinderModel(m_defaultMaterial);
+	m_colliderBoxModel = Model::createColliderBoxModel(m_defaultMaterial);
 
 	m_cullTree.setScene(this);
 }
@@ -469,9 +502,12 @@ void Scene::onPhysicsStart()
 		auto &rb = entity.getComponent<RigidbodyComponent>();
 
 		BodyDef bdDef;
-		bdDef.m_type = EBodyType::DYNAMIC_BODY;
+		if (rb.m_Type == RigidbodyComponent::EBodyType::Static)
+			bdDef.m_type = EBodyType::STATIC_BODY;
+		else
+			bdDef.m_type = EBodyType::DYNAMIC_BODY;
 		bdDef.m_position = tf.m_Position;
-		bdDef.m_orientation = glm::quat(tf.m_Rotation);
+		bdDef.m_orientation = alglm::quat(tf.m_Rotation);
 		bdDef.m_linearDamping = rb.m_Damping;
 		bdDef.m_angularDamping = rb.m_AngularDamping;
 		bdDef.m_gravityScale = 15.0f;
@@ -501,14 +537,14 @@ void Scene::onPhysicsStart()
 			float Ixx = (1.0f / 12.0f) * (h * h + d * d) * rb.m_Mass;
 			float Iyy = (1.0f / 12.0f) * (w * w + d * d) * rb.m_Mass;
 			float Izz = (1.0f / 12.0f) * (w * w + h * h) * rb.m_Mass;
-			glm::mat3 m(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 m(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			body->setMassData(rb.m_Mass, m);
 
 			FixtureDef fDef;
 			fDef.shape = boxShape.clone();
-			fDef.friction = 0.7f;
-			fDef.restitution = 0.4f;
+			fDef.friction = bc.m_Friction;
+			fDef.restitution = bc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -527,14 +563,14 @@ void Scene::onPhysicsStart()
 			// set mass data(mass, inertia mass)
 			float r = spShape.m_radius;
 			float val = (2.0f / 5.0f) * rb.m_Mass * r * r;
-			glm::mat3 m(glm::vec3(val, 0.0f, 0.0f), glm::vec3(0.0f, val, 0.0f), glm::vec3(0.0f, 0.0f, val));
+			alglm::mat3 m(alglm::vec3(val, 0.0f, 0.0f), alglm::vec3(0.0f, val, 0.0f), alglm::vec3(0.0f, 0.0f, val));
 
 			body->setMassData(rb.m_Mass, m);
 
 			FixtureDef fDef;
 			fDef.shape = spShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.8f;
+			fDef.friction = sc.m_Friction;
+			fDef.restitution = sc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -557,23 +593,23 @@ void Scene::onPhysicsStart()
 			float h = csShape.m_height;
 			float d = (3.0f * r / 8.0f);
 			float val = (2.0f / 5.0f) * mh * r * r + (h / 2.0f * d * d);
-			glm::mat3 ih(glm::vec3(val, 0.0f, 0.0f), glm::vec3(0.0f, val, 0.0f), glm::vec3(0.0f, 0.0f, val));
+			alglm::mat3 ih(alglm::vec3(val, 0.0f, 0.0f), alglm::vec3(0.0f, val, 0.0f), alglm::vec3(0.0f, 0.0f, val));
 
 			float mc = rb.m_Mass * 0.75f;
 			float Ixx = (1.0f / 12.0f) * (3.0f * r * r + h * h) * mc;
 			float Iyy = Ixx;
 			float Izz = (1.0f / 2.0f) * (r * r) * mc;
-			glm::mat3 ic(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 ic(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			float mass = mh * 2.0f + mc;
-			glm::mat3 m = ih * 2.0f + ic;
+			alglm::mat3 m = ih * 2.0f + ic;
 
 			body->setMassData(mass, m);
 
 			FixtureDef fDef;
 			fDef.shape = csShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -595,14 +631,14 @@ void Scene::onPhysicsStart()
 			float Ixx = (1.0f / 12.0f) * (3.0f * r * r + h * h) * rb.m_Mass;
 			float Iyy = (1.0f / 2.0f) * (r * r) * rb.m_Mass;
 			float Izz = Ixx;
-			glm::mat3 m(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 m(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			body->setMassData(rb.m_Mass, m);
 
 			FixtureDef fDef;
 			fDef.shape = cyShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -669,7 +705,7 @@ void Scene::insertEntityInCullTree(Entity &entity)
 	{
 		TransformComponent &tc = entity.getComponent<TransformComponent>();
 
-		CullSphere sphere(tc.getTransform() * glm::vec4(mc.cullSphere.center, 1.0f),
+		CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
 						  mc.cullSphere.radius * tc.getMaxScale());
 
 		mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
@@ -689,9 +725,33 @@ void Scene::removeEntityInCullTree(Entity &entity)
 		auto &mc = entity.getComponent<MeshRendererComponent>();
 		if (mc.m_RenderingComponent == nullptr)
 			return;
-
+		mc.m_RenderingComponent->cleanup();
 		m_cullTree.destroyNode(mc.nodeId);
 		mc.nodeId = NULL_NODE;
+	}
+}
+
+void Scene::removeColliderShaderResourceManager(Entity &entity)
+{
+	if (entity.hasComponent<BoxColliderComponent>())
+	{
+		auto &bc = entity.getComponent<BoxColliderComponent>();
+		bc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<SphereColliderComponent>())
+	{
+		auto &sc = entity.getComponent<SphereColliderComponent>();
+		sc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<CapsuleColliderComponent>())
+	{
+		auto &cc = entity.getComponent<CapsuleColliderComponent>();
+		cc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<CylinderColliderComponent>())
+	{
+		auto &cy = entity.getComponent<CylinderColliderComponent>();
+		cy.m_colliderShaderResourceManager->cleanup();
 	}
 }
 
@@ -728,7 +788,7 @@ void Scene::findMoveObject()
 		float limit = transform.getMaxScale() * mesh.cullSphere.radius * 0.1f;
 		limit = limit * limit;
 
-		if (glm::length2(transform.m_Position - transform.m_LastPosition) > limit)
+		if (alglm::length2(transform.m_Position - transform.m_LastPosition) > limit)
 		{
 			transform.m_LastPosition = transform.m_Position;
 			transform.m_isMoved = true;
@@ -784,34 +844,24 @@ template <> void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraC
 
 template <> void Scene::onComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent &component)
 {
-	component.type = 0;
-
 	// 이미 SAC가 존재하는 경우 새로 생긴 모델 갱신
 	if (entity.hasComponent<SkeletalAnimatorComponent>())
 	{
-		auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+		auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-		auto* sac = sa.sac.get();
+		auto *sac = sa.sac.get();
 		if (component.m_RenderingComponent != nullptr)
 			sac->setModel(component.m_RenderingComponent->getModel());
 	}
-}
-
-template <> void Scene::onComponentAdded<ModelComponent>(Entity entity, ModelComponent &component)
-{
-}
-
-template <> void Scene::onComponentAdded<TextureComponent>(Entity entity, TextureComponent &component)
-{
 }
 
 template <> void Scene::onComponentAdded<LightComponent>(Entity entity, LightComponent &component)
 {
 	auto &tc = entity.getComponent<TransformComponent>();
 
-	component.m_Light = std::make_shared<Light>(Light{tc.m_Position, glm::vec3(0.0f, -1.0f, 0.0f),
-													  glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::cos(glm::radians(12.5f)),
-													  glm::cos(glm::radians(17.5f)), 1, 1, 0, glm::vec2(0.0f, 0.0f)});
+	component.m_Light = std::make_shared<Light>(Light{1.0f, std::cos(alglm::radians(12.5f)),
+													  std::cos(alglm::radians(17.5f)), 1, 1, 0, 0, 0, tc.m_Position,
+													  alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec3(1.0f, 1.0f, 1.0f)});
 }
 
 template <> void Scene::onComponentAdded<RigidbodyComponent>(Entity entity, RigidbodyComponent &component)
@@ -823,18 +873,38 @@ template <> void Scene::onComponentAdded<BoxColliderComponent>(Entity entity, Bo
 	auto &tc = entity.getComponent<TransformComponent>();
 
 	component.m_Size = tc.m_Scale;
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
 }
 
 template <> void Scene::onComponentAdded<SphereColliderComponent>(Entity entity, SphereColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	auto &tc = entity.getComponent<TransformComponent>();
+
+	float maxScale = std::max({tc.m_Scale.x, tc.m_Scale.y, tc.m_Scale.z});
+	component.m_Radius = maxScale / 2;
 }
 
 template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity, CapsuleColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<CylinderColliderComponent>(Entity entity, CylinderColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent &component)
@@ -848,7 +918,7 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 
 	if (entity.hasComponent<MeshRendererComponent>())
 	{
-		auto& mr = entity.getComponent<MeshRendererComponent>();
+		auto &mr = entity.getComponent<MeshRendererComponent>();
 
 		if (mr.m_RenderingComponent != nullptr)
 		{
@@ -858,7 +928,7 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 		}
 	}
 }
-  
+
 void Scene::cleanup()
 {
 	// delete model
@@ -868,6 +938,7 @@ void Scene::cleanup()
 	m_groundModel->cleanup();
 	m_capsuleModel->cleanup();
 	m_cylinderModel->cleanup();
+	m_colliderBoxModel->cleanup();
 
 	m_defaultMaterial->cleanup();
 
@@ -876,6 +947,34 @@ void Scene::cleanup()
 	{
 		auto &mesh = view.get<MeshRendererComponent>(e);
 		mesh.m_RenderingComponent->cleanup();
+	}
+
+	auto view2 = m_Registry.view<BoxColliderComponent>();
+	for (auto e : view2)
+	{
+		auto &box = view2.get<BoxColliderComponent>(e);
+		box.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view3 = m_Registry.view<SphereColliderComponent>();
+	for (auto e : view3)
+	{
+		auto &sphere = view3.get<SphereColliderComponent>(e);
+		sphere.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view4 = m_Registry.view<CapsuleColliderComponent>();
+	for (auto e : view4)
+	{
+		auto &capsule = view4.get<CapsuleColliderComponent>(e);
+		capsule.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view5 = m_Registry.view<CylinderColliderComponent>();
+	for (auto e : view5)
+	{
+		auto &cylinder = view5.get<CylinderColliderComponent>(e);
+		cylinder.m_colliderShaderResourceManager->cleanup();
 	}
 }
 

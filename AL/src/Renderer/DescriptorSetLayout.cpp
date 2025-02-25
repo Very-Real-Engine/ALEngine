@@ -368,4 +368,35 @@ void DescriptorSetLayout::initBackgroundDescriptorSetLayout()
 		throw std::runtime_error("failed to create skybox descriptor set layout!");
 	}
 }
+
+std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::createColliderDescriptorSetLayout()
+{
+	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout =
+		std::unique_ptr<DescriptorSetLayout>(new DescriptorSetLayout());
+	descriptorSetLayout->initColliderDescriptorSetLayout();
+	return descriptorSetLayout;
+}
+
+void DescriptorSetLayout::initColliderDescriptorSetLayout()
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	VkDescriptorSetLayoutBinding mvpBinding{};
+	mvpBinding.binding = 0;
+	mvpBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	mvpBinding.descriptorCount = 1;
+	mvpBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	mvpBinding.pImmutableSamplers = nullptr;
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &mvpBinding;
+
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create collider descriptor set layout!");
+	}
+}
 } // namespace ale

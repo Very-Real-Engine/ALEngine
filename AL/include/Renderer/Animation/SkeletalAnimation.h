@@ -200,5 +200,4 @@ class SkeletalAnimation
 };
 
 } // namespace ale
-
 #endif

@@ -1,5 +1,9 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
+
+/**
+ * @file Common.h
+ * @brief 공통 헤더
+ */
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -7,6 +11,7 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <alglm/include/alglm.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -24,7 +29,7 @@
 #include <stdexcept>
 #include <vector>
 
-//헤더위치가 좀 애매
+// 헤더위치가 좀 애매
 #include "Renderer/Animation/Bones.h"
 
 namespace ale
@@ -46,26 +51,48 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+/**
+ * @brief 디버그 유틸 메시지 생성
+ * @param instance 인스턴스
+ * @param pCreateInfo 생성 정보
+ * @param pAllocator 할당 콜백
+ * @param pDebugMessenger 디버그 메시지
+ * @return VkResult
+ */
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
 									  const VkAllocationCallbacks *pAllocator,
 									  VkDebugUtilsMessengerEXT *pDebugMessenger);
 
+/**
+ * @brief 디버그 유틸 메시지 삭제
+ * @param instance 인스턴스
+ * @param debugMessenger 디버그 메시지
+ * @param pAllocator 할당 콜백
+ */
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
 								   const VkAllocationCallbacks *pAllocator);
 
-// 큐 패밀리 인덱스 관리 구조체
+/**
+ * @brief 큐 패밀리 인덱스 관리 구조체
+ */
 struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
 
+	/**
+	 * @brief 완료 여부 확인
+	 * @return 완료 여부
+	 */
 	bool isComplete()
 	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
 
-// GPU와 surface가 지원하는 SwapChain 지원 세부 정보 구조체
+/**
+ * @brief GPU와 surface가 지원하는 SwapChain 지원 세부 정보 구조체
+ */
 struct SwapChainSupportDetails
 {
 	VkSurfaceCapabilitiesKHR capabilities;
@@ -73,16 +100,22 @@ struct SwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+/**
+ * @brief 정점 구조체
+ */
 struct Vertex
 {
-	glm::vec3 pos;
-	glm::vec3 normal;
-	glm::vec2 texCoord;
-	glm::vec3 tangent;
-	glm::ivec4 boneIds;
-	glm::vec4 weights;
+	alglm::vec3 pos;
+	alglm::vec3 normal;
+	alglm::vec2 texCoord;
+	alglm::vec3 tangent;
+	alglm::ivec4 boneIds;
+	alglm::vec4 weights;
 
-	// 정점 데이터가 전달되는 방법을 알려주는 구조체 반환하는 함수
+	/**
+	 * @brief 정점 데이터가 전달되는 방법을 알려주는 구조체 반환하는 함수
+	 * @return VkVertexInputBindingDescription
+	 */
 	static VkVertexInputBindingDescription getBindingDescription()
 	{
 		// 파이프라인에 정점 데이터가 전달되는 방법을 알려주는 구조체
@@ -96,7 +129,10 @@ struct Vertex
 		return bindingDescription;
 	}
 
-	// 정점 속성별 데이터 형식과 위치를 지정하는 구조체 반환하는 함수
+	/**
+	 * @brief 정점 속성별 데이터 형식과 위치를 지정하는 구조체 반환하는 함수
+	 * @return std::array<VkVertexInputAttributeDescription, 6>
+	 */
 	static std::array<VkVertexInputAttributeDescription, 6> getAttributeDescriptions()
 	{
 		// 정점 속성의 데이터 형식과 위치를 지정하는 구조체
@@ -138,117 +174,142 @@ struct Vertex
 		attributeDescriptions[5].location = 5;
 		attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		attributeDescriptions[5].offset = offsetof(Vertex, weights);
-    
+
 		return attributeDescriptions;
 	}
 };
 
+/**
+ * @brief 유니폼 버퍼 객체
+ */
 struct UniformBufferObject
 {
-	alignas(16) glm::mat4 model;
-	alignas(16) glm::mat4 view;
-	alignas(16) glm::mat4 proj;
+	ALIGN16 alglm::mat4 model;
+	ALIGN16 alglm::mat4 view;
+	ALIGN16 alglm::mat4 proj;
 };
 
-// legacy
-// struct GeometryPassVertexUniformBufferObject
-// {
-// 	alignas(16) glm::mat4 model;  // 64바이트
-// 	alignas(16) glm::mat4 view;	  // 64바이트
-// 	alignas(16) glm::mat4 proj;	  // 64바이트
-// 	alignas(4) bool heightFlag;	  // 4바이트
-// 	alignas(4) float heightScale; // 4바이트
-// 	alignas(8) glm::vec2 padding; // 8바이트 (패딩)
-// };
-  
-struct GeometryPassVertexUniformBufferObject {
-	alignas(16) glm::mat4 model;      // 64바이트
-	alignas(16) glm::mat4 view;       // 64바이트
-	alignas(16) glm::mat4 proj;       // 64바이트
-	glm::mat4 finalBonesMatrices[MAX_BONES];
-	alignas(4) bool heightFlag;       // 4바이트
-	alignas(4) float heightScale;     // 4바이트
-	alignas(8) glm::vec2 padding;     // 8바이트 (패딩)
+/**
+ * @brief Geometry Pass 정점 유니폼 버퍼 객체
+ */
+struct GeometryPassVertexUniformBufferObject
+{
+	ALIGN16 alglm::mat4 model; // 64바이트
+	ALIGN16 alglm::mat4 view;  // 64바이트
+	ALIGN16 alglm::mat4 proj;  // 64바이트
+	ALIGN16 alglm::mat4 finalBonesMatrices[MAX_BONES];
+	ALIGN4 bool heightFlag;	  // 4바이트
+	ALIGN4 float heightScale; // 4바이트
+	ALIGN4 uint32_t padding1;
+	ALIGN4 uint32_t padding2; // 8바이트 (패딩)
 };
 
+/**
+ * @brief Geometry Pass 프래그먼트 유니폼 버퍼 객체
+ */
 struct GeometryPassFragmentUniformBufferObject
 {
-	alignas(16) glm::vec4 albedoValue; // 16바이트 (정렬 우선순위)
-	alignas(4) float roughnessValue;
-	alignas(4) float metallicValue;
-	alignas(4) float aoValue;
+	ALIGN16 alglm::vec4 albedoValue; // 16바이트 (정렬 우선순위)
+	ALIGN4 float roughnessValue;
+	ALIGN4 float metallicValue;
+	ALIGN4 float aoValue;
 
-	alignas(4) bool albedoFlag;
-	alignas(4) bool normalFlag;
-	alignas(4) bool roughnessFlag;
-	alignas(4) bool metallicFlag;
-	alignas(4) bool aoFlag;
-	alignas(8) glm::vec2 padding; // 패딩 추가 (8바이트)
+	ALIGN4 bool albedoFlag;
+	ALIGN4 bool normalFlag;
+	ALIGN4 bool roughnessFlag;
+	ALIGN4 bool metallicFlag;
+	ALIGN4 bool aoFlag;
+	ALIGN4 uint32_t padding1;
+	ALIGN4 uint32_t padding2; // 패딩 추가 (8바이트)
 };
 
+/**
+ * @brief 광원 구조체
+ */
 struct Light
 {
-	alignas(16) glm::vec3 position;	 // 광원의 위치 (점광원, 스포트라이트)
-	alignas(16) glm::vec3 direction; // 광원의 방향 (스포트라이트, 방향성 광원)
-	alignas(16) glm::vec3 color;	 // 광원의 색상
-	alignas(4) float intensity;		 // 광원의 강도
-	alignas(4) float innerCutoff;	 // 스포트라이트 내부 각도 (cosine 값)
-	alignas(4) float outerCutoff;	 // 스포트라이트 외부 각도 (cosine 값)
-	alignas(4) uint32_t type;		 // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
-	alignas(4) uint32_t onShadowMap;
-	alignas(4) uint32_t padding;
-	alignas(8) glm::vec2 padding2;
+	ALIGN4 float intensity;	  // 광원의 강도
+	ALIGN4 float innerCutoff; // 스포트라이트 내부 각도 (cosine 값)
+	ALIGN4 float outerCutoff; // 스포트라이트 외부 각도 (cosine 값)
+	ALIGN4 uint32_t type;	  // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
+	ALIGN4 uint32_t onShadowMap;
+	ALIGN4 uint32_t padding1;
+	ALIGN4 uint32_t padding2;
+	ALIGN4 uint32_t padding3;
+	alglm::vec3 position;  // 광원의 위치 (점광원, 스포트라이트)
+	alglm::vec3 direction; // 광원의 방향 (스포트라이트, 방향성 광원)
+	alglm::vec3 color;	   // 광원의 색상
 };
 
-// struct LightingPassUniformBufferObject
-// {
-// 	alignas(16) glm::vec3 lightPos;
-// 	alignas(16) glm::vec3 lightColor;
-// 	alignas(16) glm::vec3 cameraPos;
-// };
-
+/**
+ * @brief Lighting Pass 유니폼 버퍼 객체
+ */
 struct LightingPassUniformBufferObject
 {
-	alignas(16) Light lights[16];	 // 최대 16개의 광원 정보
-	alignas(16) glm::vec3 cameraPos; // 카메라 위치
-	alignas(16) glm::mat4 view[4][6];
-	alignas(16) glm::mat4 proj[4];
-	alignas(4) uint32_t numLights;	  // 활성화된 광원 개수
-	alignas(4) float ambientStrength; // 주변광 강도
-	alignas(8) glm::vec2 padding;
+	ALIGN16 Light lights[16];	   // 최대 16개의 광원 정보
+	ALIGN16 alglm::vec3 cameraPos; // 카메라 위치
+	ALIGN16 alglm::mat4 view[4][6];
+	ALIGN16 alglm::mat4 proj[4];
+	ALIGN4 uint32_t numLights;	  // 활성화된 광원 개수
+	ALIGN4 float ambientStrength; // 주변광 강도
+	ALIGN4 uint32_t padding1;
+	ALIGN4 uint32_t padding2;
 };
 
+/**
+ * @brief Shadow Map 유니폼 버퍼 객체
+ */
 struct ShadowMapUniformBufferObject
 {
-	alignas(16) glm::mat4 proj;
-	alignas(16) glm::mat4 view;
-	alignas(16) glm::mat4 model;
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::mat4 view;
+	ALIGN16 alglm::mat4 model;
 };
 
+/**
+ * @brief Shadow Cube Map 유니폼 버퍼 객체
+ */
 struct ShadowCubeMapUniformBufferObject
 {
-	alignas(16) glm::mat4 proj;
-	alignas(16) glm::mat4 view[6];
-	alignas(16) glm::mat4 model;
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::mat4 view[6];
+	ALIGN16 alglm::mat4 model;
 };
 
+/**
+ * @brief Shadow Cube Map 레이어 인덱스 유니폼 버퍼 객체
+ */
 struct ShadowCubeMapLayerIndex
 {
-	alignas(4) uint32_t layerIndex;
+	ALIGN4 uint32_t layerIndex;
 };
 
+/**
+ * @brief Spherical Map 유니폼 버퍼 객체
+ */
 struct SphericalMapUniformBufferObject
 {
-	alignas(16) glm::mat4 transform;
-	alignas(4) uint32_t layerIndex;
+	ALIGN16 alglm::mat4 transform;
+	ALIGN4 uint32_t layerIndex;
 };
 
+/**
+ * @brief Background 유니폼 버퍼 객체
+ */
 struct BackgroundUniformBufferObject
 {
-	alignas(16) glm::mat4 proj;
-	alignas(16) glm::mat4 view;
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::mat4 view;
+};
+
+/**
+ * @brief Collider 유니폼 버퍼 객체
+ */
+struct ColliderUniformBufferObject
+{
+	alignas(16) alglm::mat4 model;
+	alignas(16) alglm::mat4 view;
+	alignas(16) alglm::mat4 proj;
 };
 
 } // namespace ale
-
-#endif

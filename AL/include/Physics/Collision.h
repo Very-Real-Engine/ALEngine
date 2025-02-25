@@ -8,17 +8,17 @@ struct AABB
 {
 	bool isValid() const;
 
-	glm::vec3 getCenter() const
+	alglm::vec3 getCenter() const
 	{
 	}
 
-	glm::vec3 getExtents() const
+	alglm::vec3 getExtents() const
 	{
 	}
 
 	float getSurface() const
 	{
-		glm::vec3 v = upperBound - lowerBound;
+		alglm::vec3 v = upperBound - lowerBound;
 
 		return (v.x * v.y + v.y * v.z + v.z * v.x) * 2.0f;
 	}
@@ -50,8 +50,8 @@ struct AABB
 		return result;
 	}
 
-	glm::vec3 lowerBound;
-	glm::vec3 upperBound;
+	alglm::vec3 lowerBound;
+	alglm::vec3 upperBound;
 };
 
 // translation, rotation
@@ -61,40 +61,40 @@ struct Transform
 	{
 	}
 
-	Transform(const glm::vec3 &p, const glm::quat &r) : position(p), orientation(r)
+	Transform(const alglm::vec3 &p, const alglm::quat &r) : position(p), orientation(r)
 	{
 	}
 
-	void set(const glm::vec3 &p, float angle)
+	void set(const alglm::vec3 &p, float angle)
 	{
 		position = p;
 		// set orientation by angle
 	}
 
-	glm::mat4 toMatrix() const
+	alglm::mat4 toMatrix() const
 	{
 		// Create a 4x4 transformation matrix
-		glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position); // Translation
-		glm::mat4 rotationMatrix = glm::toMat4(glm::normalize(orientation));	 // Rotation
+		alglm::mat4 translationMatrix = alglm::translate(alglm::mat4(1.0f), position); // Translation
+		alglm::mat4 rotationMatrix = alglm::toMat4(alglm::normalize(orientation));	   // Rotation
 
 		// Combine translation and rotation
 		return translationMatrix * rotationMatrix;
 	}
 
-	glm::vec3 position;
-	glm::quat orientation;
+	alglm::vec3 position;
+	alglm::quat orientation;
 };
 
 struct Sweep
 {
-	glm::vec3 p;
-	glm::quat q;
+	alglm::vec3 p;
+	alglm::quat q;
 	float alpha;
 };
 
 inline bool testOverlap(const AABB &a, const AABB &b)
 {
-	glm::vec3 d1, d2;
+	alglm::vec3 d1, d2;
 
 	d1 = b.lowerBound - a.upperBound;
 	d2 = a.lowerBound - b.upperBound;
@@ -111,9 +111,9 @@ struct ManifoldPoint
 	float normalImpulse;  // 법선 방향 충격량
 	float tangentImpulse; // 접촉면 충격량
 	float seperation;	  // 관통 깊이
-	glm::vec3 pointA;	  // 충돌 지점의 위치
-	glm::vec3 pointB;	  // 충돌 지점의 위치
-	glm::vec3 normal;	  // 법선 벡터
+	alglm::vec3 pointA;	  // 충돌 지점의 위치
+	alglm::vec3 pointB;	  // 충돌 지점의 위치
+	alglm::vec3 normal;	  // 법선 벡터
 };
 
 const int32_t MAX_MANIFOLD_COUNT = 40;

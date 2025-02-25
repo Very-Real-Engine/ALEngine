@@ -10,8 +10,8 @@ class BoxToCapsuleContact : public Contact
 	static Contact *create(Fixture *fixtureA, Fixture *fixtureB, int32_t indexA, int32_t indexB);
 	BoxToCapsuleContact(Fixture *fixtureA, Fixture *fixtureB, int32_t indexA, int32_t indexB);
 
-	virtual glm::vec3 supportA(const ConvexInfo &box, glm::vec3 dir) override;
-	virtual glm::vec3 supportB(const ConvexInfo &capsule, glm::vec3 dir) override;
+	virtual alglm::vec3 supportA(const ConvexInfo &box, alglm::vec3 dir) override;
+	virtual alglm::vec3 supportB(const ConvexInfo &capsule, alglm::vec3 dir) override;
 	virtual void findCollisionPoints(const ConvexInfo &box, const ConvexInfo &capsule, CollisionInfo &collisionInfo,
 									 EpaInfo &epaInfo, SimplexArray &simplexArray) override;
 };

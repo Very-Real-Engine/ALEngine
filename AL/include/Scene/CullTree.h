@@ -21,14 +21,14 @@ ECullState operator|(ECullState state1, ECullState state2);
 
 struct CullSphere
 {
-	glm::vec3 center;
+	alglm::vec3 center;
 	float radius;
 
 	CullSphere() = default;
 
-	CullSphere(glm::vec3 &center, float radius) : center(center), radius(radius) {};
+	CullSphere(alglm::vec3 &center, float radius) : center(center), radius(radius) {};
 
-	CullSphere(glm::vec4 &center, float radius) : center(center), radius(radius) {};
+	CullSphere(alglm::vec4 &center, float radius) : center(center), radius(radius) {};
 
 	float getVolume()
 	{
@@ -37,8 +37,8 @@ struct CullSphere
 
 	void combine(const CullSphere &sphere1, const CullSphere &sphere2)
 	{
-		glm::vec3 centerDiff = sphere2.center - sphere1.center;
-		float distance = glm::length(centerDiff);
+		alglm::vec3 centerDiff = sphere2.center - sphere1.center;
+		float distance = alglm::length(centerDiff);
 
 		// sphere1이 sphere2를 포함
 		if (sphere1.radius >= distance + sphere2.radius)
@@ -67,15 +67,15 @@ struct CullSphere
 struct FrustumPlane
 {
 	float distance;
-	glm::vec3 normal;
+	alglm::vec3 normal;
 
 	FrustumPlane() = default;
 
 	// CCW
-	FrustumPlane(const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3)
+	FrustumPlane(const alglm::vec3 &p1, const alglm::vec3 &p2, const alglm::vec3 &p3)
 	{
-		normal = glm::normalize(glm::cross(p2 - p1, p3 - p1));
-		distance = glm::dot(normal, p1);
+		normal = alglm::normalize(alglm::cross(p2 - p1, p3 - p1));
+		distance = alglm::dot(normal, p1);
 		// AL_CORE_INFO("p1: {}, {}, {}", p1.x, p1.y, p1.z);
 		// AL_CORE_INFO("normal: {}, {}, {}", normal.x, normal.y, normal.z);
 		// AL_CORE_INFO("distance: {}", distance);
@@ -100,7 +100,7 @@ struct Frustum
 
 		for (int32_t i = 0; i < 6; ++i)
 		{
-			float dotResult = glm::dot(plane[i].normal, sphere.center);
+			float dotResult = alglm::dot(plane[i].normal, sphere.center);
 			float distance = plane[i].distance;
 			// AL_CORE_INFO("sphere center: {}, {}, {}", sphere.center.x, sphere.center.y, sphere.center.z);
 			// AL_CORE_INFO("sphere radius: {}", sphere.radius);

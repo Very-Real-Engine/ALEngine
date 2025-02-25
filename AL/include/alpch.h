@@ -1,5 +1,10 @@
-#ifndef ALPCH_H
-#define ALPCH_H
+#pragma once
+
+/**
+ * @file alpch.h
+ * @brief 프로젝트에서 사용되는 미리 컴파일된 헤더(precompiled header).
+ *        자주 사용되는 헤더 파일을 포함하여 컴파일 시간을 단축합니다.
+ */
 
 // precompiled header
 #include <algorithm>
@@ -32,4 +37,5 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#endif
+// alglm
+#include <alglm/include/alglm.h>

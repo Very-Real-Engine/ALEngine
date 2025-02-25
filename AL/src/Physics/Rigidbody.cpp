@@ -5,21 +5,21 @@
 
 namespace ale
 {
-static inline void _calculateTransformMatrix(glm::mat4 &transformMatrix, const glm::vec3 &position,
-											 const glm::quat &orientation)
+static inline void _calculateTransformMatrix(alglm::mat4 &transformMatrix, const alglm::vec3 &position,
+											 const alglm::quat &orientation)
 {
-	glm::mat4 rotationMatrix = glm::toMat4(orientation);
+	alglm::mat4 rotationMatrix = alglm::toMat4(orientation);
 
-	glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), position);
+	alglm::mat4 translationMatrix = alglm::translate(alglm::mat4(1.0f), position);
 
 	transformMatrix = translationMatrix * rotationMatrix;
 }
 
-static inline void _transformInertiaTensor(glm::mat3 &iitWorld, const glm::mat3 &iitBody, const glm::mat4 &rotmat)
+static inline void _transformInertiaTensor(alglm::mat3 &iitWorld, const alglm::mat3 &iitBody, const alglm::mat4 &rotmat)
 {
-	glm::mat3 rotationMatrix = glm::mat3(rotmat);
+	alglm::mat3 rotationMatrix = alglm::mat3(rotmat);
 
-	iitWorld = rotationMatrix * iitBody * glm::transpose(rotationMatrix);
+	iitWorld = rotationMatrix * iitBody * alglm::transpose(rotationMatrix);
 }
 
 int32_t Rigidbody::BODY_COUNT = 0;
@@ -43,12 +43,12 @@ Rigidbody::Rigidbody(const BodyDef *bd, World *world)
 
 	m_posFreeze = bd->m_posFreeze;
 	m_rotFreeze = bd->m_rotFreeze;
-	
+
 	m_useGravity = bd->m_useGravity;
 	m_canSleep = bd->m_canSleep;
 	m_isAwake = bd->m_isAwake;
 	m_sleepTime = 0.0f;
-	m_acceleration = glm::vec3(0.0f);
+	m_acceleration = alglm::vec3(0.0f);
 	m_flags = 0;
 	m_contactLinks = nullptr;
 	m_bodyID = BODY_COUNT++;
@@ -99,12 +99,12 @@ void Rigidbody::integrate(float duration)
 		addGravity();
 
 	// set angular acceleration
-	glm::vec3 angularAcceleration = m_inverseInertiaTensorWorld * m_torqueAccum;
+	alglm::vec3 angularAcceleration = m_inverseInertiaTensorWorld * m_torqueAccum;
 
 	// set velocity by accerleration
 	m_linearVelocity += (m_lastFrameAcceleration * duration) * m_posFreeze;
 	m_angularVelocity += (angularAcceleration * duration) * m_rotFreeze;
-	
+
 	// impose drag
 	m_linearVelocity *= (1.0f - m_linearDamping);
 	m_angularVelocity *= (1.0f - m_angularDamping);
@@ -117,9 +117,9 @@ void Rigidbody::integrate(float duration)
 	m_xf.position += (m_linearVelocity * duration);
 
 	// set orientation
-	glm::quat angularVelocityQuat = glm::quat(0.0f, m_angularVelocity * duration); // 각속도를 쿼터니언으로 변환
-	m_xf.orientation += 0.5f * angularVelocityQuat * m_xf.orientation;			   // 쿼터니언 미분 공식
-	m_xf.orientation = glm::normalize(m_xf.orientation);						   // 정규화하여 안정성 유지
+	alglm::quat angularVelocityQuat = alglm::quat(0.0f, m_angularVelocity * duration); // 각속도를 쿼터니언으로 변환
+	m_xf.orientation += 0.5f * angularVelocityQuat * m_xf.orientation;				   // 쿼터니언 미분 공식
+	m_xf.orientation = alglm::normalize(m_xf.orientation);							   // 정규화하여 안정성 유지
 
 	calculateDerivedData();
 	clearAccumulators();
@@ -129,33 +129,33 @@ void Rigidbody::integrate(float duration)
 
 void Rigidbody::calculateDerivedData()
 {
-	glm::quat q = glm::normalize(m_xf.orientation);
+	alglm::quat q = alglm::normalize(m_xf.orientation);
 
 	_calculateTransformMatrix(m_transformMatrix, m_xf.position, q);
 	_transformInertiaTensor(m_inverseInertiaTensorWorld, m_inverseInertiaTensor, m_transformMatrix);
 }
 
-void Rigidbody::addForce(const glm::vec3 &force)
+void Rigidbody::addForce(const alglm::vec3 &force)
 {
 	m_forceAccum += force;
 }
 
-void Rigidbody::addForceAtPoint(const glm::vec3 &force, const glm::vec3 &point)
+void Rigidbody::addForceAtPoint(const alglm::vec3 &force, const alglm::vec3 &point)
 {
-	glm::vec3 pt = point;
+	alglm::vec3 pt = point;
 	pt -= m_xf.position;
 
 	m_forceAccum += force;
-	m_torqueAccum += glm::cross(pt, force);
+	m_torqueAccum += alglm::cross(pt, force);
 }
 
-void Rigidbody::addForceAtBodyPoint(const glm::vec3 &force, const glm::vec3 &point)
+void Rigidbody::addForceAtBodyPoint(const alglm::vec3 &force, const alglm::vec3 &point)
 {
-	glm::vec3 pt = getPointInWorldSpace(point);
+	alglm::vec3 pt = getPointInWorldSpace(point);
 	addForceAtPoint(force, pt);
 }
 
-void Rigidbody::addTorque(const glm::vec3 &torque)
+void Rigidbody::addTorque(const alglm::vec3 &torque)
 {
 	m_torqueAccum += torque;
 }
@@ -164,7 +164,7 @@ void Rigidbody::addGravity()
 {
 	if (m_type == EBodyType::DYNAMIC_BODY)
 	{
-		m_lastFrameAcceleration += glm::vec3(0.0f, -m_gravityScale, 0.0f);
+		m_lastFrameAcceleration += alglm::vec3(0.0f, -m_gravityScale, 0.0f);
 	}
 }
 
@@ -177,7 +177,7 @@ void Rigidbody::calculateForceAccum()
 	}
 }
 
-void Rigidbody::registerForce(const glm::vec3 &force)
+void Rigidbody::registerForce(const alglm::vec3 &force)
 {
 	setAwake();
 
@@ -196,10 +196,10 @@ void Rigidbody::clearAccumulators()
 	m_torqueAccum.z = 0;
 }
 
-glm::vec3 Rigidbody::getPointInWorldSpace(const glm::vec3 &point) const
+alglm::vec3 Rigidbody::getPointInWorldSpace(const alglm::vec3 &point) const
 {
-	glm::vec4 ret = m_transformMatrix * glm::vec4(point, 1.0f);
-	return glm::vec3(ret);
+	alglm::vec4 ret = m_transformMatrix * alglm::vec4(point, 1.0f);
+	return alglm::vec3(ret);
 }
 
 const Transform &Rigidbody::getTransform() const
@@ -207,32 +207,32 @@ const Transform &Rigidbody::getTransform() const
 	return m_xf;
 }
 
-const glm::vec3 &Rigidbody::getPosition() const
+const alglm::vec3 &Rigidbody::getPosition() const
 {
 	return m_xf.position;
 }
 
-const glm::quat &Rigidbody::getOrientation() const
+const alglm::quat &Rigidbody::getOrientation() const
 {
 	return m_xf.orientation;
 }
 
-const glm::vec3 &Rigidbody::getLinearVelocity() const
+const alglm::vec3 &Rigidbody::getLinearVelocity() const
 {
 	return m_linearVelocity;
 }
 
-const glm::vec3 &Rigidbody::getAngularVelocity() const
+const alglm::vec3 &Rigidbody::getAngularVelocity() const
 {
 	return m_angularVelocity;
 }
 
-const glm::mat4 &Rigidbody::getTransformMatrix() const
+const alglm::mat4 &Rigidbody::getTransformMatrix() const
 {
 	return m_transformMatrix;
 }
 
-const glm::mat3 &Rigidbody::getInverseInertiaTensorWorld() const
+const alglm::mat3 &Rigidbody::getInverseInertiaTensorWorld() const
 {
 	return m_inverseInertiaTensorWorld;
 }
@@ -267,28 +267,28 @@ int32_t Rigidbody::getBodyId() const
 	return m_bodyID;
 }
 
-void Rigidbody::setPosition(glm::vec3 &position)
+void Rigidbody::setPosition(alglm::vec3 &position)
 {
 	position -= m_xf.position;
 	m_xf.position += position * m_posFreeze;
 }
 
-void Rigidbody::setOrientation(glm::quat &orientation)
+void Rigidbody::setOrientation(alglm::quat &orientation)
 {
 	m_xf.orientation = orientation;
 }
 
-void Rigidbody::setLinearVelocity(glm::vec3 &linearVelocity)
+void Rigidbody::setLinearVelocity(alglm::vec3 &linearVelocity)
 {
 	m_linearVelocity = linearVelocity * m_posFreeze;
 }
 
-void Rigidbody::setAngularVelocity(glm::vec3 &angularVelocity)
+void Rigidbody::setAngularVelocity(alglm::vec3 &angularVelocity)
 {
 	m_angularVelocity = angularVelocity * m_rotFreeze;
 }
 
-void Rigidbody::setMassData(float mass, const glm::mat3 &inertiaTensor)
+void Rigidbody::setMassData(float mass, const alglm::mat3 &inertiaTensor)
 {
 	// 추후 예외처리
 	if (mass == 0)
@@ -302,7 +302,7 @@ void Rigidbody::setMassData(float mass, const glm::mat3 &inertiaTensor)
 
 		// 역행렬 존재 가능한지 예외처리
 		m_inverseInertiaTensor = inertiaTensor;
-		m_inverseInertiaTensor = glm::inverse(m_inverseInertiaTensor);
+		m_inverseInertiaTensor = alglm::inverse(m_inverseInertiaTensor);
 	}
 }
 

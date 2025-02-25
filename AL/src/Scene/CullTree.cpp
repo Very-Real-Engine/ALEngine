@@ -32,7 +32,7 @@ void CullTree::updateTree()
 		{
 			MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
 			CullSphere newSphere(transformComponent.m_WorldTransform *
-									 glm::vec4(meshRendererComponent.cullSphere.center, 1.0f),
+									 alglm::vec4(meshRendererComponent.cullSphere.center, 1.0f),
 								 transformComponent.getMaxScale() * meshRendererComponent.cullSphere.radius);
 			moveNode(meshRendererComponent.nodeId, newSphere);
 			transformComponent.m_isMoved = false;

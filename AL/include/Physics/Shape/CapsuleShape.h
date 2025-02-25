@@ -18,14 +18,14 @@ class CapsuleShape : public Shape
 	void computeAABB(AABB *aabb, const Transform &xf) const;
 	// void setShapeFeatures(const std::vector<Vertex> &vertices);
 	// void computeCapsuleFeatures(const std::vector<Vertex> &vertices);
-	void setShapeFeatures(const glm::vec3 &center, float radius, float height);
+	void setShapeFeatures(const alglm::vec3 &center, float radius, float height);
 	void createCapsulePoints();
 	virtual ConvexInfo getShapeInfo(const Transform &transform) const override;
 
 	float m_radius;
 	float m_height;
-	glm::vec3 m_axes[21];
-	glm::vec3 m_points[40];
-	std::set<glm::vec3, Vec3Comparator> m_vertices;
+	alglm::vec3 m_axes[21];
+	alglm::vec3 m_points[40];
+	std::set<alglm::vec3, Vec3Comparator> m_vertices;
 };
 } // namespace ale

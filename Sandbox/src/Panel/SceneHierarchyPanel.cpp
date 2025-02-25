@@ -120,19 +120,18 @@ void SceneHierarchyPanel::onImGuiRender()
 	ImGui::End();
 }
 
-static bool decomposeMatrix(const glm::mat4 &transform, glm::vec3 &outScale, glm::vec3 &outRotation,
-							glm::vec3 &outTranslation)
+static bool decomposeMatrix(const alglm::mat4 &transform, alglm::vec3 &outScale, alglm::vec3 &outRotation,
+							alglm::vec3 &outTranslation)
 {
-	glm::vec3 skew;
-	glm::vec4 perspective;
+	alglm::vec4 perspective;
 
-	glm::quat &orientation = glm::quat(glm::radians(outRotation));
+	alglm::quat &orientation = alglm::quat(alglm::radians(outRotation));
 
-	// glm::decompose(매트릭스, 스케일, 로테이션, 위치, skew, perspective)
-	if (!glm::decompose(transform, outScale, orientation, outTranslation, skew, perspective))
+	// alglm::decompose(매트릭스, 스케일, 로테이션, 위치, skew, perspective)
+	if (!alglm::decompose(transform, outScale, orientation, outTranslation, perspective))
 		return false;
 
-	outRotation = glm::eulerAngles(orientation);
+	outRotation = alglm::eulerAngles(orientation);
 
 	return true;
 }
@@ -160,10 +159,10 @@ void SceneHierarchyPanel::updateRelationship(Entity &newParent, Entity &child)
 
 	// 4. 자식의 위치를 부모 기준 local좌표로 변환
 	auto &tc = child.getComponent<TransformComponent>();
-	glm::mat4 parentWorld = newParent.getComponent<TransformComponent>().m_WorldTransform; // 부모의 월드 매트릭스
-	glm::mat4 childWorld = child.getComponent<TransformComponent>().m_WorldTransform;	   // 자식의 현재 월드 매트릭스
-	// tc.m_LocalTransform = glm::inverse(parentWorld) * childWorld;
-	glm::mat4 childLocalMat = glm::inverse(parentWorld) * childWorld;
+	alglm::mat4 parentWorld = newParent.getComponent<TransformComponent>().m_WorldTransform; // 부모의 월드 매트릭스
+	alglm::mat4 childWorld = child.getComponent<TransformComponent>().m_WorldTransform; // 자식의 현재 월드 매트릭스
+	// tc.m_LocalTransform = alglm::inverse(parentWorld) * childWorld;
+	alglm::mat4 childLocalMat = alglm::inverse(parentWorld) * childWorld;
 
 	decomposeMatrix(childLocalMat, tc.m_Scale, tc.m_Rotation, tc.m_Position);
 	// updateTransforms(newParent);
@@ -198,7 +197,7 @@ void SceneHierarchyPanel::updateTransforms(Entity entity)
 	}
 
 	Entity t{top, m_Context.get()};
-	updateTransformRecursive(t, glm::mat4(1.0f));
+	updateTransformRecursive(t, alglm::mat4(1.0f));
 }
 
 void SceneHierarchyPanel::updateActiveInfo(Entity &entity, bool parentEffectiveActive)
@@ -216,7 +215,7 @@ void SceneHierarchyPanel::updateActiveInfo(Entity &entity, bool parentEffectiveA
 	}
 }
 
-void SceneHierarchyPanel::updateTransformRecursive(Entity entity, const glm::mat4 &parentWorldTransform)
+void SceneHierarchyPanel::updateTransformRecursive(Entity entity, const alglm::mat4 &parentWorldTransform)
 {
 	auto &transform = entity.getComponent<TransformComponent>();
 	auto &relation = entity.getComponent<RelationshipComponent>();
@@ -307,7 +306,7 @@ void SceneHierarchyPanel::drawEntityNode(Entity entity)
 	}
 }
 
-static void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f,
+static void drawVec3Control(const std::string &label, alglm::vec3 &values, float resetValue = 0.0f,
 							float columnWidth = 100.0f)
 {
 	ImGuiIO &io = ImGui::GetIO();
@@ -416,7 +415,7 @@ static void drawFloatControl(const std::string &label, float &value, float reset
 	ImGui::PopID();
 }
 
-static void drawColorControl(const std::string &label, glm::vec3 &color, float columnWidth = 100.0f)
+static void drawColorControl(const std::string &label, alglm::vec3 &color, float columnWidth = 100.0f)
 {
 	ImGuiIO &io = ImGui::GetIO();
 	auto boldFont = io.Fonts->Fonts[0];
@@ -430,8 +429,8 @@ static void drawColorControl(const std::string &label, glm::vec3 &color, float c
 	ImGui::NextColumn();
 
 	// ColorEdit3을 사용하여 색상 조정
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});						 // 패딩 조정
-	ImGui::ColorEdit3("##Color", glm::value_ptr(color), ImGuiColorEditFlags_DisplayRGB); // 컬러 조정
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});						   // 패딩 조정
+	ImGui::ColorEdit3("##Color", alglm::value_ptr(color), ImGuiColorEditFlags_DisplayRGB); // 컬러 조정
 	ImGui::PopStyleVar();
 
 	// 컬럼 마무리
@@ -551,7 +550,9 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction uiF
 		if (!std::is_same<T, TransformComponent>::value)
 		{
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			if (ImGui::Button("+", ImVec2{lineHeight, lineHeight}))
+			UUID uuid;
+			std::string label = "+##" + std::to_string((uint64_t)uuid);
+			if (ImGui::Button(label.c_str(), ImVec2{lineHeight, lineHeight}))
 			{
 				ImGui::OpenPopup("ComponentSettings");
 			}
@@ -617,51 +618,55 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 
 	if (ImGui::Button("Add Component"))
 	{
-		ImGui::OpenPopup("AddComponent");
+		if (!m_Context->isRunning())
+			ImGui::OpenPopup("AddComponent");
 	}
 
 	ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(600, 400));
-	if (ImGui::BeginPopup("AddComponent"))
+	if (!m_Context->isRunning())
 	{
-		const char *text = "Component";
-		float windowWidth = ImGui::GetWindowSize().x;
-		float textWidth = ImGui::CalcTextSize(text).x;
-		float textPosX = (windowWidth - textWidth) * 0.5f;
-
-		ImGui::SetCursorPosX(textPosX);
-		ImGui::Text("%s", text);
-		ImGui::Separator();
-
-		displayAddComponentEntry<CameraComponent>("Camera");
-		displayAddComponentEntry<ScriptComponent>("Script");
-		displayAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
-		displayAddComponentEntry<LightComponent>("Light");
-		displayAddComponentEntry<RigidbodyComponent>("Rigidbody");
-		displayAddComponentEntry<SkeletalAnimatorComponent>("Animator");
-
-		bool hasCollider = m_SelectionContext.hasComponent<BoxColliderComponent>() ||
-						   m_SelectionContext.hasComponent<SphereColliderComponent>() ||
-						   m_SelectionContext.hasComponent<CapsuleColliderComponent>() ||
-						   m_SelectionContext.hasComponent<CylinderColliderComponent>();
-
-		if (!hasCollider)
+		if (ImGui::BeginPopup("AddComponent"))
 		{
-			displayAddComponentEntry<BoxColliderComponent>("Box Collider");
-			displayAddComponentEntry<SphereColliderComponent>("Sphere Collider");
-			displayAddComponentEntry<CapsuleColliderComponent>("Capsule Collider");
-			displayAddComponentEntry<CylinderColliderComponent>("Cylinder Collider");
-		}
+			const char *text = "Component";
+			float windowWidth = ImGui::GetWindowSize().x;
+			float textWidth = ImGui::CalcTextSize(text).x;
+			float textPosX = (windowWidth - textWidth) * 0.5f;
 
-		ImGui::EndPopup();
+			ImGui::SetCursorPosX(textPosX);
+			ImGui::Text("%s", text);
+			ImGui::Separator();
+
+			displayAddComponentEntry<CameraComponent>("Camera");
+			displayAddComponentEntry<ScriptComponent>("Script");
+			displayAddComponentEntry<MeshRendererComponent>("Mesh Renderer");
+			displayAddComponentEntry<LightComponent>("Light");
+			displayAddComponentEntry<RigidbodyComponent>("Rigidbody");
+			displayAddComponentEntry<SkeletalAnimatorComponent>("Animator");
+
+			bool hasCollider = m_SelectionContext.hasComponent<BoxColliderComponent>() ||
+							   m_SelectionContext.hasComponent<SphereColliderComponent>() ||
+							   m_SelectionContext.hasComponent<CapsuleColliderComponent>() ||
+							   m_SelectionContext.hasComponent<CylinderColliderComponent>();
+
+			if (!hasCollider)
+			{
+				displayAddComponentEntry<BoxColliderComponent>("Box Collider");
+				displayAddComponentEntry<SphereColliderComponent>("Sphere Collider");
+				displayAddComponentEntry<CapsuleColliderComponent>("Capsule Collider");
+				displayAddComponentEntry<CylinderColliderComponent>("Cylinder Collider");
+			}
+
+			ImGui::EndPopup();
+		}
 	}
 	ImGui::PopItemWidth();
 
 	drawComponent<TransformComponent>("Transform", entity, [this, entity](auto &component) mutable {
 		// Update Recursively
 		drawVec3Control("Position", component.m_Position);
-		auto &rotation = glm::degrees(component.m_Rotation);
+		auto &rotation = alglm::degrees(component.m_Rotation);
 		drawVec3Control("Rotation", rotation);
-		component.m_Rotation = glm::radians(rotation);
+		component.m_Rotation = alglm::radians(rotation);
 		drawVec3Control("Scale", component.m_Scale, 1.0f);
 		updateTransforms(entity);
 	});
@@ -669,9 +674,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	drawComponent<CameraComponent>("Camera", entity, [](auto &component) {
 		auto &camera = component.m_Camera;
 
-		float perspectiveVerticalFov = glm::degrees(camera.getFov());
+		float perspectiveVerticalFov = alglm::degrees(camera.getFov());
 		if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
-			camera.setFov(glm::radians(perspectiveVerticalFov));
+			camera.setFov(alglm::radians(perspectiveVerticalFov));
 
 		float perspectiveNear = camera.getNear();
 		if (ImGui::DragFloat("Near", &perspectiveNear))
@@ -704,7 +709,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		if (!entity.hasComponent<MeshRendererComponent>())
 		{
 			ImGui::Text("Animator needs MeshRenderComponent");
-			return ;
+			return;
 		}
 		auto& mr = entity.getComponent<MeshRendererComponent>();
 		if (!mr.m_RenderingComponent)
@@ -713,7 +718,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			return ;
 		}
 
-		SAComponent* sac = (SAComponent *)component.sac.get();
+		SAComponent *sac = (SAComponent *)component.sac.get();
 		// 1. 현재 애니메이션 버튼/박스
 		ImGui::Text("Current Animation:");
 		std::string currentAnimationName = sac->getCurrentAnimationName();
@@ -805,7 +810,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			component.m_SpeedFactor = std::max(0.1f, component.m_SpeedFactor - 0.5f);
 		}
 		ImGui::SameLine();
-		// 현재 속도 텍스트 
+		// 현재 속도 텍스트
 		float customVerticalPadding = 5.0f;
 		ImVec2 currentPadding = ImGui::GetStyle().FramePadding;
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(currentPadding.x, customVerticalPadding));
@@ -857,17 +862,16 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		float buttonX = timelinePos.x + timelineProgress * timelineWidth;
 		ImVec2 buttonCenter(buttonX, timelinePos.y + timelineHeight * 0.5f);
 
-		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+		ImDrawList *draw_list = ImGui::GetWindowDrawList();
 		draw_list->AddLine(ImVec2(timelinePos.x, timelinePos.y + timelineHeight * 0.5f),
-						ImVec2(timelinePos.x + timelineWidth, timelinePos.y + timelineHeight * 0.5f),
-						IM_COL32(200,200,200,255), 2.0f);
-		draw_list->AddCircleFilled(buttonCenter, buttonRadius, IM_COL32(239,109,128,255));
+						   ImVec2(timelinePos.x + timelineWidth, timelinePos.y + timelineHeight * 0.5f),
+						   IM_COL32(200, 200, 200, 255), 2.0f);
+		draw_list->AddCircleFilled(buttonCenter, buttonRadius, IM_COL32(239, 109, 128, 255));
 
 		// Dummy로 위젯 크기 확보
 		ImGui::Dummy(ImVec2(timelineWidth, timelineHeight));
 
 		ImGui::Spacing();
-
 
 		// 5. 애니메이션 속성 (테스트용: 반복 체크박스)
 		bool repeat;
@@ -881,10 +885,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 
 			sac->setRepeat(repeat, index);
 		}
-		
+
 		ImGui::Separator();
 		ImGui::Spacing();
-		//StateManager
+		// StateManager
 		if (entity.hasComponent<ScriptComponent>())
 		{
 			std::shared_ptr<AnimationStateManager> stateManager = sac->getStateManager();
@@ -902,9 +906,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			// 좌측: State 리스트
 			ImGui::BeginChild("StatesList", ImVec2(150, 150), true);
 			static std::string selectedStateKey;
-			for (auto& kv : states)
+			for (auto &kv : states)
 			{
-				const std::string& key = kv.first;
+				const std::string &key = kv.first;
 				// AnimationState& state = kv.second;
 				if (ImGui::Selectable(key.c_str(), selectedStateKey == key))
 				{
@@ -925,10 +929,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			static int selectedTransitionIndex = -1;
 
 			ImGui::BeginChild("TransitionsList", ImVec2(150, 150), true);
-			
+
 			for (int i = 0; i < transitions.size(); i++)
 			{
-				AnimationStateTransition& trans = transitions[i];
+				AnimationStateTransition &trans = transitions[i];
 				char label[128];
 				snprintf(label, 128, "From:%s > To:%s", trans.fromState.c_str(), trans.toState.c_str());
 				if (ImGui::Selectable(label, selectedTransitionIndex == i))
@@ -942,10 +946,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			{
 				AnimationStateTransition newTransition;
 				newTransition.fromState = "";
-				newTransition.toState   = "";
+				newTransition.toState = "";
 				newTransition.blendTime = 0.5f;
 				newTransition.conditionName = "";
-				
+
 				transitions.push_back(newTransition);
 				selectedTransitionIndex = static_cast<int>(transitions.size()) - 1;
 			}
@@ -961,7 +965,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			// State 수정창
 			if (!selectedStateKey.empty())
 			{
-				AnimationState& state = states[selectedStateKey];
+				AnimationState &state = states[selectedStateKey];
 				ImGui::Text("State Details:");
 				ImGui::Columns(2, "StateColumns", false);
 
@@ -1033,7 +1037,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			// Transition 수정창
 			if (selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
 			{
-				AnimationStateTransition& transition = transitions[selectedTransitionIndex];
+				AnimationStateTransition &transition = transitions[selectedTransitionIndex];
 				ImGui::Text("Transition Details:");
 				ImGui::Columns(2, "TransitionColumns", false);
 
@@ -1048,9 +1052,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					}
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("STATE_ITEM"))
+						if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("STATE_ITEM"))
 						{
-							const char* payloadStr = (const char*)payload->Data;
+							const char *payloadStr = (const char *)payload->Data;
 							if (transition.fromState != payloadStr)
 							{
 								transition.fromState = std::string(payloadStr);
@@ -1073,9 +1077,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					}
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("STATE_ITEM"))
+						if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("STATE_ITEM"))
 						{
-							const char* payloadStr = (const char*)payload->Data;
+							const char *payloadStr = (const char *)payload->Data;
 							if (transition.toState != payloadStr)
 							{
 								transition.toState = std::string(payloadStr);
@@ -1109,16 +1113,17 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 				ImGui::Text("Condition:");
 				ImGui::NextColumn();
 				{
-					std::string condMethod = transition.conditionName.empty() ? "Drop Method Here" : transition.conditionName;
+					std::string condMethod =
+						transition.conditionName.empty() ? "Drop Method Here" : transition.conditionName;
 					if (ImGui::Button(condMethod.c_str(), ImVec2(-1, 0)))
 					{
 						// 클릭 동작 없음
 					}
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("METHOD_ITEM"))
+						if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("METHOD_ITEM"))
 						{
-							std::string methodStr = std::string((const char*)payload->Data);
+							std::string methodStr = std::string((const char *)payload->Data);
 							if (transition.conditionName != methodStr)
 							{
 								transition.conditionName = methodStr;
@@ -1149,7 +1154,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 				component.m_Methods = ScriptingEngine::getBooleanMethods(entity);
 			}
 			ImGui::BeginChild("MethodsList", ImVec2(200, 150), true);
-			for (auto& pair : component.m_Methods)
+			for (auto &pair : component.m_Methods)
 			{
 				ImGui::Selectable(pair.first.c_str());
 				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
@@ -1196,22 +1201,13 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					// model 정보 바꾸기
 
 					component.type = i;
-					if (i == 0) // None
-					{
-						component.path.clear();
-						component.matPath.clear();
-						component.isMatChanged = false;
-						// scene->insertEntityInCullTree(entity);
-						scene->removeEntityInCullTree(entity);
-						component.m_RenderingComponent = nullptr;
-						component.cullState = ECullState::NONE;
-					}
-					else if (i == 7)
+					if (i == 0 || i == 7)
 					{
 						break;
 					}
 					else
 					{
+						component.m_RenderingComponent->cleanup();
 						component.m_RenderingComponent =
 							RenderingComponent::createRenderingComponent(scene->getDefaultModel(i));
 						component.path.clear();
@@ -1242,6 +1238,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					filePath.extension().string() == ".obj")
 				{
 					std::shared_ptr<Model> model = Model::createModel(filePath.string(), scene->getDefaultMaterial());
+					component.m_RenderingComponent->cleanup();
 					component.m_RenderingComponent = RenderingComponent::createRenderingComponent(model);
 					component.type = 7;
 					component.path = filePath.string();
@@ -1251,8 +1248,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					// SAC가 존재하는 경우 모델 갱신
 					if (entity.hasComponent<SkeletalAnimatorComponent>())
 					{
-						auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
-						auto* sac = sa.sac.get();
+						auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
+						auto *sac = sa.sac.get();
 
 						if (component.m_RenderingComponent != nullptr)
 							sac->setModel(component.m_RenderingComponent->getModel());
@@ -1279,9 +1276,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					// SAC가 존재하는 경우 모델 갱신
 					if (entity.hasComponent<SkeletalAnimatorComponent>())
 					{
-						auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+						auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-						auto* sac = sa.sac.get();
+						auto *sac = sa.sac.get();
 						if (component.m_RenderingComponent != nullptr)
 							sac->setModel(component.m_RenderingComponent->getModel());
 					}
@@ -1469,11 +1466,32 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Mass", component.m_Mass);
 		drawFloatControl("Drag", component.m_Damping);
 		drawFloatControl("Angular Drag", component.m_AngularDamping);
-
-		// bool useGravity = component.m_UseGravity ? true : false;
-		// ImGui::Checkbox("Gravity", &useGravity);
-		// component.m_UseGravity = useGravity ? true : false;
 		drawCheckBox("Gravity", component.m_UseGravity);
+
+		const char *bodyTypeStrings[] = {"Static", "Dynamic"};
+		const char *currentBodyTypeString = bodyTypeStrings[(int)component.m_Type];
+
+		if (ImGui::BeginCombo("##MeshTypeCombo", currentBodyTypeString))
+		{
+			for (int32_t i = 0; i < 2; ++i)
+			{
+				bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
+
+				if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
+				{
+					currentBodyTypeString = bodyTypeStrings[i];
+					if (i == 0)
+						component.m_Type = RigidbodyComponent::EBodyType::Static;
+					else
+						component.m_Type = RigidbodyComponent::EBodyType::Dynamic;
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
 
 		// FreezePos
 		ImGui::Text("FreezePos");
@@ -1552,30 +1570,38 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawVec3Control("Center", component.m_Center);
 		drawVec3Control("Size", component.m_Size);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawCheckBox("IsActive", component.m_IsActive);
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<SphereColliderComponent>("SphereCollider", entity, [](auto &component) {
 		drawVec3Control("Center", component.m_Center);
 		drawFloatControl("Radius", component.m_Radius);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawCheckBox("IsActive", component.m_IsActive);
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<CapsuleColliderComponent>("CapsuleCollider", entity, [](auto &component) {
 		drawVec3Control("Center", component.m_Center);
 		drawFloatControl("Radius", component.m_Radius);
-		drawFloatControl("Radius", component.m_Height);
+		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawCheckBox("IsActive", component.m_IsActive);
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 	drawComponent<CylinderColliderComponent>("CylinderCollider", entity, [](auto &component) {
 		drawVec3Control("Center", component.m_Center);
 		drawFloatControl("Radius", component.m_Radius);
-		drawFloatControl("Radius", component.m_Height);
+		drawFloatControl("Height", component.m_Height);
 		drawCheckBox("IsTrigger", component.m_IsTrigger);
-
+		drawCheckBox("IsActive", component.m_IsActive);
+		drawFloatControl("Friction", component.m_Friction);
+		drawFloatControl("Restitution", component.m_Restitution);
 		// Runtime 중 수정 기능
 	});
 }
@@ -1587,6 +1613,25 @@ template <typename T> void SceneHierarchyPanel::displayAddComponentEntry(const s
 		if (ImGui::Selectable(entryName.c_str()))
 		{
 			m_SelectionContext.addComponent<T>();
+			ImGui::CloseCurrentPopup();
+		}
+	}
+}
+
+template <> void SceneHierarchyPanel::displayAddComponentEntry<MeshRendererComponent>(const std::string &entryName)
+{
+	if (!m_SelectionContext.hasComponent<MeshRendererComponent>())
+	{
+		if (ImGui::Selectable(entryName.c_str()))
+		{
+			auto &mc = m_SelectionContext.addComponent<MeshRendererComponent>();
+			std::shared_ptr<Model> &model = m_Context->getBoxModel();
+
+			mc.type = 1;
+			mc.m_RenderingComponent = RenderingComponent::createRenderingComponent(model);
+			mc.cullSphere = mc.m_RenderingComponent->getCullSphere();
+
+			m_Context->insertEntityInCullTree(m_SelectionContext);
 			ImGui::CloseCurrentPopup();
 		}
 	}

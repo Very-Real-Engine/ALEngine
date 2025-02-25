@@ -27,6 +27,10 @@ extern "C"
 
 namespace ale
 {
+/**
+ * @enum EScriptFieldType
+ * @brief 스크립트 필드의 데이터 유형을 정의하는 열거형.
+ */
 enum class EScriptFieldType
 {
 	NONE = 0,
@@ -49,6 +53,10 @@ enum class EScriptFieldType
 	STRING
 };
 
+/**
+ * @struct ScriptField
+ * @brief 개별 스크립트 필드 정보를 저장하는 구조체.
+ */
 struct ScriptField
 {
 	EScriptFieldType m_Type;
@@ -57,15 +65,37 @@ struct ScriptField
 	MonoClassField *m_ClassField;
 };
 
-// App Assembly로부터 파싱해온 Class
+/**
+ * @class ScriptClass
+ * @brief App Assembly로부터 파싱해온 Class. C# 스크립트 클래스를 나타내며, 앱 어셈블리에서 로드된 클래스 정보를 관리.
+ */
 class ScriptClass
 {
   public:
+	/// @brief ScriptClass 기본 생성자.
 	ScriptClass() = default;
+
+	/// @brief ScriptClass 생성자.
+	/// @param classNamespace C# 스크립트의 namespace.
+	/// @param className C# 스크립트의 Class 이름.
+	/// @param isCore Core Assembly인지 확인하는 불리언 변수.
 	ScriptClass(const std::string &classNamespace, const std::string &className, bool isCore = false);
 
+	/// @brief ScriptClass를 Mono 구조에 맞게 생성.
+	/// @return MonoObject* 
 	MonoObject *instantiate();
+
+	/// @brief Mono Script Class의 함수 가져오기.
+	/// @param name 함수 이름.
+	/// @param parameterCount 함수의 매개변수 개수.
+	/// @return MonoMethod*
 	MonoMethod *getMethod(const std::string &name, int parameterCount);
+
+	/// @brief MonoMethod를 런타임에 invoke하는 함수.
+	/// @param instance Mono Script Class
+	/// @param method Mono Method
+	/// @param params 인자 포인터
+	/// @return MonoObject*
 	MonoObject *invokeMethod(MonoObject *instance, MonoMethod *method, void **params = nullptr);
 	std::vector<std::string> getAllMethods();
 
@@ -84,12 +114,23 @@ class ScriptClass
 	friend class ScriptingEngine;
 };
 
+/**
+ * @class ScriptInstance
+ * @brief 개별 엔티티의 C# 스크립트 인스턴스를 나타내는 클래스.
+ */
 class ScriptInstance
 {
   public:
+	/// @brief ScriptInstance 생성자.
+	/// @param scriptClass 기존에 생성한 ScriptClass 
+	/// @param entity ScriptComponent를 가지고 있는 Entity.
 	ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, Entity entity);
 
+	/// @brief ScriptInstance의 OnCreate 함수 실행.
 	void invokeOnCreate();
+
+	/// @brief ScriptInstance의 OnUpdate 함수 실행.
+	/// @param ts 프레임 간격
 	void invokeOnUpdate(float ts);
 	std::map<std::string, std::function<bool()>> getAllBooleanMethods();
 
@@ -103,6 +144,10 @@ class ScriptInstance
 		return m_Instance;
 	}
 
+	/// @brief ScriptInstance의 변수 값을 가져오는 템플릿 함수.
+	/// @tparam T 변수 type.
+	/// @param name 변수 이름.
+	/// @return 변수 type.
 	template <typename T> T getFieldValue(const std::string &name)
 	{
 		static_assert(sizeof(T) <= 16, "Type too large!");
@@ -114,6 +159,10 @@ class ScriptInstance
 		return *(T *)s_FieldValueBuffer;
 	}
 
+	/// @brief ScriptInstance의 변수 값 설정하는 템플릿 함수.
+	/// @tparam T 변수 type.
+	/// @param name 변수 이름.
+	/// @param value 변수 값.
 	template <typename T> void setFieldValue(const std::string &name, T value)
 	{
 		static_assert(sizeof(T) <= 16, "Type too large!");
@@ -139,6 +188,10 @@ class ScriptInstance
 	friend class ScriptFieldInstance;
 };
 
+/**
+ * @struct ScriptFieldInstance
+ * @brief 특정 엔티티의 개별 스크립트 필드 데이터를 저장하는 구조체.
+ */
 struct ScriptFieldInstance
 {
 	ScriptField m_Field;
@@ -169,22 +222,53 @@ struct ScriptFieldInstance
 
 using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;
 
+/**
+ * @class ScriptingEngine
+ * @brief C# 스크립트와 상호작용하는 Mono 런타임을 관리하는 클래스.
+ */
 class ScriptingEngine
 {
   public:
+	/// @brief ScriptingEngine 초기화.
 	static void init();
+
+	/// @brief ScriptingEngine 종료.
 	static void shutDown();
 
+	/// @brief ScriptCore를 읽어 저장하는 함수.
+	/// @param filepath ScriptCore file 경로.
+	/// @return true 읽는데 성공.
+	/// @return false 읽는데 실패.
 	static bool loadAssembly(const std::filesystem::path &filepath);
+
+	/// @brief ScriptModule를 읽어 저장하는 함수.
+	/// @param filepath ScriptModule file 경로.
+	/// @return true 읽는데 성공.
+	/// @return false 읽는데 실패.
 	static bool loadAppAssembly(const std::filesystem::path &filepath);
 
 	static void reloadAssembly();
 
+	/// @brief ScriptEngine을 Runtime에 시작하는 함수.
+	/// @param scene 현재 Scene의 정보.
 	static void onRuntimeStart(Scene *scene);
+
+	/// @brief ScriptEngine을 Runtime에 끝내는 함수.
 	static void onRuntimeStop();
 
+	/// @brief Entity Class가 존재하는 확인하는 함수.
+	/// @param fullClassName Entity Class 이름.
+	/// @return true Entity Class가 존재함.
+	/// @return false Entity Class가 존재하지 않음.
 	static bool entityClassExists(const std::string &fullClassName);
+
+	/// @brief Entity의 ScriptComponent 정보를 읽어와 OnCreate를 실행하는 함수.
+	/// @param entity Entity.
 	static void onCreateEntity(Entity entity);
+
+	/// @brief Entity의 ScriptComponent 정보를 읽어와 OnUpdate를 실행하는 함수.
+	/// @param entity Entity.
+	/// @param ts 프레임간 간격. 
 	static void onUpdateEntity(Entity entity, Timestep ts);
 	static std::map<std::string, std::function<bool()>> getBooleanMethods(Entity entity);
 
@@ -211,10 +295,24 @@ class ScriptingEngine
 
 namespace utils
 {
-
+/**
+ * @brief MonoString* 형식을 std::string으로 변환합니다.
+ * @param MonoString*
+ * @return std::string
+ */
 std::string monoStringToString2(MonoString *string);
+ /**
+ * @brief std::string 형식을 MonoString* 으로 변환합니다.
+ * @param std::string
+ * @return MonoString*
+ */
 MonoString* stringToMonoString(std::string& string);
 
+/**
+ * @brief 스크립트 필드 유형을 문자열로 변환합니다.
+ * @param fieldType 변환할 필드 유형.
+ * @return const char* 변환된 문자열.
+ */
 inline const char *scriptFieldTypeToString(EScriptFieldType fieldType)
 {
 	switch (fieldType)
@@ -259,6 +357,9 @@ inline const char *scriptFieldTypeToString(EScriptFieldType fieldType)
 	return "None";
 }
 
+/// @brief 문자열을 스크립트 필드 열거형으로 변환.
+/// @param fieldType 필드 타입 문자열.
+/// @return 스크립트 필드 열거형.
 inline EScriptFieldType scriptFieldTypeFromString(std::string_view fieldType)
 {
 	if (fieldType == "None")

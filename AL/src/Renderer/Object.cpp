@@ -3,8 +3,8 @@
 namespace ale
 {
 std::unique_ptr<Object> Object::createObject(std::string name, std::shared_ptr<Model> model,
-											 std::shared_ptr<Texture> texture, glm::vec3 position, glm::vec3 rotation,
-											 glm::vec3 scale)
+											 std::shared_ptr<Texture> texture, alglm::vec3 position,
+											 alglm::vec3 rotation, alglm::vec3 scale)
 {
 	std::unique_ptr<Object> object = std::unique_ptr<Object>(new Object());
 	object->initObject(name, model, texture, position, rotation, scale);
@@ -16,19 +16,19 @@ std::unique_ptr<Object> Object::createObject(std::string name, std::shared_ptr<M
 // 	m_model->draw(commandBuffer);
 // }
 
-glm::mat4 Object::getModelMatrix()
+alglm::mat4 Object::getModelMatrix()
 {
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, m_position);
-	model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::scale(model, m_scale);
+	alglm::mat4 model = alglm::mat4(1.0f);
+	model = alglm::translate(model, m_position);
+	model = alglm::rotate(model, alglm::radians(m_rotation.x), alglm::vec3(1.0f, 0.0f, 0.0f));
+	model = alglm::rotate(model, alglm::radians(m_rotation.y), alglm::vec3(0.0f, 1.0f, 0.0f));
+	model = alglm::rotate(model, alglm::radians(m_rotation.z), alglm::vec3(0.0f, 0.0f, 1.0f));
+	model = alglm::scale(model, m_scale);
 	return model;
 }
 
 void Object::initObject(std::string name, std::shared_ptr<Model> model, std::shared_ptr<Texture> texture,
-						glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+						alglm::vec3 position, alglm::vec3 rotation, alglm::vec3 scale)
 {
 	m_name = name;
 	m_model = model;

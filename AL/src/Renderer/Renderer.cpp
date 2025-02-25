@@ -50,7 +50,7 @@ void Renderer::init(GLFWwindow *window)
 	inFlightFences = m_syncObjects->getInFlightFences();
 #pragma endregion
 
-	m_sphericalMapTexture = Texture::createTexture("./Sandbox/assets/defaultSkybox.hdr");
+	m_sphericalMapTexture = Texture::createHDRTexture("./Sandbox/assets/defaultSkybox.hdr");
 
 	m_sphericalMapRenderPass = RenderPass::createSphericalMapRenderPass();
 	sphericalMapRenderPass = m_sphericalMapRenderPass->getRenderPass();
@@ -121,6 +121,21 @@ void Renderer::init(GLFWwindow *window)
 	viewPortFramebuffers = m_viewPortFrameBuffers->getFramebuffers();
 	viewPortImageView = m_viewPortFrameBuffers->getViewPortImageView();
 	viewPortSampler = VulkanUtil::createSampler();
+
+	m_colliderRenderPass = RenderPass::createColliderRenderPass();
+	colliderRenderPass = m_colliderRenderPass->getRenderPass();
+
+	m_colliderFrameBuffers =
+		FrameBuffers::createColliderFrameBuffers(viewPortSize, colliderRenderPass, viewPortImageView);
+	colliderFramebuffers = m_colliderFrameBuffers->getFramebuffers();
+
+	m_colliderDescriptorSetLayout = DescriptorSetLayout::createColliderDescriptorSetLayout();
+	colliderDescriptorSetLayout = m_colliderDescriptorSetLayout->getDescriptorSetLayout();
+	context.setColliderDescriptorSetLayout(colliderDescriptorSetLayout);
+
+	m_colliderPipeline = Pipeline::createColliderPipeline(colliderRenderPass, colliderDescriptorSetLayout);
+	colliderPipelineLayout = m_colliderPipeline->getPipelineLayout();
+	colliderGraphicsPipeline = m_colliderPipeline->getPipeline();
 
 	m_ImGuiSwapChainFrameBuffers = FrameBuffers::createImGuiFrameBuffers(m_swapChain.get(), imGuiRenderPass);
 	imGuiSwapChainFrameBuffers = m_ImGuiSwapChainFrameBuffers->getFramebuffers();
@@ -224,6 +239,7 @@ void Renderer::cleanup()
 	m_noCamTexture->cleanup();
 
 	// framebuffer
+	m_colliderFrameBuffers->cleanup();
 	m_viewPortFrameBuffers->cleanup();
 	m_ImGuiSwapChainFrameBuffers->cleanup();
 	for (size_t i = 0; i < 4; i++)
@@ -252,11 +268,13 @@ void Renderer::cleanup()
 	}
 	m_sphericalMapPipeline->cleanup();
 	m_backgroundPipeline->cleanup();
+	m_colliderPipeline->cleanup();
 
 	// renderpass
 	m_deferredRenderPass->cleanup();
 	m_sphericalMapRenderPass->cleanup();
 	m_backgroundRenderPass->cleanup();
+	m_colliderRenderPass->cleanup();
 	for (size_t i = 0; i < 4; i++)
 	{
 		m_shadowMapRenderPass[i]->cleanup();
@@ -286,6 +304,7 @@ void Renderer::cleanup()
 	m_shadowCubeMapDescriptorSetLayout->cleanup();
 	m_sphericalMapDescriptorSetLayout->cleanup();
 	m_backgroundDescriptorSetLayout->cleanup();
+	m_colliderDescriptorSetLayout->cleanup();
 
 	m_syncObjects->cleanup();
 	VulkanContext::getContext().cleanup();
@@ -339,6 +358,10 @@ void Renderer::recreateViewPort()
 	m_geometryPassPipeline->cleanup();
 	m_lightingPassPipeline->cleanup();
 	m_deferredRenderPass->cleanup();
+
+	m_colliderFrameBuffers->cleanup();
+	m_colliderPipeline->cleanup();
+	m_colliderRenderPass->cleanup();
 
 	m_viewPortFrameBuffers->cleanup();
 	m_viewPortShaderResourceManager->cleanup();
@@ -395,6 +418,16 @@ void Renderer::recreateViewPort()
 	m_noCamShaderResourceManager->initViewPortShaderResourceManager(
 		viewPortDescriptorSetLayout, m_noCamTexture->getImageView(), m_noCamTexture->getSampler());
 	noCamDescriptorSets = m_noCamShaderResourceManager->getDescriptorSets();
+
+	m_colliderRenderPass->initColliderRenderPass();
+	colliderRenderPass = m_colliderRenderPass->getRenderPass();
+
+	m_colliderFrameBuffers->initColliderFrameBuffers(viewPortSize, colliderRenderPass, viewPortImageView);
+	colliderFramebuffers = m_colliderFrameBuffers->getFramebuffers();
+
+	m_colliderPipeline->initColliderPipeline(colliderRenderPass, colliderDescriptorSetLayout);
+	colliderPipelineLayout = m_colliderPipeline->getPipelineLayout();
+	colliderGraphicsPipeline = m_colliderPipeline->getPipeline();
 }
 
 void Renderer::updateSkybox(std::string path)
@@ -415,8 +448,7 @@ void Renderer::updateSkybox(std::string path)
 	m_sphericalMapTexture->cleanup();
 
 	// 새로운 텍스쳐 로드
-	m_sphericalMapTexture->initTexture(path);
-
+	m_sphericalMapTexture->initHDRTexture(path);
 	m_sphericalMapRenderPass->initSphericalMapRenderPass();
 	sphericalMapRenderPass = m_sphericalMapRenderPass->getRenderPass();
 
@@ -486,7 +518,7 @@ void Renderer::beginScene(Scene *scene, EditorCamera &camera)
 void Renderer::beginScene(Scene *scene, Camera &camera)
 {
 	// projMatrix = camera.getProjection();
-	// projMatrix = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	// projMatrix = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	camera.setAspectRatio(viewPortSize.x / viewPortSize.y);
 	projMatrix = camera.getProjection();
 	viewMatirx = camera.getView();
@@ -543,7 +575,7 @@ void Renderer::drawFrame(Scene *scene)
 		ImVec2 guiViewPortSize = ImGui::GetContentRegionAvail();
 		if (guiViewPortSize.x != viewPortSize.x || guiViewPortSize.y != viewPortSize.y)
 		{
-			viewPortSize = glm::vec2(guiViewPortSize.x, guiViewPortSize.y);
+			viewPortSize = alglm::vec2(guiViewPortSize.x, guiViewPortSize.y);
 			recreateViewPort();
 		}
 		ImGui::Image(reinterpret_cast<ImTextureID>(viewPortDescriptorSets[0]), ImVec2{viewPortSize.x, viewPortSize.y});
@@ -589,6 +621,8 @@ void Renderer::drawFrame(Scene *scene)
 	recordBackgroundCommandBuffer(commandBuffers[currentFrame]);
 	recordDeferredRenderPassCommandBuffer(scene, commandBuffers[currentFrame], imageIndex,
 										  shadowMapIndex); // 현재 작업할 image의 index와 commandBuffer를 전송
+
+	recordColliderCommandBuffer(scene, commandBuffers[currentFrame]);
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -719,7 +753,7 @@ void Renderer::drawNoCamFrame()
 		ImVec2 guiViewPortSize = ImGui::GetContentRegionAvail();
 		if (guiViewPortSize.x != viewPortSize.x || guiViewPortSize.y != viewPortSize.y)
 		{
-			viewPortSize = glm::vec2(guiViewPortSize.x, guiViewPortSize.y);
+			viewPortSize = alglm::vec2(guiViewPortSize.x, guiViewPortSize.y);
 			recreateViewPort();
 		}
 		ImGui::Image(reinterpret_cast<ImTextureID>(noCamDescriptorSets[0]), ImVec2{viewPortSize.x, viewPortSize.y});
@@ -893,11 +927,10 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	drawInfo.commandBuffer = commandBuffer;
 	drawInfo.view = viewMatirx;
 	drawInfo.projection = projMatrix;
-	// drawInfo.projection = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	// drawInfo.projection = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	drawInfo.projection[1][1] *= -1;
-	
 	for (size_t i = 0; i < MAX_BONES; ++i) // 항등행렬 초기화
-		drawInfo.finalBonesMatrices[i] = glm::mat4(1.0f);
+		drawInfo.finalBonesMatrices[i] = alglm::mat4(1.0f);
 
 	// int32_t drawNum = 0;
 	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
@@ -908,15 +941,14 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 			continue;
 		}
 		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
-		if (auto* sa = scene->tryGet<SkeletalAnimatorComponent>(entity)) //SA 컴포넌트 있으면 데이터 전달
+		if (auto *sa = scene->tryGet<SkeletalAnimatorComponent>(entity)) // SA 컴포넌트 있으면 데이터 전달
 		{
-			auto* sac = (SAComponent *)sa->sac.get();
-			std::vector<glm::mat4> matrices = sac->getCurrentPose();
+			auto *sac = (SAComponent *)sa->sac.get();
+			std::vector<alglm::mat4> matrices = sac->getCurrentPose();
 
 			for (size_t i = 0; i < matrices.size(); ++i)
 				drawInfo.finalBonesMatrices[i] = matrices[i];
 		}
-		
 		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
 		if (meshRendererComponent.cullState == ECullState::RENDER)
 		{
@@ -952,43 +984,44 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	for (auto entity : lightView)
 	{
 		std::shared_ptr<Light> light = lightView.get<LightComponent>(entity).m_Light;
-		glm::vec3 lightPos = light->position;
-		glm::vec3 lightDir = glm::normalize(light->direction);
+		alglm::vec3 lightPos = light->position;
+		alglm::vec3 lightDir = alglm::normalize(light->direction);
 		float outerCutoff = light->outerCutoff;
 		lightingPassUbo.lights[i] = *light.get();
-		glm::vec3 up = (glm::abs(lightDir.y) > 0.99f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+		alglm::vec3 up =
+			(alglm::abs(lightDir.y) > 0.99f) ? alglm::vec3(0.0f, 0.0f, 1.0f) : alglm::vec3(0.0f, 1.0f, 0.0f);
 
 		if (light->onShadowMap == 1 && index < shadowMapIndex)
 		{
 			if (light->type == 0)
 			{
 				lightingPassUbo.view[index][0] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][1] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][2] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
 				lightingPassUbo.view[index][3] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
 				lightingPassUbo.view[index][4] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][5] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
-				lightingPassUbo.proj[index] = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
+				lightingPassUbo.proj[index] = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 				// lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			else if (light->type == 1)
 			{
-				lightingPassUbo.view[index][0] = glm::lookAt(lightPos, lightPos + lightDir, up);
-				lightingPassUbo.proj[index] = glm::perspective(glm::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
+				lightingPassUbo.view[index][0] = alglm::lookAt(lightPos, lightPos + lightDir, up);
+				lightingPassUbo.proj[index] = alglm::perspective(std::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
 				lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			else if (light->type == 2)
 			{
-				lightPos = glm::vec3(0.0f) - lightDir * 10.0f;
-				lightingPassUbo.view[index][0] = glm::lookAt(lightPos, glm::vec3(0.0f), up);
+				lightPos = alglm::vec3(0.0f) - lightDir * 10.0f;
+				lightingPassUbo.view[index][0] = alglm::lookAt(lightPos, alglm::vec3(0.0f), up);
 				float orthoSize = 10.0f;
-				lightingPassUbo.proj[index] = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -10.0f, 20.0f);
+				lightingPassUbo.proj[index] = alglm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -10.0f, 20.0f);
 				lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			index++;
@@ -1082,31 +1115,31 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 	// Depth Bias 설정
 	vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
 
-	glm::vec3 lightPos = lightInfo.position;
-	glm::vec3 lightDir = glm::normalize(lightInfo.direction);
+	alglm::vec3 lightPos = lightInfo.position;
+	alglm::vec3 lightDir = alglm::normalize(lightInfo.direction);
 	float outerCutoff = lightInfo.outerCutoff;
-	glm::vec3 up = (glm::abs(lightDir.y) > 0.99f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 lightView = glm::mat4(1.0f);
-	glm::mat4 lightProj = glm::mat4(1.0f);
+	alglm::vec3 up = (alglm::abs(lightDir.y) > 0.99f) ? alglm::vec3(0.0f, 0.0f, 1.0f) : alglm::vec3(0.0f, 1.0f, 0.0f);
+	alglm::mat4 lightView = alglm::mat4(1.0f);
+	alglm::mat4 lightProj = alglm::mat4(1.0f);
 	if (lightInfo.type == 1)
 	{ // spotlight
-		lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
-		lightProj = glm::perspective(glm::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
+		lightView = alglm::lookAt(lightPos, lightPos + lightDir, up);
+		lightProj = alglm::perspective(std::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
 		lightProj[1][1] *= -1;
 	}
 	else if (lightInfo.type == 2)
-	{												   // directional light
-		lightPos = glm::vec3(0.0f) - lightDir * 10.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
+	{													 // directional light
+		lightPos = alglm::vec3(0.0f) - lightDir * 10.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
 		// View 행렬 계산
-		lightView = glm::lookAt(lightPos,		 // 광원이 가리키는 가상의 위치
-								glm::vec3(0.0f), // 광원이 비추는 중심 (월드 좌표계 원점)
-								up				 // 카메라의 상단 방향
+		lightView = alglm::lookAt(lightPos,			 // 광원이 가리키는 가상의 위치
+								  alglm::vec3(0.0f), // 광원이 비추는 중심 (월드 좌표계 원점)
+								  up				 // 카메라의 상단 방향
 		);
 		// Projection 행렬 계산 (Orthographic)
-		float orthoSize = 10.0f;					  // 광원의 영향을 받는 영역의 크기
-		lightProj = glm::ortho(-orthoSize, orthoSize, // 좌/우 클립 경계
-							   -orthoSize, orthoSize, // 아래/위 클립 경계
-							   -10.0f, 20.0f		  // 근/원 클립 경계
+		float orthoSize = 10.0f;						// 광원의 영향을 받는 영역의 크기
+		lightProj = alglm::ortho(-orthoSize, orthoSize, // 좌/우 클립 경계
+								 -orthoSize, orthoSize, // 아래/위 클립 경계
+								 -10.0f, 20.0f			// 근/원 클립 경계
 		);
 		// Vulkan 좌표계 보정
 		lightProj[1][1] *= -1;
@@ -1196,17 +1229,17 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 	// Depth Bias 설정
 	vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
 
-	glm::vec3 lightPos = lightInfo.position;
-	glm::mat4 lightProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+	alglm::vec3 lightPos = lightInfo.position;
+	alglm::mat4 lightProj = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 	// lightProj[1][1] *= -1;
 
 	ShadowCubeMapDrawInfo drawInfo;
-	drawInfo.view[0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-	drawInfo.view[3] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-	drawInfo.view[4] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[5] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[0] = alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[1] = alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[2] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
+	drawInfo.view[3] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
+	drawInfo.view[4] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[5] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
 	drawInfo.projection = lightProj;
 	drawInfo.commandBuffer = commandBuffer;
 	drawInfo.pipelineLayout = shadowCubeMapPipelineLayout[shadowMapIndex];
@@ -1266,26 +1299,26 @@ void Renderer::recordSphericalMapCommandBuffer()
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, sphericalMapGraphicsPipeline);
 
-	auto projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	auto projection = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	projection[1][1] *= -1;
-	std::vector<glm::mat4> views = {
+	std::vector<alglm::mat4> views = {
 		// **Right (+X) - layerIndex 0**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Left (-X) - layerIndex 1**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Top (+Y) - layerIndex 2**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec3(0.0f, 0.0f, -1.0f)),
 
 		// **Bottom (-Y) - layerIndex 3**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec3(0.0f, 0.0f, 1.0f)),
 
 		// **Front (+Z) - layerIndex 4**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Back (-Z) - layerIndex 5**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))};
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec3(0.0f, -1.0f, 0.0f))};
 
 	for (size_t i = 0; i < 6; i++)
 	{
@@ -1333,10 +1366,10 @@ void Renderer::recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer)
 	scissor.extent = {static_cast<uint32_t>(viewPortSize.x), static_cast<uint32_t>(viewPortSize.y)};
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	alglm::mat4 projection = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	projection[1][1] *= -1;
 
-	glm::mat4 view = viewMatirx;
+	alglm::mat4 view = viewMatirx;
 
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, backgroundPipelineLayout, 0, 1,
 							&backgroundDescriptorSets[currentFrame], 0, nullptr);
@@ -1351,4 +1384,151 @@ void Renderer::recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer)
 	vkCmdEndRenderPass(commandBuffer);
 }
 
+void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer)
+{
+	VkClearValue clearValue{};
+	clearValue.color = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = colliderRenderPass;
+	renderPassInfo.framebuffer = colliderFramebuffers[0];
+	renderPassInfo.renderArea.offset = {0, 0};
+	renderPassInfo.renderArea.extent = {static_cast<uint32_t>(viewPortSize.x), static_cast<uint32_t>(viewPortSize.y)};
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearValue;
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderGraphicsPipeline);
+
+	ColliderUniformBufferObject ubo{};
+	ubo.proj = projMatrix;
+	ubo.proj[1][1] *= -1;
+	ubo.view = viewMatirx;
+
+	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, SphereColliderComponent>();
+	for (auto entity : view)
+	{
+		if (!view.get<TagComponent>(entity).m_isActive || !view.get<SphereColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		SphereColliderComponent &sphereColliderComponent = view.get<SphereColliderComponent>(entity);
+		float radius = sphereColliderComponent.m_Radius;
+		alglm::vec3 center = sphereColliderComponent.m_Center;
+
+		auto &transform = view.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f));
+
+		auto &shaderResourceManager = sphereColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["sphere"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view2 = scene->getAllEntitiesWith<TransformComponent, TagComponent, BoxColliderComponent>();
+	for (auto entity : view2)
+	{
+		if (!view2.get<TagComponent>(entity).m_isActive || !view2.get<BoxColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		BoxColliderComponent &boxColliderComponent = view2.get<BoxColliderComponent>(entity);
+		alglm::vec3 size = boxColliderComponent.m_Size;
+		alglm::vec3 center = boxColliderComponent.m_Center;
+
+		auto &transform = view2.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, size);
+
+		auto &shaderResourceManager = boxColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["colliderBox"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view3 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CapsuleColliderComponent>();
+	for (auto entity : view3)
+	{
+		if (!view3.get<TagComponent>(entity).m_isActive || !view3.get<CapsuleColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		CapsuleColliderComponent &capsuleColliderComponent = view3.get<CapsuleColliderComponent>(entity);
+		float radius = capsuleColliderComponent.m_Radius;
+		float height = capsuleColliderComponent.m_Height;
+		alglm::vec3 center = capsuleColliderComponent.m_Center;
+
+		auto &transform = view3.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f, height, radius * 2.0f));
+
+		auto &shaderResourceManager = capsuleColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["capsule"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view4 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CylinderColliderComponent>();
+	for (auto entity : view4)
+	{
+		if (!view4.get<TagComponent>(entity).m_isActive || !view4.get<CylinderColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		CylinderColliderComponent &cylinderColliderComponent = view4.get<CylinderColliderComponent>(entity);
+		float radius = cylinderColliderComponent.m_Radius;
+		float height = cylinderColliderComponent.m_Height;
+		alglm::vec3 center = cylinderColliderComponent.m_Center;
+
+		auto &transform = view4.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f, height, radius * 2.0f));
+
+		auto &shaderResourceManager = cylinderColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["cylinder"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	vkCmdEndRenderPass(commandBuffer);
+}
 } // namespace ale

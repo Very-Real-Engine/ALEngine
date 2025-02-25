@@ -35,6 +35,20 @@ std::shared_ptr<Model> Model::createBoxModel(std::shared_ptr<Material> &defaultM
 	return model;
 }
 
+std::shared_ptr<Model> Model::createColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	auto &renderer = App::get().getRenderer();
+	auto &modelsMap = renderer.getModelsMap();
+	if (modelsMap.find("colliderBox") != modelsMap.end())
+	{
+		return modelsMap["colliderBox"];
+	}
+	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
+	model->initColliderBoxModel(defaultMaterial);
+	modelsMap["colliderBox"] = model;
+	return model;
+}
+
 std::shared_ptr<Model> Model::createSphereModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	auto &renderer = App::get().getRenderer();
@@ -134,11 +148,12 @@ void Model::draw(DrawInfo &drawInfo)
 			vertexUbo.finalBonesMatrices[i] = drawInfo.finalBonesMatrices[i];
 		vertexUbo.heightFlag = drawInfo.materials[i]->getHeightMap().flag;
 		vertexUbo.heightScale = 0.1;
-		vertexUbo.padding = glm::vec2(0.0f);
+		vertexUbo.padding1 = 0;
+		vertexUbo.padding2 = 0;
 		vertexUniformBuffers[index]->updateUniformBuffer(&vertexUbo, sizeof(vertexUbo));
 
 		GeometryPassFragmentUniformBufferObject fragmentUbo{};
-		fragmentUbo.albedoValue = glm::vec4(drawInfo.materials[i]->getAlbedo().albedo, 1.0f);
+		fragmentUbo.albedoValue = alglm::vec4(drawInfo.materials[i]->getAlbedo().albedo, 1.0f);
 		fragmentUbo.roughnessValue = drawInfo.materials[i]->getRoughness().roughness;
 		fragmentUbo.metallicValue = drawInfo.materials[i]->getMetallic().metallic;
 		fragmentUbo.aoValue = drawInfo.materials[i]->getAOMap().ao;
@@ -147,7 +162,8 @@ void Model::draw(DrawInfo &drawInfo)
 		fragmentUbo.roughnessFlag = drawInfo.materials[i]->getRoughness().flag;
 		fragmentUbo.metallicFlag = drawInfo.materials[i]->getMetallic().flag;
 		fragmentUbo.aoFlag = drawInfo.materials[i]->getAOMap().flag;
-		fragmentUbo.padding = glm::vec2(0.0f);
+		fragmentUbo.padding1 = 0;
+		fragmentUbo.padding2 = 0;
 		fragmentUniformBuffers[index]->updateUniformBuffer(&fragmentUbo, sizeof(fragmentUbo));
 
 		m_meshes[i]->draw(drawInfo.commandBuffer);
@@ -243,6 +259,12 @@ void Model::initCylinderModel(std::shared_ptr<Material> &defaultMaterial)
 	m_meshes.push_back(Mesh::createCylinder());
 }
 
+void Model::initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	m_materials.push_back(defaultMaterial);
+	m_meshes.push_back(Mesh::createColliderBox());
+}
+
 void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
 	// gltf, obj 구별해서 로드하자
@@ -295,7 +317,7 @@ std::shared_ptr<Material> Model::processOBJMaterial(MTL &mtl, std::shared_ptr<Ma
 
 	if (mtl.illum >= 1) // albedo, normal, ao, heightmap
 	{
-		albedo.albedo = glm::vec3(mtl.Ka.x, mtl.Ka.y, mtl.Ka.z);
+		albedo.albedo = alglm::vec3(mtl.Ka.x, mtl.Ka.y, mtl.Ka.z);
 		if (mtl.map_Kd != "")
 		{
 			albedo.albedoTexture = Texture::createTexture(mtl.map_Kd);
@@ -433,7 +455,7 @@ std::shared_ptr<Material> Model::processGLTFMaterial(const aiScene *scene, aiMat
 
 	if (material->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS)
 	{
-		albedo.albedo = glm::vec3(color.r, color.g, color.b);
+		albedo.albedo = alglm::vec3(color.r, color.g, color.b);
 	}
 	else
 	{
@@ -576,8 +598,8 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 			vertex.texCoord = {0.0f, 0.0f};
 		}
 
-		vertex.boneIds = glm::ivec4(-1, -1, -1, -1);
-		vertex.weights = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		vertex.boneIds = alglm::ivec4(-1, -1, -1, -1);
+		vertex.weights = alglm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
 		vertices.push_back(vertex);
 	}
@@ -728,8 +750,8 @@ void Model::loadBone(aiNode *node, int parentBoneIndex)
 	if (it != m_Skeleton->m_NodeNameToBoneIndex.end())
 	{
 		currentBoneIndex = it->second;
-    
-		auto& bone = m_Skeleton->m_Bones[currentBoneIndex];
+
+		auto &bone = m_Skeleton->m_Bones[currentBoneIndex];
 
 		bone.m_ParentBone = parentBoneIndex;
 
@@ -793,10 +815,10 @@ void Model::loadAnimations(const aiScene *scene)
 				{
 					float timeSec = static_cast<float>(nodeAnim->mPositionKeys[keyIndex].mTime / ticksPerSecond);
 					aiVector3D aiPos = nodeAnim->mPositionKeys[keyIndex].mValue;
-					glm::vec3 pos(aiPos.x, aiPos.y, aiPos.z);
+					alglm::vec3 pos(aiPos.x, aiPos.y, aiPos.z);
 
 					samplerPos.m_Timestamps[keyIndex] = timeSec;
-					samplerPos.m_TRSoutputValuesToBeInterpolated[keyIndex] = glm::vec4(pos, 0.0f);
+					samplerPos.m_TRSoutputValuesToBeInterpolated[keyIndex] = alglm::vec4(pos, 0.0f);
 				}
 
 				size_t samplerIndexPos = animation->m_Samplers.size();
@@ -840,10 +862,10 @@ void Model::loadAnimations(const aiScene *scene)
 				{
 					float timeSec = static_cast<float>(nodeAnim->mRotationKeys[keyIndex].mTime / ticksPerSecond);
 					aiQuaternion aiQuat = nodeAnim->mRotationKeys[keyIndex].mValue;
-					glm::quat rot(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
+					alglm::quat rot(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
 
 					samplerRot.m_Timestamps[keyIndex] = timeSec;
-					samplerRot.m_TRSoutputValuesToBeInterpolated[keyIndex] = glm::vec4(rot.x, rot.y, rot.z, rot.w);
+					samplerRot.m_TRSoutputValuesToBeInterpolated[keyIndex] = alglm::vec4(rot.x, rot.y, rot.z, rot.w);
 				}
 
 				size_t samplerIndexRot = animation->m_Samplers.size();
@@ -887,10 +909,10 @@ void Model::loadAnimations(const aiScene *scene)
 				{
 					float timeSec = static_cast<float>(nodeAnim->mScalingKeys[keyIndex].mTime / ticksPerSecond);
 					aiVector3D aiScale = nodeAnim->mScalingKeys[keyIndex].mValue;
-					glm::vec3 scl(aiScale.x, aiScale.y, aiScale.z);
+					alglm::vec3 scl(aiScale.x, aiScale.y, aiScale.z);
 
 					samplerScl.m_Timestamps[keyIndex] = timeSec;
-					samplerScl.m_TRSoutputValuesToBeInterpolated[keyIndex] = glm::vec4(scl, 0.0f);
+					samplerScl.m_TRSoutputValuesToBeInterpolated[keyIndex] = alglm::vec4(scl, 0.0f);
 				}
 
 				size_t samplerIndexScl = animation->m_Samplers.size();
@@ -917,18 +939,24 @@ void Model::loadAnimations(const aiScene *scene)
 	}
 }
 
-glm::mat4 Model::convertMatrix(const aiMatrix4x4 &m)
+alglm::mat4 Model::convertMatrix(const aiMatrix4x4 &m)
 {
-	return glm::mat4(m.a1, m.b1, m.c1, m.d1, m.a2, m.b2, m.c2, m.d2, m.a3, m.b3, m.c3, m.d3, m.a4, m.b4, m.c4, m.d4);
+	return alglm::mat4(m.a1, m.b1, m.c1, m.d1, m.a2, m.b2, m.c2, m.d2, m.a3, m.b3, m.c3, m.d3, m.a4, m.b4, m.c4, m.d4);
 }
 
-void Model::setShaderData(const std::vector<glm::mat4> &shaderData)
+void Model::setShaderData(const std::vector<alglm::mat4> &shaderData)
 {
 	m_ShaderData.m_FinalBonesMatrices = shaderData;
 }
 
-std::shared_ptr<SkeletalAnimations>& Model::getAnimations()  { return m_Animations; }
-std::shared_ptr<Armature::Skeleton>& Model::getSkeleton() { return m_Skeleton; }
+std::shared_ptr<SkeletalAnimations> &Model::getAnimations()
+{
+	return m_Animations;
+}
+std::shared_ptr<Armature::Skeleton> &Model::getSkeleton()
+{
+	return m_Skeleton;
+}
 
 void Model::loadOBJModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
@@ -993,15 +1021,15 @@ std::shared_ptr<Texture> Model::loadMaterialTexture(const aiScene *scene, aiMate
 
 CullSphere Model::initCullSphere()
 {
-	glm::vec3 maxPos(-FLT_MAX);
-	glm::vec3 minPos(FLT_MIN);
+	alglm::vec3 maxPos(-FLT_MAX);
+	alglm::vec3 minPos(FLT_MIN);
 	for (auto &mesh : m_meshes)
 	{
-		maxPos = glm::max(maxPos, mesh->getMaxPos());
-		minPos = glm::min(minPos, mesh->getMinPos());
+		maxPos = alglm::max(maxPos, mesh->getMaxPos());
+		minPos = alglm::min(minPos, mesh->getMinPos());
 	}
 
-	return CullSphere((maxPos + minPos) * 0.5f, glm::length(maxPos - minPos) * 0.5f);
+	return CullSphere((maxPos + minPos) * 0.5f, alglm::length(maxPos - minPos) * 0.5f);
 }
 
 } // namespace ale

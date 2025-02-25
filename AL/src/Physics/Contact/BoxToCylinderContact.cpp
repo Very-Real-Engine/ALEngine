@@ -11,12 +11,13 @@ Contact *BoxToCylinderContact::create(Fixture *fixtureA, Fixture *fixtureB, int3
 	return new (static_cast<BoxToCylinderContact *>(memory)) BoxToCylinderContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 BoxToCylinderContact::supportA(const ConvexInfo &box, glm::vec3 dir)
+alglm::vec3 BoxToCylinderContact::supportA(const ConvexInfo &box, alglm::vec3 dir)
 {
-	float dotAxes[3] = {glm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f, glm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
-						glm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
+	float dotAxes[3] = {alglm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
 
-	glm::vec3 point = box.center;
+	alglm::vec3 point = box.center;
 	for (int32_t i = 0; i < 3; ++i)
 	{
 		point += box.axes[i] * (dotAxes[i] * box.halfSize[i]);
@@ -25,28 +26,28 @@ glm::vec3 BoxToCylinderContact::supportA(const ConvexInfo &box, glm::vec3 dir)
 	return point;
 }
 
-glm::vec3 BoxToCylinderContact::supportB(const ConvexInfo &cylinder, glm::vec3 dir)
+alglm::vec3 BoxToCylinderContact::supportB(const ConvexInfo &cylinder, alglm::vec3 dir)
 {
 	// 원기둥 정보
-	glm::vec3 center = cylinder.center;				   // 중심점
-	glm::vec3 axis = glm::normalize(cylinder.axes[0]); // 높이 축 (단위 벡터)
+	alglm::vec3 center = cylinder.center;				   // 중심점
+	alglm::vec3 axis = alglm::normalize(cylinder.axes[0]); // 높이 축 (단위 벡터)
 	float height = cylinder.height;
 
 	// 1. 축 방향으로 윗면/아랫면 선택
 
 	bool isUpSide = true;
-	float dotResult = glm::dot(dir, axis);
+	float dotResult = alglm::dot(dir, axis);
 
 	if (dotResult < 0)
 	{
 		isUpSide = false;
 	}
 
-	glm::vec3 circleDir = dir - glm::dot(dir, axis) * axis; // 축에 수직한 방향
+	alglm::vec3 circleDir = dir - alglm::dot(dir, axis) * axis; // 축에 수직한 방향
 
-	if (glm::length2(circleDir) > 1e-8f)
+	if (alglm::length2(circleDir) > 1e-8f)
 	{
-		circleDir = glm::normalize(circleDir); // 정규화
+		circleDir = alglm::normalize(circleDir); // 정규화
 
 		int32_t maxIdx;
 		int32_t segments = 20;
@@ -54,7 +55,7 @@ glm::vec3 BoxToCylinderContact::supportB(const ConvexInfo &cylinder, glm::vec3 d
 		float max = -FLT_MAX;
 		for (int32_t i = 0; i < segments; ++i)
 		{
-			dotResult = glm::dot(cylinder.points[i], dir);
+			dotResult = alglm::dot(cylinder.points[i], dir);
 			if (dotResult > max)
 			{
 				maxIdx = i;

@@ -259,7 +259,7 @@ bool Contact::hasFlag(EContactFlag flag)
 
 // manifold functions
 
-Simplex Contact::getSupportPoint(const ConvexInfo &convexA, const ConvexInfo &convexB, glm::vec3 &dir)
+Simplex Contact::getSupportPoint(const ConvexInfo &convexA, const ConvexInfo &convexB, alglm::vec3 &dir)
 {
 	Simplex simplex;
 	simplex.a = supportA(convexA, dir);
@@ -269,58 +269,58 @@ Simplex Contact::getSupportPoint(const ConvexInfo &convexA, const ConvexInfo &co
 	return simplex;
 }
 
-bool Contact::handleLineSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
+bool Contact::handleLineSimplex(SimplexArray &simplexArray, alglm::vec3 &dir)
 {
 	// std::cout << "Line GJK\n";
-	glm::vec3 &a = simplexArray.simplices[0].diff;
-	glm::vec3 &b = simplexArray.simplices[1].diff;
+	alglm::vec3 &a = simplexArray.simplices[0].diff;
+	alglm::vec3 &b = simplexArray.simplices[1].diff;
 
-	glm::vec3 ab = b - a;
-	glm::vec3 ao = -a;
+	alglm::vec3 ab = b - a;
+	alglm::vec3 ao = -a;
 
 	if (isSameDirection(ab, ao))
 	{
-		glm::vec3 tmpAxis(0, 1, 0);
+		alglm::vec3 tmpAxis(0, 1, 0);
 		if (isSameDirection(ab, tmpAxis))
 		{
-			tmpAxis = glm::vec3(1, 0, 0);
+			tmpAxis = alglm::vec3(1, 0, 0);
 
-			dir = glm::normalize(glm::cross(ab, tmpAxis));
+			dir = alglm::normalize(alglm::cross(ab, tmpAxis));
 		}
 		else
 		{
-			dir = glm::normalize(glm::cross(ab, tmpAxis));
+			dir = alglm::normalize(alglm::cross(ab, tmpAxis));
 		}
 	}
 	else
 	{
-		dir = glm::normalize(glm::cross(glm::cross(ab, ao), ab));
+		dir = alglm::normalize(alglm::cross(alglm::cross(ab, ao), ab));
 	}
 
 	return false;
 }
 
-bool Contact::handleTriangleSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
+bool Contact::handleTriangleSimplex(SimplexArray &simplexArray, alglm::vec3 &dir)
 {
-	glm::vec3 &a = simplexArray.simplices[0].diff;
-	glm::vec3 &b = simplexArray.simplices[1].diff;
-	glm::vec3 &c = simplexArray.simplices[2].diff;
+	alglm::vec3 &a = simplexArray.simplices[0].diff;
+	alglm::vec3 &b = simplexArray.simplices[1].diff;
+	alglm::vec3 &c = simplexArray.simplices[2].diff;
 
-	glm::vec3 ab = b - a;
-	glm::vec3 ac = c - a;
-	glm::vec3 bc = c - b;
-	glm::vec3 abc = glm::cross(ac, ab);
+	alglm::vec3 ab = b - a;
+	alglm::vec3 ac = c - a;
+	alglm::vec3 bc = c - b;
+	alglm::vec3 abc = alglm::cross(ac, ab);
 
 	// 면적이 없으면 반대 dir로 세 번째 점 다시 찾기기
-	if (glm::length2(abc) == 0.0f)
+	if (alglm::length2(abc) == 0.0f)
 	{
 		--simplexArray.simplexCount;
 		dir = -dir;
 		return false;
 	}
 
-	dir = glm::normalize(glm::cross(abc, bc));
-	if (glm::dot(dir, -c) > 0.0f)
+	dir = alglm::normalize(alglm::cross(abc, bc));
+	if (alglm::dot(dir, -c) > 0.0f)
 	{
 		// a 제거
 		simplexArray.simplices[0] = simplexArray.simplices[1];
@@ -329,8 +329,8 @@ bool Contact::handleTriangleSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
 		return false;
 	}
 
-	dir = glm::normalize(glm::cross(ac, abc));
-	if (glm::dot(dir, -c) > 0.0f)
+	dir = alglm::normalize(alglm::cross(ac, abc));
+	if (alglm::dot(dir, -c) > 0.0f)
 	{
 		// b 제거
 		simplexArray.simplices[1] = simplexArray.simplices[2];
@@ -338,28 +338,28 @@ bool Contact::handleTriangleSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
 		return false;
 	}
 
-	if (glm::dot(-a, abc) > 0.0f)
+	if (alglm::dot(-a, abc) > 0.0f)
 	{
-		dir = glm::normalize(abc);
+		dir = alglm::normalize(abc);
 	}
 	else
 	{
-		dir = glm::normalize(-abc);
+		dir = alglm::normalize(-abc);
 	}
 
 	return false;
 }
 
-bool Contact::handleTetrahedronSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
+bool Contact::handleTetrahedronSimplex(SimplexArray &simplexArray, alglm::vec3 &dir)
 {
-	glm::vec3 &a = simplexArray.simplices[0].diff;
-	glm::vec3 &b = simplexArray.simplices[1].diff;
-	glm::vec3 &c = simplexArray.simplices[2].diff;
-	glm::vec3 &d = simplexArray.simplices[3].diff;
+	alglm::vec3 &a = simplexArray.simplices[0].diff;
+	alglm::vec3 &b = simplexArray.simplices[1].diff;
+	alglm::vec3 &c = simplexArray.simplices[2].diff;
+	alglm::vec3 &d = simplexArray.simplices[3].diff;
 
-	glm::vec3 abc = glm::cross((b - a), (c - a));
+	alglm::vec3 abc = alglm::cross((b - a), (c - a));
 	// 부피가 없으면 반대 방향으로 4번째 점 다시 찾기기
-	if (std::abs(glm::dot((d - a), abc)) < 1e-8f)
+	if (std::abs(alglm::dot((d - a), abc)) < 1e-8f)
 	{
 		--simplexArray.simplexCount;
 		dir = -dir;
@@ -367,57 +367,57 @@ bool Contact::handleTetrahedronSimplex(SimplexArray &simplexArray, glm::vec3 &di
 	}
 
 	// bcd 법선 방향에 원점 있는지 확인
-	glm::vec3 bc = c - b;
-	glm::vec3 bd = d - b;
-	glm::vec3 bcd = glm::cross(bd, bc);
-	if (glm::dot(bcd, a - c) > 0)
+	alglm::vec3 bc = c - b;
+	alglm::vec3 bd = d - b;
+	alglm::vec3 bcd = alglm::cross(bd, bc);
+	if (alglm::dot(bcd, a - c) > 0)
 	{
 		bcd = -bcd;
 	}
 
-	if (glm::dot(bcd, -d) > 0.0f)
+	if (alglm::dot(bcd, -d) > 0.0f)
 	{
 		simplexArray.simplices[0] = simplexArray.simplices[1];
 		simplexArray.simplices[1] = simplexArray.simplices[2];
 		simplexArray.simplices[2] = simplexArray.simplices[3];
 		--simplexArray.simplexCount;
-		dir = glm::normalize(bcd);
+		dir = alglm::normalize(bcd);
 		return false;
 	}
 
 	// acd 법선 방향에 원점 있는지 확인
-	glm::vec3 ca = a - c;
-	glm::vec3 cd = d - c;
-	glm::vec3 acd = glm::cross(cd, ca);
-	if (glm::dot(acd, b - c) > 0)
+	alglm::vec3 ca = a - c;
+	alglm::vec3 cd = d - c;
+	alglm::vec3 acd = alglm::cross(cd, ca);
+	if (alglm::dot(acd, b - c) > 0)
 	{
 		acd = -acd;
 	}
 
-	if (glm::dot(acd, -d) > 0.0f)
+	if (alglm::dot(acd, -d) > 0.0f)
 	{
 		simplexArray.simplices[1] = simplexArray.simplices[2];
 		simplexArray.simplices[2] = simplexArray.simplices[3];
 		--simplexArray.simplexCount;
-		dir = glm::normalize(acd);
+		dir = alglm::normalize(acd);
 		return false;
 	}
 
 	// abd 법선 방향에 원점 있는지 확인
-	glm::vec3 ab = b - a;
-	glm::vec3 ad = d - a;
-	glm::vec3 abd = glm::cross(ad, ab);
+	alglm::vec3 ab = b - a;
+	alglm::vec3 ad = d - a;
+	alglm::vec3 abd = alglm::cross(ad, ab);
 
-	if (glm::dot(abd, c - a) > 0)
+	if (alglm::dot(abd, c - a) > 0)
 	{
 		abd = -abd;
 	}
 
-	if (glm::dot(abd, -d) > 0.0f)
+	if (alglm::dot(abd, -d) > 0.0f)
 	{
 		simplexArray.simplices[2] = simplexArray.simplices[3];
 		--simplexArray.simplexCount;
-		dir = glm::normalize(abd);
+		dir = alglm::normalize(abd);
 		return false;
 	}
 
@@ -426,7 +426,7 @@ bool Contact::handleTetrahedronSimplex(SimplexArray &simplexArray, glm::vec3 &di
 
 // 가장 최근에 추가된 점 A = simplex.points.back() 로 가정
 // simplex가 2, 3, 4개 점일 때 각각 처리 달라짐
-bool Contact::handleSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
+bool Contact::handleSimplex(SimplexArray &simplexArray, alglm::vec3 &dir)
 {
 	switch (simplexArray.simplexCount)
 	{
@@ -440,12 +440,12 @@ bool Contact::handleSimplex(SimplexArray &simplexArray, glm::vec3 &dir)
 	return false;
 }
 
-bool Contact::isDuplicatedPoint(const SimplexArray &simplexArray, const glm::vec3 &supportPoint)
+bool Contact::isDuplicatedPoint(const SimplexArray &simplexArray, const alglm::vec3 &supportPoint)
 {
 	int32_t size = simplexArray.simplexCount;
 	for (int32_t i = 0; i < size; i++)
 	{
-		if (glm::length2(simplexArray.simplices[i].diff - supportPoint) < 1e-6f)
+		if (alglm::length2(simplexArray.simplices[i].diff - supportPoint) < 1e-6f)
 		{
 			return true;
 		}
@@ -455,7 +455,7 @@ bool Contact::isDuplicatedPoint(const SimplexArray &simplexArray, const glm::vec
 
 bool Contact::checkSphereToSphereCollide(const ConvexInfo &convexA, const ConvexInfo &convexB)
 {
-	if (glm::length(convexA.center - convexB.center) < (convexA.radius + convexB.radius))
+	if (alglm::length(convexA.center - convexB.center) < (convexA.radius + convexB.radius))
 	{
 		return true;
 	}
@@ -469,32 +469,32 @@ bool Contact::getGjkResult(const ConvexInfo &convexA, const ConvexInfo &convexB,
 {
 	const int32_t ITERATION = 64;
 
-	glm::vec3 dir;
+	alglm::vec3 dir;
 
 	// 첫 번째 support point 구하기
-	if (glm::length2(convexB.center - convexA.center) < 1e-8f)
+	if (alglm::length2(convexB.center - convexA.center) < 1e-8f)
 	{
-		dir = glm::vec3(1.0f, 0.0f, 0.0f);
+		dir = alglm::vec3(1.0f, 0.0f, 0.0f);
 	}
 	else
 	{
-		dir = glm::normalize(convexB.center - convexA.center);
+		dir = alglm::normalize(convexB.center - convexA.center);
 	}
 
 	simplexArray.simplices[0] = getSupportPoint(convexA, convexB, dir);
 	++simplexArray.simplexCount;
 
-	glm::vec3 supportPoint = simplexArray.simplices[0].diff;
+	alglm::vec3 supportPoint = simplexArray.simplices[0].diff;
 
 	// 두 번째 support point 구하기
-	if (glm::length2(supportPoint) == 0.0f)
+	if (alglm::length2(supportPoint) == 0.0f)
 	{
 		dir = -dir;
 		simplexArray.simplices[0] = getSupportPoint(convexA, convexB, dir);
 		supportPoint = simplexArray.simplices[0].diff;
 	}
 
-	dir = glm::normalize(-supportPoint);
+	dir = alglm::normalize(-supportPoint);
 
 	int32_t iter = 0;
 	while (iter < ITERATION)
@@ -505,7 +505,7 @@ bool Contact::getGjkResult(const ConvexInfo &convexA, const ConvexInfo &convexB,
 
 		// 만약 newSupport가 direction과 내적(dot)했을 때 0 이하라면
 		// 더 이상 원점을 "방향 dir" 쪽에서 감쌀 수 없음 => 충돌X
-		if (glm::dot(supportPoint, dir) < 0 || isDuplicatedPoint(simplexArray, supportPoint))
+		if (alglm::dot(supportPoint, dir) < 0 || isDuplicatedPoint(simplexArray, supportPoint))
 		{
 			return false; // 교차하지 않음
 		}
@@ -526,14 +526,14 @@ bool Contact::getGjkResult(const ConvexInfo &convexA, const ConvexInfo &convexB,
 	return false;
 }
 
-bool Contact::isSimilarDirection(glm::vec3 v1, glm::vec3 v2)
+bool Contact::isSimilarDirection(alglm::vec3 v1, alglm::vec3 v2)
 {
-	return glm::dot(v1, v2) > 0.0f;
+	return alglm::dot(v1, v2) > 0.0f;
 }
 
-bool Contact::isSameDirection(glm::vec3 v1, glm::vec3 v2)
+bool Contact::isSameDirection(alglm::vec3 v1, alglm::vec3 v2)
 {
-	return glm::length2(glm::cross(v1, v2)) == 0.0f;
+	return alglm::length2(alglm::cross(v1, v2)) == 0.0f;
 }
 
 EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &convexB, SimplexArray &simplexArray)
@@ -549,7 +549,7 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 
 	// GJK에서 구한 simplex들중 원점에서 가장 가까운 삼각형의 법선과 최소 거리
 	int32_t minFace = getFaceNormals(simplexArray, faceArray);
-	glm::vec3 minNormal(0.0f);
+	alglm::vec3 minNormal(0.0f);
 	float minDistance = FLT_MAX;
 
 	if (minFace == -1)
@@ -563,21 +563,21 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 	{
 		if (++iter > ITERATION)
 		{
-			minNormal = glm::vec3(0.0f);
+			minNormal = alglm::vec3(0.0f);
 			minDistance = -1.0f;
 			break;
 		}
 
 		// 최소 거리의 법선, 거리 쿼리
-		minNormal = glm::vec3(faceArray.normals[minFace]);
+		minNormal = alglm::vec3(faceArray.normals[minFace]);
 		minDistance = faceArray.normals[minFace].w;
 
 		// 최소 거리의 법선에 해당하는 supportPoint 쿼리
 		Simplex simplex = getSupportPoint(convexA, convexB, minNormal);
-		glm::vec3 supportPoint = simplex.diff;
+		alglm::vec3 supportPoint = simplex.diff;
 
 		// 원점에서 supportPoint까지의 거리
-		float supportDistance = glm::dot(minNormal, supportPoint);
+		float supportDistance = alglm::dot(minNormal, supportPoint);
 
 		// supportPoint가 현재 minDistance보다 원점에서 더 멀리있는 경우
 		// 다시 원점에서부터 최소거리의 삼각형을 찾음
@@ -594,10 +594,10 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 
 			for (int32_t i = 0; i < faceArray.count; i++)
 			{
-				glm::vec3 center = (simplexArray.simplices[faceArray.faces[i * 3]].diff +
-									simplexArray.simplices[faceArray.faces[i * 3 + 1]].diff +
-									simplexArray.simplices[faceArray.faces[i * 3 + 2]].diff) /
-								   3.0f;
+				alglm::vec3 center = (simplexArray.simplices[faceArray.faces[i * 3]].diff +
+									  simplexArray.simplices[faceArray.faces[i * 3 + 1]].diff +
+									  simplexArray.simplices[faceArray.faces[i * 3 + 2]].diff) /
+									 3.0f;
 				if (isSimilarDirection(faceArray.normals[i], supportPoint - center))
 				{
 					int32_t faceIdx = i * 3;
@@ -636,7 +636,7 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 			// 새로 추가되는 면이 없다면 종료료
 			if (newFaceArray.count == 0)
 			{
-				minNormal = glm::vec3(0.0f);
+				minNormal = alglm::vec3(0.0f);
 				minDistance = -1.0f;
 				break;
 			}
@@ -653,7 +653,7 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 
 			if (newMinFace == -1)
 			{
-				minNormal = glm::vec3(0.0f);
+				minNormal = alglm::vec3(0.0f);
 				minDistance = -1.0f;
 				break;
 			}
@@ -681,9 +681,9 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 	}
 
 	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.faces, sizeof(int32_t) * faceArray.maxCount * 3);
-	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.normals, sizeof(glm::vec4) * faceArray.maxCount);
+	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.normals, sizeof(alglm::vec4) * faceArray.maxCount);
 	PhysicsAllocator::m_blockAllocator.freeBlock(newFaceArray.faces, sizeof(int32_t) * newFaceArray.maxCount * 3);
-	PhysicsAllocator::m_blockAllocator.freeBlock(newFaceArray.normals, sizeof(glm::vec4) * newFaceArray.maxCount);
+	PhysicsAllocator::m_blockAllocator.freeBlock(newFaceArray.normals, sizeof(alglm::vec4) * newFaceArray.maxCount);
 
 	EpaInfo epaInfo;
 	epaInfo.normal = minNormal;
@@ -695,7 +695,7 @@ EpaInfo Contact::getEpaResult(const ConvexInfo &convexA, const ConvexInfo &conve
 // simplex의 삼각형들의 법선벡터와 삼각형들중 원점에서 가장 멀리 떨어져있는 놈을 찾아서 반환
 int32_t Contact::getFaceNormals(SimplexArray &simplexArray, FaceArray &faceArray)
 {
-	glm::vec3 center(0.0f);
+	alglm::vec3 center(0.0f);
 
 	int32_t simplexSize = simplexArray.simplexCount;
 	for (int32_t i = 0; i < simplexSize; ++i)
@@ -713,28 +713,28 @@ int32_t Contact::getFaceNormals(SimplexArray &simplexArray, FaceArray &faceArray
 	for (int32_t i = 0; i < facesSize; i = i + 3)
 	{
 		// 삼각형 꼭짓점들
-		glm::vec3 &a = simplexArray.simplices[faceArray.faces[i]].diff;
-		glm::vec3 &b = simplexArray.simplices[faceArray.faces[i + 1]].diff;
-		glm::vec3 &c = simplexArray.simplices[faceArray.faces[i + 2]].diff;
+		alglm::vec3 &a = simplexArray.simplices[faceArray.faces[i]].diff;
+		alglm::vec3 &b = simplexArray.simplices[faceArray.faces[i + 1]].diff;
+		alglm::vec3 &c = simplexArray.simplices[faceArray.faces[i + 2]].diff;
 
 		// 삼각형의 법선
-		glm::vec3 crossResult = glm::cross(b - a, c - a);
+		alglm::vec3 crossResult = alglm::cross(b - a, c - a);
 
-		glm::vec3 normal = glm::normalize(crossResult);
+		alglm::vec3 normal = alglm::normalize(crossResult);
 		// 삼각형과 원점 사이의 거리
-		if (glm::dot(normal, a - center) < 0)
+		if (alglm::dot(normal, a - center) < 0)
 		{
 			normal = -normal;
 		}
 
-		float distance = glm::dot(normal, a);
+		float distance = alglm::dot(normal, a);
 		if (distance < 0)
 		{
 			return -1;
 		}
 
 		// 법선 벡터 저장
-		faceArray.normals[i / 3] = glm::vec4(normal, distance);
+		faceArray.normals[i / 3] = alglm::vec4(normal, distance);
 
 		// 원점과 가장 가까운 삼각형 저장
 		if (distance < minDistance)
@@ -812,19 +812,20 @@ void Contact::buildManifoldFromPolygon(CollisionInfo &collisionInfo, const Face 
 
 	// Incident 면의 plane 구하기 (간단히 incFace.normal, incFace.distance)
 	// 혹은 실제로 dot(incFace.normal, incFace.vertices[0]) 등으로 distance를 구해도 됨
-	glm::vec3 &normal = epaInfo.normal;
+	alglm::vec3 &normal = epaInfo.normal;
 	float distance = epaInfo.distance;
 	float refPlaneDist = refFace.distance;
 	float incPlaneDist = incFace.distance;
-	glm::vec3 refN = refFace.normal;
-	glm::vec3 incN = incFace.normal;
+	alglm::vec3 refN = refFace.normal;
+	alglm::vec3 incN = incFace.normal;
 
-	std::sort(contactPolygon.points, contactPolygon.points + contactPolygon.pointsCount,
-			  [&refN](const glm::vec3 &a, const glm::vec3 &b) { return glm::dot(a, refN) < glm::dot(b, refN); });
+	std::sort(
+		contactPolygon.points, contactPolygon.points + contactPolygon.pointsCount,
+		[&refN](const alglm::vec3 &a, const alglm::vec3 &b) { return alglm::dot(a, refN) < alglm::dot(b, refN); });
 
 	// 각 꼭지점마다 물체 A,B에서의 좌표를 구해 penetration 등 계산
 	// 여기서는 "Ref Face plane에서 A 물체 좌표, Incident Face plane에서 B 물체 좌표" 라고 가정
-	float denominator = (-(glm::dot(contactPolygon.points[0], refN) - refPlaneDist));
+	float denominator = (-(alglm::dot(contactPolygon.points[0], refN) - refPlaneDist));
 	float ratio;
 	if (denominator < 1e-8f)
 	{
@@ -839,16 +840,16 @@ void Contact::buildManifoldFromPolygon(CollisionInfo &collisionInfo, const Face 
 
 	for (int32_t i = 0; i < polygonCount; ++i)
 	{
-		const glm::vec3 &point = contactPolygon.points[i];
+		const alglm::vec3 &point = contactPolygon.points[i];
 
 		// B측 point
-		glm::vec3 pointB = point;
+		alglm::vec3 pointB = point;
 
 		// 침투깊이
-		float penentration = ratio * (-(glm::dot(point, refN) - refPlaneDist));
+		float penentration = ratio * (-(alglm::dot(point, refN) - refPlaneDist));
 
 		// A측 point
-		glm::vec3 pointA = point + normal * penentration;
+		alglm::vec3 pointA = point + normal * penentration;
 
 		// 접촉 정보
 		collisionInfo.normal[i] = refN;
@@ -859,7 +860,7 @@ void Contact::buildManifoldFromPolygon(CollisionInfo &collisionInfo, const Face 
 	}
 }
 
-void Contact::clipPolygonAgainstPlane(ContactPolygon &contactPolygon, const glm::vec3 &planeNormal, float planeDist)
+void Contact::clipPolygonAgainstPlane(ContactPolygon &contactPolygon, const alglm::vec3 &planeNormal, float planeDist)
 {
 	int32_t polygonCount = contactPolygon.pointsCount;
 	if (polygonCount == 0)
@@ -869,11 +870,11 @@ void Contact::clipPolygonAgainstPlane(ContactPolygon &contactPolygon, const glm:
 
 	for (size_t i = 0; i < polygonCount; i++)
 	{
-		glm::vec3 &curr = contactPolygon.points[i];
-		glm::vec3 &next = contactPolygon.points[(i + 1) % polygonCount];
+		alglm::vec3 &curr = contactPolygon.points[i];
+		alglm::vec3 &next = contactPolygon.points[(i + 1) % polygonCount];
 
-		float distCurr = glm::dot(planeNormal, curr) - planeDist;
-		float distNext = glm::dot(planeNormal, next) - planeDist;
+		float distCurr = alglm::dot(planeNormal, curr) - planeDist;
+		float distNext = alglm::dot(planeNormal, next) - planeDist;
 		bool currInside = (distCurr <= 0.0f);
 		bool nextInside = (distNext <= 0.0f);
 
@@ -888,7 +889,7 @@ void Contact::clipPolygonAgainstPlane(ContactPolygon &contactPolygon, const glm:
 		else if (!currInside && nextInside)
 		{
 			float t = distCurr / (distCurr - distNext);
-			glm::vec3 intersect = curr + t * (next - curr);
+			alglm::vec3 intersect = curr + t * (next - curr);
 			contactPolygon.buffer[idx] = intersect;
 			++idx;
 			contactPolygon.buffer[idx] = next;
@@ -898,41 +899,41 @@ void Contact::clipPolygonAgainstPlane(ContactPolygon &contactPolygon, const glm:
 		else if (currInside && !nextInside)
 		{
 			float t = distCurr / (distCurr - distNext);
-			glm::vec3 intersect = curr + t * (next - curr);
+			alglm::vec3 intersect = curr + t * (next - curr);
 			contactPolygon.buffer[idx] = intersect;
 			++idx;
 		}
 		// CASE4: 둘 다 밖 => nothing
 	}
 
-	memcpy(contactPolygon.points, contactPolygon.buffer, sizeof(glm::vec3) * idx);
+	memcpy(contactPolygon.points, contactPolygon.buffer, sizeof(alglm::vec3) * idx);
 	contactPolygon.pointsCount = idx;
 }
 
 void Contact::computeContactPolygon(ContactPolygon &contactPolygon, Face &refFace, Face &incFace)
 {
 	// 초기 polygon: Incident Face의 4점
-	memcpy(contactPolygon.points, incFace.vertices, sizeof(glm::vec3) * incFace.verticesCount);
+	memcpy(contactPolygon.points, incFace.vertices, sizeof(alglm::vec3) * incFace.verticesCount);
 	contactPolygon.pointsCount = incFace.verticesCount;
 
 	// Ref Face의 4개 엣지로 만들어지는 '4개 사이드 평면'에 대해 클리핑
 	// refFace.vertices = v0,v1,v2,v3 라고 가정, CCW 형태
-	glm::vec3 *vertices = refFace.vertices;
+	alglm::vec3 *vertices = refFace.vertices;
 	int32_t len = refFace.verticesCount;
 
 	for (int32_t i = 0; i < len; i++)
 	{
-		glm::vec3 start = vertices[i];
-		glm::vec3 end = vertices[(i + 1) % len];
+		alglm::vec3 start = vertices[i];
+		alglm::vec3 end = vertices[(i + 1) % len];
 
 		// edge
-		glm::vec3 edge = end - start;
+		alglm::vec3 edge = end - start;
 
 		// refFace.normal과 edge의 cross => 사이드 plane normal
-		glm::vec3 sideN = glm::cross(refFace.normal, edge);
-		sideN = glm::normalize(sideN);
+		alglm::vec3 sideN = alglm::cross(refFace.normal, edge);
+		sideN = alglm::normalize(sideN);
 
-		float planeDist = glm::dot(sideN, start);
+		float planeDist = alglm::dot(sideN, start);
 		clipPolygonAgainstPlane(contactPolygon, sideN, planeDist);
 
 		if (contactPolygon.pointsCount == 0)
@@ -944,26 +945,26 @@ void Contact::computeContactPolygon(ContactPolygon &contactPolygon, Face &refFac
 	clipPolygonAgainstPlane(contactPolygon, refFace.normal, refFace.distance);
 }
 
-void Contact::sortVerticesClockwise(glm::vec3 *vertices, const glm::vec3 &center, const glm::vec3 &normal,
+void Contact::sortVerticesClockwise(alglm::vec3 *vertices, const alglm::vec3 &center, const alglm::vec3 &normal,
 									int32_t verticesSize)
 {
 	// 1. 법선 벡터 기준으로 평면의 두 축 정의
-	glm::vec3 u = glm::normalize(glm::cross(normal, glm::vec3(1.0f, 0.0f, 0.0f)));
-	if (glm::length(u) < 1e-6)
+	alglm::vec3 u = alglm::normalize(alglm::cross(normal, alglm::vec3(1.0f, 0.0f, 0.0f)));
+	if (alglm::length(u) < 1e-6)
 	{
 		// normal이 x축과 평행한 경우 y축 사용
-		u = glm::normalize(glm::cross(normal, glm::vec3(0.0f, 1.0f, 0.0f)));
+		u = alglm::normalize(alglm::cross(normal, alglm::vec3(0.0f, 1.0f, 0.0f)));
 	}
-	glm::vec3 v = glm::normalize(glm::cross(normal, u)); // 법선과 u의 외적
+	alglm::vec3 v = alglm::normalize(alglm::cross(normal, u)); // 법선과 u의 외적
 
 	// 2. 각도 계산 및 정렬
-	auto angleComparator = [&center, &u, &v](const glm::vec3 &a, const glm::vec3 &b) {
+	auto angleComparator = [&center, &u, &v](const alglm::vec3 &a, const alglm::vec3 &b) {
 		// a와 b를 u, v 축 기준으로 투영
-		glm::vec3 da = a - center;
-		glm::vec3 db = b - center;
+		alglm::vec3 da = a - center;
+		alglm::vec3 db = b - center;
 
-		float angleA = atan2(glm::dot(da, v), glm::dot(da, u));
-		float angleB = atan2(glm::dot(db, v), glm::dot(db, u));
+		float angleA = atan2(alglm::dot(da, v), alglm::dot(da, u));
+		float angleB = atan2(alglm::dot(db, v), alglm::dot(db, u));
 
 		return angleA > angleB; // 시계 방향 정렬
 	};
@@ -971,20 +972,20 @@ void Contact::sortVerticesClockwise(glm::vec3 *vertices, const glm::vec3 &center
 	std::sort(vertices, vertices + verticesSize, angleComparator);
 }
 
-void Contact::setBoxFace(Face &face, const ConvexInfo &box, const glm::vec3 &normal)
+void Contact::setBoxFace(Face &face, const ConvexInfo &box, const alglm::vec3 &normal)
 {
 	// 1) box의 6개 면 중, worldNormal과 가장 유사한 면( dot > 0 ) 찾기
 	// 2) 그 면의 4개 꼭지점을 구함
 	// 여기서는 '법선이 박스의 +Y축과 가장 가까우면 top face' 식으로 단순화 예시
 	// 실제 구현은 회전/transform 고려해야 함
 
-	glm::vec3 axes[6] = {-box.axes[0], -box.axes[1], -box.axes[2], box.axes[0], box.axes[1], box.axes[2]};
+	alglm::vec3 axes[6] = {-box.axes[0], -box.axes[1], -box.axes[2], box.axes[0], box.axes[1], box.axes[2]};
 
 	float maxDotRes = -FLT_MAX;
 	int32_t maxIdx = -1;
 	for (int32_t i = 0; i < 6; i++)
 	{
-		float nowDotRes = glm::dot(axes[i], normal);
+		float nowDotRes = alglm::dot(axes[i], normal);
 		if (nowDotRes > maxDotRes)
 		{
 			maxDotRes = nowDotRes;
@@ -992,16 +993,16 @@ void Contact::setBoxFace(Face &face, const ConvexInfo &box, const glm::vec3 &nor
 		}
 	}
 
-	glm::vec3 axis = axes[maxIdx];
-	float centerDotRes = glm::dot(box.center, axis);
-	glm::vec3 center(0.0f);
+	alglm::vec3 axis = axes[maxIdx];
+	float centerDotRes = alglm::dot(box.center, axis);
+	alglm::vec3 center(0.0f);
 
 	int32_t pointCount = box.pointsCount;
 	int32_t idx = 0;
 	for (int32_t i = 0; i < pointCount; ++i)
 	{
-		glm::vec3 &point = box.points[i];
-		if (glm::dot(point, axis) > centerDotRes)
+		alglm::vec3 &point = box.points[i];
+		if (alglm::dot(point, axis) > centerDotRes)
 		{
 			center += point;
 			face.vertices[idx] = point;
@@ -1009,22 +1010,22 @@ void Contact::setBoxFace(Face &face, const ConvexInfo &box, const glm::vec3 &nor
 		}
 	}
 
-	center = glm::vec3((center.x / idx), (center.y / idx), (center.z / idx));
+	center = alglm::vec3((center.x / idx), (center.y / idx), (center.z / idx));
 	face.verticesCount = idx;
 	face.normal = axis;
-	face.distance = glm::dot(axis, face.vertices[0]);
+	face.distance = alglm::dot(axis, face.vertices[0]);
 
 	sortVerticesClockwise(face.vertices, center, face.normal, face.verticesCount);
 }
 
-void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const glm::vec3 &normal)
+void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const alglm::vec3 &normal)
 {
-	glm::vec3 center;
+	alglm::vec3 center;
 	int32_t segments = 20;
-	float length = glm::dot(normal, cylinder.axes[0]);
-	float angleStep = 2.0f * glm::pi<float>() / static_cast<float>(segments);
+	float length = alglm::dot(normal, cylinder.axes[0]);
+	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 
-	float limit = glm::dot(cylinder.axes[0], glm::normalize(cylinder.points[0] - cylinder.center));
+	float limit = alglm::dot(cylinder.axes[0], alglm::normalize(cylinder.points[0] - cylinder.center));
 
 	if (length > limit)
 	{
@@ -1037,7 +1038,7 @@ void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const glm:
 
 		center = cylinder.center + cylinder.axes[0] * cylinder.height * 0.5f;
 		face.normal = cylinder.axes[0];
-		face.distance = glm::dot(cylinder.axes[0], face.vertices[0]);
+		face.distance = alglm::dot(cylinder.axes[0], face.vertices[0]);
 	}
 	else if (length < -limit)
 	{
@@ -1050,15 +1051,15 @@ void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const glm:
 
 		center = cylinder.center - cylinder.axes[0] * cylinder.height * 0.5f;
 		face.normal = -cylinder.axes[0];
-		face.distance = glm::dot(-cylinder.axes[0], face.vertices[0]);
+		face.distance = alglm::dot(-cylinder.axes[0], face.vertices[0]);
 	}
 	else
 	{
 		face.normal = normal;
-		float dotResult = glm::dot(normal, cylinder.axes[0]);
+		float dotResult = alglm::dot(normal, cylinder.axes[0]);
 		if (dotResult != 0.0f)
 		{
-			face.normal = glm::normalize(normal - dotResult * cylinder.axes[0]);
+			face.normal = alglm::normalize(normal - dotResult * cylinder.axes[0]);
 		}
 
 		int32_t dir;
@@ -1066,7 +1067,7 @@ void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const glm:
 
 		for (int32_t i = 1; i <= segments; ++i)
 		{
-			dotResult = glm::dot(cylinder.axes[i], face.normal);
+			dotResult = alglm::dot(cylinder.axes[i], face.normal);
 			if (dotResult > max)
 			{
 				dir = i;
@@ -1083,24 +1084,24 @@ void Contact::setCylinderFace(Face &face, const ConvexInfo &cylinder, const glm:
 		face.vertices[2] = cylinder.points[idx1 + segments];
 		face.vertices[3] = cylinder.points[idx2 + segments];
 
-		face.distance = glm::dot(face.normal, face.vertices[0]);
+		face.distance = alglm::dot(face.normal, face.vertices[0]);
 		center = (face.vertices[0] + face.vertices[1] + face.vertices[2] + face.vertices[3]) / 4.0f;
 	}
 
 	sortVerticesClockwise(face.vertices, center, face.normal, face.verticesCount);
 }
 
-void Contact::setCapsuleFace(Face &face, const ConvexInfo &capsule, const glm::vec3 &normal)
+void Contact::setCapsuleFace(Face &face, const ConvexInfo &capsule, const alglm::vec3 &normal)
 {
 	int32_t segments = 20;
-	float angleStep = 2.0f * glm::pi<float>() / static_cast<float>(segments);
+	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 
 	face.normal = normal;
-	float dotResult = glm::dot(normal, capsule.axes[0]);
+	float dotResult = alglm::dot(normal, capsule.axes[0]);
 
 	if (dotResult != 0.0f)
 	{
-		face.normal = glm::normalize(normal - dotResult * capsule.axes[0]);
+		face.normal = alglm::normalize(normal - dotResult * capsule.axes[0]);
 	}
 
 	int32_t dir;
@@ -1108,7 +1109,7 @@ void Contact::setCapsuleFace(Face &face, const ConvexInfo &capsule, const glm::v
 
 	for (int32_t i = 1; i <= segments; ++i)
 	{
-		dotResult = glm::dot(capsule.axes[i], face.normal);
+		dotResult = alglm::dot(capsule.axes[i], face.normal);
 		if (dotResult > max)
 		{
 			dir = i;
@@ -1125,15 +1126,15 @@ void Contact::setCapsuleFace(Face &face, const ConvexInfo &capsule, const glm::v
 	face.vertices[2] = capsule.points[idx1 + segments];
 	face.vertices[3] = capsule.points[idx2 + segments];
 
-	face.distance = glm::dot(face.normal, face.vertices[0]);
-	glm::vec3 center = (face.vertices[0] + face.vertices[1] + face.vertices[2] + face.vertices[3]) / 4.0f;
+	face.distance = alglm::dot(face.normal, face.vertices[0]);
+	alglm::vec3 center = (face.vertices[0] + face.vertices[1] + face.vertices[2] + face.vertices[3]) / 4.0f;
 
 	sortVerticesClockwise(face.vertices, center, face.normal, face.verticesCount);
 }
 
-bool Contact::isCollideToHemisphere(const ConvexInfo &capsule, const glm::vec3 &dir)
+bool Contact::isCollideToHemisphere(const ConvexInfo &capsule, const alglm::vec3 &dir)
 {
-	float dotResult = glm::dot(capsule.axes[0], dir);
+	float dotResult = alglm::dot(capsule.axes[0], dir);
 	return dotResult > 0.0001f || dotResult < -0.0001f;
 }
 
@@ -1171,7 +1172,7 @@ void Contact::mergeFaceArray(FaceArray &faceArray, FaceArray &newFaceArray)
 	}
 
 	memcpy(faceArray.faces + faceArrayCount * 3, newFaceArray.faces, sizeof(int32_t) * newFaceArrayCount * 3);
-	memcpy(faceArray.normals + faceArrayCount, newFaceArray.normals, sizeof(glm::vec4) * newFaceArrayCount);
+	memcpy(faceArray.normals + faceArrayCount, newFaceArray.normals, sizeof(alglm::vec4) * newFaceArrayCount);
 
 	faceArray.count = newCount;
 }
@@ -1183,12 +1184,12 @@ void Contact::sizeUpFaceArray(FaceArray &faceArray, int32_t newMaxCount)
 	int32_t *newFaces = static_cast<int32_t *>(memory);
 	memcpy(newFaces, faceArray.faces, sizeof(int32_t) * count * 3);
 
-	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(newMaxCount * sizeof(glm::vec4));
-	glm::vec4 *newNormals = static_cast<glm::vec4 *>(memory);
-	memcpy(newNormals, faceArray.normals, sizeof(glm::vec4) * count);
+	memory = PhysicsAllocator::m_blockAllocator.allocateBlock(newMaxCount * sizeof(alglm::vec4));
+	alglm::vec4 *newNormals = static_cast<alglm::vec4 *>(memory);
+	memcpy(newNormals, faceArray.normals, sizeof(alglm::vec4) * count);
 
 	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.faces, sizeof(int32_t) * faceArray.maxCount * 3);
-	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.normals, sizeof(glm::vec4) * faceArray.maxCount);
+	PhysicsAllocator::m_blockAllocator.freeBlock(faceArray.normals, sizeof(alglm::vec4) * faceArray.maxCount);
 
 	faceArray.maxCount = newMaxCount;
 	faceArray.faces = newFaces;
@@ -1199,21 +1200,21 @@ void Contact::freeConvexInfo(ConvexInfo &convexA, ConvexInfo &convexB)
 {
 	if (convexA.points != nullptr)
 	{
-		PhysicsAllocator::m_blockAllocator.freeBlock(convexA.points, sizeof(glm::vec3) * convexA.pointsCount);
+		PhysicsAllocator::m_blockAllocator.freeBlock(convexA.points, sizeof(alglm::vec3) * convexA.pointsCount);
 	}
 	if (convexB.points != nullptr)
 	{
-		PhysicsAllocator::m_blockAllocator.freeBlock(convexB.points, sizeof(glm::vec3) * convexB.pointsCount);
+		PhysicsAllocator::m_blockAllocator.freeBlock(convexB.points, sizeof(alglm::vec3) * convexB.pointsCount);
 	}
 
 	if (convexA.axes != nullptr)
 	{
-		PhysicsAllocator::m_blockAllocator.freeBlock(convexA.axes, sizeof(glm::vec3) * convexA.axesCount);
+		PhysicsAllocator::m_blockAllocator.freeBlock(convexA.axes, sizeof(alglm::vec3) * convexA.axesCount);
 	}
 
 	if (convexB.axes != nullptr)
 	{
-		PhysicsAllocator::m_blockAllocator.freeBlock(convexB.axes, sizeof(glm::vec3) * convexB.axesCount);
+		PhysicsAllocator::m_blockAllocator.freeBlock(convexB.axes, sizeof(alglm::vec3) * convexB.axesCount);
 	}
 }
 } // namespace ale

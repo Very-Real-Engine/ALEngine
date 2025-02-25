@@ -3,9 +3,13 @@
 #include <cstring>
 #include <stdint.h>
 
+
 namespace ale
 {
-// Non-owning raw buffer class
+/**
+ * @brief 파일을 읽을 때 사용하는 Buffer 구조체
+ * 
+ */
 struct SBuffer
 {
 	uint8_t *data = nullptr;
@@ -53,6 +57,11 @@ struct SBuffer
 	}
 };
 
+/**
+ * @brief 파일을 읽을 때 사용하는 Buffer 구조체
+ * @details ScopedBuffer 소멸 시, buffer가 자동으로 해제.
+ * 
+ */
 struct ScopedBuffer
 {
 	ScopedBuffer(SBuffer buffer) : m_Buffer(buffer)

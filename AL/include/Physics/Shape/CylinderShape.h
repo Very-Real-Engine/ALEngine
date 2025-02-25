@@ -18,15 +18,15 @@ class CylinderShape : public Shape
 	// void findAxisByLongestPair(const std::vector<Vertex> &vertices);
 	// void computeCylinderRadius(const std::vector<Vertex> &vertices);
 	// void computeCylinderFeatures(const std::vector<Vertex> &vertices);
-	void setShapeFeatures(const glm::vec3 &center, float radius, float height);
+	void setShapeFeatures(const alglm::vec3 &center, float radius, float height);
 	void createCylinderPoints();
 
 	virtual ConvexInfo getShapeInfo(const Transform &transform) const override;
 
 	float m_radius;
 	float m_height;
-	glm::vec3 m_axes[21];
-	glm::vec3 m_points[40];
-	std::set<glm::vec3, Vec3Comparator> m_vertices;
+	alglm::vec3 m_axes[21];
+	alglm::vec3 m_points[40];
+	std::set<alglm::vec3, Vec3Comparator> m_vertices;
 };
 } // namespace ale

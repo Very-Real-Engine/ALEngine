@@ -11,17 +11,18 @@ Contact *SphereToBoxContact::create(Fixture *fixtureA, Fixture *fixtureB, int32_
 	return new (static_cast<SphereToBoxContact *>(memory)) SphereToBoxContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 SphereToBoxContact::supportA(const ConvexInfo &sphere, glm::vec3 dir)
+alglm::vec3 SphereToBoxContact::supportA(const ConvexInfo &sphere, alglm::vec3 dir)
 {
 	return sphere.center + dir * sphere.radius;
 }
 
-glm::vec3 SphereToBoxContact::supportB(const ConvexInfo &box, glm::vec3 dir)
+alglm::vec3 SphereToBoxContact::supportB(const ConvexInfo &box, alglm::vec3 dir)
 {
-	float dotAxes[3] = {glm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f, glm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
-						glm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
+	float dotAxes[3] = {alglm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
 
-	glm::vec3 point = box.center;
+	alglm::vec3 point = box.center;
 	for (int i = 0; i < 3; ++i)
 	{
 		point += box.axes[i] * (dotAxes[i] * box.halfSize[i]);

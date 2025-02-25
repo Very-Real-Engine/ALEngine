@@ -46,11 +46,13 @@ void EditorLayer::onAttach()
 		App::get().close();
 	}
 
-	m_EditorScene = Scene::createScene();
-	m_ActiveScene = m_EditorScene;
+	// m_EditorScene = Scene::createScene();
+	// m_ActiveScene = m_EditorScene;
 
 	auto projectFilePath = cmdLineArgs[1];
-	openProject(projectFilePath);
+
+	if (!openProject(projectFilePath))
+		throw std::runtime_error("Failed to load project file!");
 
 	// editor camera setting
 }
@@ -166,8 +168,8 @@ bool EditorLayer::onKeyPressed(KeyPressedEvent &e)
 		break;
 	case Key::D:
 		if (control)
-			duplicateEntity();
-		break;
+			// duplicateEntity();
+			break;
 	case Key::Delete:
 		break;
 	case Key::Escape:
@@ -434,8 +436,6 @@ void EditorLayer::openScene(const std::filesystem::path &path)
 	auto view = newScene->getAllEntitiesWith<MeshRendererComponent, TransformComponent>();
 
 	// newScene->printCullTree();
-
-	// loadSceneToRenderer(m_ActiveScene);
 }
 
 void EditorLayer::saveScene()
@@ -472,8 +472,6 @@ void EditorLayer::onScenePlay()
 
 	m_ActiveScene = Scene::copyScene(m_EditorScene);
 
-	// loadSceneToRenderer(m_ActiveScene);
-
 	// active scene runtime start
 	m_ActiveScene->onRuntimeStart();
 
@@ -494,7 +492,6 @@ void EditorLayer::onSceneStop()
 	m_SceneState = ESceneState::EDIT;
 
 	m_ActiveScene = m_EditorScene;
-	// loadSceneToRenderer(m_ActiveScene);
 
 	m_SceneHierarchyPanel.setContext(m_ActiveScene);
 }
@@ -510,12 +507,6 @@ void EditorLayer::duplicateEntity()
 		Entity newEntity = m_EditorScene->duplicateEntity(selectedEntity);
 		m_SceneHierarchyPanel.setSelectedEntity(newEntity);
 	}
-}
-
-void EditorLayer::loadSceneToRenderer(std::shared_ptr<Scene> &scene)
-{
-	Renderer &renderer = App::get().getRenderer();
-	renderer.loadScene(scene.get());
 }
 
 } // namespace ale

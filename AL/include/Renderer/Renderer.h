@@ -1,5 +1,9 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#pragma once
+
+/**
+ * @file Renderer.h
+ * @brief 렌더러 클래스
+ */
 
 #include "Core/Base.h"
 #include "Renderer/CommandBuffers.h"
@@ -9,54 +13,117 @@
 #include "Renderer/FrameBuffers.h"
 #include "Renderer/Pipeline.h"
 #include "Renderer/RenderPass.h"
+#include "Renderer/SAComponent.h"
 #include "Renderer/ShaderResourceManager.h"
 #include "Renderer/SwapChain.h"
 #include "Renderer/SyncObjects.h"
 #include "Renderer/VulkanContext.h"
-#include "Renderer/SAComponent.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneCamera.h"
 
 namespace ale
 {
+/**
+ * @class Renderer
+ * @brief 렌더러 클래스
+ */
 class Renderer
 {
   public:
+	/**
+	 * @brief 렌더러 생성
+	 * @param window 윈도우
+	 * @return std::unique_ptr<Renderer> 렌더러
+	 */
 	static std::unique_ptr<Renderer> createRenderer(GLFWwindow *window);
 	~Renderer() = default;
+	/**
+	 * @brief 렌더러 정리
+	 */
 	void cleanup();
 
+	/**
+	 * @brief 씬 로드
+	 * @param scene 씬
+	 */
 	void loadScene(Scene *scene);
+	/**
+	 * @brief 씬 시작
+	 * @param scene 씬
+	 * @param camera 카메라
+	 */
 	void beginScene(Scene *scene, EditorCamera &camera);
+	/**
+	 * @brief 카메라 없는 씬 시작
+	 * @param scene 씬
+	 * @param camera 카메라
+	 */
 	void beginScene(Scene *scene, Camera &camera);
-	void biginNoCamScene();
-	void drawFrame(Scene *scene);
-	void drawNoCamFrame();
-	void recreateSwapChain();
-	void recreateViewPort();
 
+	/**
+	 * @brief 카메라 없는 씬 시작
+	 */
+	void biginNoCamScene();
+	/**
+	 * @brief 프레임 그리기
+	 * @param scene 씬
+	 */
+	void drawFrame(Scene *scene);
+	/**
+	 * @brief 카메라 없는 프레임 그리기
+	 */
+	void drawNoCamFrame();
+	/**
+	 * @brief 스왑 체인 재생성
+	 */
+	void recreateSwapChain();
+	/**
+	 * @brief 뷰포트 재생성
+	 */
+	void recreateViewPort();
+	/**
+	 * @brief 스카이박스 업데이트
+	 * @param path 경로
+	 */
 	void updateSkybox(std::string path);
 
+	/**
+	 * @brief 디바이스 반환
+	 * @return VkDevice 디바이스
+	 */
 	VkDevice getDevice()
 	{
 		return device;
 	}
-
+	/**
+	 * @brief 렌더 패스 반환
+	 * @return VkRenderPass 렌더 패스
+	 */
 	VkRenderPass getRenderPass()
 	{
 		return imGuiRenderPass;
 	}
-
+	/**
+	 * @brief 디스크립터 세트 레이아웃 반환
+	 * @return VkDescriptorSetLayout 디스크립터 세트 레이아웃
+	 */
 	VkDescriptorSetLayout getDescriptorSetLayout()
 	{
 		return geometryPassDescriptorSetLayout;
 	}
-
+	/**
+	 * @brief 뷰포트 디스크립터 세트 반환
+	 * @return VkDescriptorSet 뷰포트 디스크립터 세트
+	 */
 	VkDescriptorSet getViewPortDescriptorSet()
 	{
 		return viewPortDescriptorSets[0];
 	}
+	/**
+	 * @brief 모델 맵 반환
+	 * @return std::unordered_map<std::string, std::shared_ptr<Model>> & 모델 맵
+	 */
 	std::unordered_map<std::string, std::shared_ptr<Model>> &getModelsMap()
 	{
 		return m_modelsMap;
@@ -174,10 +241,10 @@ class Renderer
 	std::unique_ptr<ShaderResourceManager> m_viewPortShaderResourceManager;
 	std::vector<VkDescriptorSet> viewPortDescriptorSets;
 
-	glm::vec2 viewPortSize;
+	alglm::vec2 viewPortSize;
 
-	glm::mat4 projMatrix;
-	glm::mat4 viewMatirx;
+	alglm::mat4 projMatrix;
+	alglm::mat4 viewMatirx;
 
 	std::unordered_map<std::string, std::shared_ptr<Model>> m_modelsMap;
 
@@ -227,20 +294,79 @@ class Renderer
 	std::unique_ptr<ShaderResourceManager> m_noCamShaderResourceManager;
 	std::vector<VkDescriptorSet> noCamDescriptorSets;
 
+	std::unique_ptr<RenderPass> m_colliderRenderPass;
+	VkRenderPass colliderRenderPass;
+
+	std::unique_ptr<FrameBuffers> m_colliderFrameBuffers;
+	std::vector<VkFramebuffer> colliderFramebuffers;
+
+	std::unique_ptr<DescriptorSetLayout> m_colliderDescriptorSetLayout;
+	VkDescriptorSetLayout colliderDescriptorSetLayout;
+
+	std::unique_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
+	std::vector<VkDescriptorSet> colliderDescriptorSets;
+	std::vector<std::shared_ptr<UniformBuffer>> colliderUniformBuffers;
+
+	std::unique_ptr<Pipeline> m_colliderPipeline;
+	VkPipelineLayout colliderPipelineLayout;
+	VkPipeline colliderGraphicsPipeline;
+
 	bool firstFrame = true;
 
+	/**
+	 * @brief 초기화
+	 * @param window 윈도우
+	 */
 	void init(GLFWwindow *window);
-
+	/**
+	 * @brief 디퍼드 렌더 패스 명령 버퍼 레코드
+	 * @param scene 씬
+	 * @param commandBuffer 명령 버퍼
+	 * @param imageIndex 이미지 인덱스
+	 * @param shadowMapIndex 그림자 맵 인덱스
+	 */
 	void recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer, uint32_t imageIndex,
 											   uint32_t shadowMapIndex);
+	/**
+	 * @brief 이미지 인덱스 레코드
+	 * @param commandBuffer 명령 버퍼
+	 * @param imageIndex 이미지 인덱스
+	 */
 	void recordImGuiCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+	/**
+	 * @brief 그림자 맵 명령 버퍼 레코드
+	 * @param scene 씬
+	 * @param commandBuffer 명령 버퍼
+	 * @param lightInfo 조명 정보
+	 * @param shadowMapIndex 그림자 맵 인덱스
+	 */
 	void recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer, Light &lightInfo,
 									  uint32_t shadowMapIndex);
+
+	/**
+	 * @brief 그림자 큐브 맵 명령 버퍼 레코드
+	 * @param scene 씬
+	 * @param commandBuffer 명령 버퍼
+	 * @param lightInfo 조명 정보
+	 * @param shadowMapIndex 그림자 맵 인덱스
+	 */
 	void recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer, Light &lightInfo,
 										  uint32_t shadowMapIndex);
+	/**
+	 * @brief 구면 맵 명령 버퍼 레코드
+	 */
 	void recordSphericalMapCommandBuffer();
+	/**
+	 * @brief 배경 명령 버퍼 레코드
+	 * @param commandBuffer 명령 버퍼
+	 */
 	void recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer);
+	/**
+	 * @brief 콜라이더 명령 버퍼 레코드
+	 * @param scene 씬
+	 * @param commandBuffer 명령 버퍼
+	 */
+	void recordColliderCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer);
 };
 } // namespace ale
-
-#endif
