@@ -3,6 +3,7 @@
 
 namespace ale
 {
+
 SkeletalAnimation::SkeletalAnimation(std::string const& name) : m_Name(name), m_Repeat(false) {}
 
 void SkeletalAnimation::start() { m_CurrentKeyFrameTime = m_FirstKeyFrameTime; }
