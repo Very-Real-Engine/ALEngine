@@ -227,6 +227,23 @@ class Renderer
 	std::unique_ptr<ShaderResourceManager> m_noCamShaderResourceManager;
 	std::vector<VkDescriptorSet> noCamDescriptorSets;
 
+	std::unique_ptr<RenderPass> m_colliderRenderPass;
+	VkRenderPass colliderRenderPass;
+
+	std::unique_ptr<FrameBuffers> m_colliderFrameBuffers;
+	std::vector<VkFramebuffer> colliderFramebuffers;
+
+	std::unique_ptr<DescriptorSetLayout> m_colliderDescriptorSetLayout;
+	VkDescriptorSetLayout colliderDescriptorSetLayout;
+
+	std::unique_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
+	std::vector<VkDescriptorSet> colliderDescriptorSets;
+	std::vector<std::shared_ptr<UniformBuffer>> colliderUniformBuffers;
+
+	std::unique_ptr<Pipeline> m_colliderPipeline;
+	VkPipelineLayout colliderPipelineLayout;
+	VkPipeline colliderGraphicsPipeline;
+
 	bool firstFrame = true;
 
 	void init(GLFWwindow *window);
@@ -240,6 +257,7 @@ class Renderer
 										  uint32_t shadowMapIndex);
 	void recordSphericalMapCommandBuffer();
 	void recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer);
+	void recordColliderCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer);
 };
 } // namespace ale
 

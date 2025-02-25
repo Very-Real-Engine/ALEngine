@@ -26,7 +26,7 @@ void OBJLoader::parse(const std::string &path)
 	int32_t currentSmoothingGroup = 0;
 	std::string line;
 
-	auto getVertexIndex = [&](std::string &vertex, uint32_t &vIndex, uint32_t &tIndex, uint32_t &nIndex) -> void {
+	auto getVertexIndex = [&](std::string &vertex, int32_t &vIndex, int32_t &tIndex, int32_t &nIndex) -> bool {
 		std::stringstream vss(vertex);
 		std::string vIdx, tIdx, nIdx;
 		std::getline(vss, vIdx, '/');
@@ -36,39 +36,65 @@ void OBJLoader::parse(const std::string &path)
 		for (auto &c : vIdx)
 		{
 			if (!std::isdigit(c))
-				return;
+				return false;
 		}
 		for (auto &c : tIdx)
 		{
 			if (!std::isdigit(c))
-				return;
+				return false;
 		}
 		for (auto &c : nIdx)
 		{
 			if (!std::isdigit(c))
-				return;
+				return false;
 		}
 		vIndex = std::stoi(vIdx) - 1;
 		tIndex = tIdx.empty() ? -1 : std::stoi(tIdx) - 1;
 		nIndex = nIdx.empty() ? -1 : std::stoi(nIdx) - 1;
 
-		if (vIndex >= globalPosition.size() || tIndex >= globalTexCoord.size() || nIndex >= globalNormal.size())
+		if (vIndex >= static_cast<int32_t>(globalPosition.size()) ||
+			tIndex >= static_cast<int32_t>(globalTexCoord.size()) ||
+			nIndex >= static_cast<int32_t>(globalNormal.size()))
 		{
-			std::cerr << "Invalid index: " << vIndex << " " << tIndex << " " << nIndex << std::endl;
-			return;
+			return false;
 		}
+		return true;
 	};
 
-	auto makeKey = [&](uint32_t vIndex, uint32_t tIndex, uint32_t nIndex, uint32_t smoothingGroup) -> std::string {
+	auto makeKey = [&](int32_t vIndex, int32_t tIndex, int32_t nIndex, int32_t smoothingGroup) -> std::string {
 		return std::to_string(vIndex) + "/" + std::to_string(tIndex) + "/" + std::to_string(nIndex) + "/" +
 			   std::to_string(smoothingGroup);
 	};
 
-	auto getVertex = [&](uint32_t vIndex, uint32_t tIndex, uint32_t nIndex, uint32_t smoothingGroup) -> Vertex {
+	auto getVertex = [&](int32_t vIndex, int32_t tIndex, int32_t nIndex, int32_t smoothingGroup) -> Vertex {
 		Vertex tmp;
-		tmp.pos = globalPosition[vIndex];
-		tmp.normal = tIndex != -1 ? globalNormal[nIndex] : alglm::vec3(0.0f);
-		tmp.texCoord = tIndex != -1 ? globalTexCoord[tIndex] : alglm::vec2(0.0f);
+		if (vIndex >= 0 && vIndex < static_cast<int32_t>(globalPosition.size()))
+		{
+			tmp.pos = globalPosition[vIndex];
+		}
+		else
+		{
+			tmp.pos = alglm::vec3(0.0f);
+		}
+
+		if (nIndex >= 0 && nIndex < static_cast<int32_t>(globalNormal.size()))
+		{
+			tmp.normal = globalNormal[nIndex];
+		}
+		else
+		{
+			tmp.normal = alglm::vec3(0.0f);
+		}
+
+		if (tIndex >= 0 && tIndex < static_cast<int32_t>(globalTexCoord.size()))
+		{
+			tmp.texCoord = globalTexCoord[tIndex];
+		}
+		else
+		{
+			tmp.texCoord = alglm::vec2(0.0f);
+		}
+
 		return tmp;
 	};
 
@@ -89,10 +115,14 @@ void OBJLoader::parse(const std::string &path)
 			{
 				std::string vertex;
 				ss >> vertex;
-				uint32_t vIndex, tIndex, nIndex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				int32_t vIndex, tIndex, nIndex;
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				std::string key = makeKey(vIndex, tIndex, nIndex, currentSmoothingGroup);
-				uint32_t firstVertexIndex;
+				int32_t firstVertexIndex;
 				if (vertexCache.find(key) == vertexCache.end())
 				{
 					vertexCache[key] = subMesh.vertices.size();
@@ -107,7 +137,11 @@ void OBJLoader::parse(const std::string &path)
 				}
 
 				ss >> vertex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				key = makeKey(vIndex, tIndex, nIndex, currentSmoothingGroup);
 				if (vertexCache.find(key) == vertexCache.end())
 				{
@@ -121,9 +155,13 @@ void OBJLoader::parse(const std::string &path)
 				}
 
 				ss >> vertex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				key = makeKey(vIndex, tIndex, nIndex, currentSmoothingGroup);
-				uint32_t pastVertexIndex;
+				int32_t pastVertexIndex;
 				if (vertexCache.find(key) == vertexCache.end())
 				{
 					vertexCache[key] = subMesh.vertices.size();
@@ -136,10 +174,14 @@ void OBJLoader::parse(const std::string &path)
 					pastVertexIndex = vertexCache[key];
 					subMesh.indices.push_back(pastVertexIndex);
 				}
-				uint32_t currentVertexIndex;
+				int32_t currentVertexIndex;
 				while (ss >> vertex)
 				{
-					getVertexIndex(vertex, vIndex, tIndex, nIndex);
+					if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+					{
+						std::cerr << "Failed to get vertex index" << std::endl;
+						return;
+					}
 					key = makeKey(vIndex, tIndex, nIndex, currentSmoothingGroup);
 					if (vertexCache.find(key) == vertexCache.end())
 					{
@@ -157,20 +199,32 @@ void OBJLoader::parse(const std::string &path)
 			{
 				std::string vertex;
 				ss >> vertex;
-				uint32_t vIndex, tIndex, nIndex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				int32_t vIndex, tIndex, nIndex;
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				Vertex firstVertex = getVertex(vIndex, tIndex, nIndex, currentSmoothingGroup);
 				subMesh.vertices.push_back(firstVertex);
 				subMesh.indices.push_back(subMesh.vertices.size() - 1);
 
 				ss >> vertex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				Vertex secondVertex = getVertex(vIndex, tIndex, nIndex, currentSmoothingGroup);
 				subMesh.vertices.push_back(secondVertex);
 				subMesh.indices.push_back(subMesh.vertices.size() - 1);
 
 				ss >> vertex;
-				getVertexIndex(vertex, vIndex, tIndex, nIndex);
+				if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+				{
+					std::cerr << "Failed to get vertex index" << std::endl;
+					return;
+				}
 				Vertex pastVertex = getVertex(vIndex, tIndex, nIndex, currentSmoothingGroup);
 				subMesh.vertices.push_back(pastVertex);
 				subMesh.indices.push_back(subMesh.vertices.size() - 1);
@@ -178,7 +232,11 @@ void OBJLoader::parse(const std::string &path)
 				Vertex currentVertex;
 				while (ss >> vertex)
 				{
-					getVertexIndex(vertex, vIndex, tIndex, nIndex);
+					if (!getVertexIndex(vertex, vIndex, tIndex, nIndex))
+					{
+						std::cerr << "Failed to get vertex index" << std::endl;
+						return;
+					}
 					currentVertex = getVertex(vIndex, tIndex, nIndex, currentSmoothingGroup);
 					subMesh.vertices.push_back(firstVertex);
 					subMesh.vertices.push_back(pastVertex);
@@ -277,7 +335,6 @@ void OBJLoader::parseMTL(const std::string &path)
 		{
 			ss >> currentMtlName;
 			mtlMap[currentMtlName] = MTL();
-			std::cout << "currentMtlName: " << currentMtlName << std::endl;
 		}
 		else if (type == "Ka")
 		{
@@ -288,7 +345,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].Ka = Ka;
-			std::cout << "Ka: " << Ka.x << " " << Ka.y << " " << Ka.z << std::endl;
 		}
 		else if (type == "Kd")
 		{
@@ -299,7 +355,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].Kd = Kd;
-			std::cout << "Kd: " << Kd.x << " " << Kd.y << " " << Kd.z << std::endl;
 		}
 		else if (type == "Ks")
 		{
@@ -310,7 +365,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].Ks = Ks;
-			std::cout << "Ks: " << Ks.x << " " << Ks.y << " " << Ks.z << std::endl;
 		}
 		else if (type == "Ns")
 		{
@@ -321,7 +375,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].Ns = Ns;
-			std::cout << "Ns: " << Ns << std::endl;
 		}
 		else if (type == "Ni")
 		{
@@ -332,7 +385,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].Ni = Ni;
-			std::cout << "Ni: " << Ni << std::endl;
 		}
 		else if (type == "d")
 		{
@@ -343,7 +395,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].d = d;
-			std::cout << "d: " << d << std::endl;
 		}
 		else if (type == "illum")
 		{
@@ -354,7 +405,6 @@ void OBJLoader::parseMTL(const std::string &path)
 				return;
 			}
 			mtlMap[currentMtlName].illum = illum;
-			std::cout << "illum: " << illum << std::endl;
 		}
 		else if (type == "map_Kd")
 		{
@@ -362,7 +412,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_Kd;
 			map_Kd = getMTLPath(path, map_Kd);
 			mtlMap[currentMtlName].map_Kd = map_Kd;
-			std::cout << "map_Kd: " << map_Kd << std::endl;
 		}
 		else if (type == "map_Ks")
 		{
@@ -370,7 +419,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_Ks;
 			map_Ks = getMTLPath(path, map_Ks);
 			mtlMap[currentMtlName].map_Ks = map_Ks;
-			std::cout << "map_Ks: " << map_Ks << std::endl;
 		}
 		else if (type == "map_Ns")
 		{
@@ -378,7 +426,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_Ns;
 			map_Ns = getMTLPath(path, map_Ns);
 			mtlMap[currentMtlName].map_Ns = map_Ns;
-			std::cout << "map_Ns: " << map_Ns << std::endl;
 		}
 		else if (type == "map_Bump" || type == "bump")
 		{
@@ -386,7 +433,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_Bump;
 			map_Bump = getMTLPath(path, map_Bump);
 			mtlMap[currentMtlName].map_Bump = map_Bump;
-			std::cout << "map_Bump: " << map_Bump << std::endl;
 		}
 		else if (type == "map_d")
 		{
@@ -394,7 +440,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_d;
 			map_d = getMTLPath(path, map_d);
 			mtlMap[currentMtlName].map_d = map_d;
-			std::cout << "map_d: " << map_d << std::endl;
 		}
 		else if (type == "disp")
 		{
@@ -402,7 +447,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> disp;
 			disp = getMTLPath(path, disp);
 			mtlMap[currentMtlName].disp = disp;
-			std::cout << "disp: " << disp << std::endl;
 		}
 		else if (type == "map_Ao")
 		{
@@ -410,7 +454,6 @@ void OBJLoader::parseMTL(const std::string &path)
 			ss >> map_Ao;
 			map_Ao = getMTLPath(path, map_Ao);
 			mtlMap[currentMtlName].map_Ao = map_Ao;
-			std::cout << "map_Ao: " << map_Ao << std::endl;
 		}
 	}
 }

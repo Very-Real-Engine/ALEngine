@@ -276,6 +276,47 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 	return createMesh(vertices, indices);
 }
 
+std::shared_ptr<Mesh> Mesh::createColliderBox()
+{
+	std::vector<Vertex> vertices = {
+		Vertex{alglm::vec3(-0.5f, -0.5f, -0.5f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec2(0.0f, 0.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, -0.5f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(0.5f, 0.5f, -0.5f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(-0.5f, 0.5f, -0.5f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec2(0.0f, 1.0f)},
+
+		Vertex{alglm::vec3(-0.5f, -0.5f, 0.5f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec2(0.0f, 0.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, 0.5f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(0.5f, 0.5f, 0.5f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(-0.5f, 0.5f, 0.5f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec2(0.0f, 1.0f)},
+
+		Vertex{alglm::vec3(-0.5f, 0.5f, 0.5f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(-0.5f, 0.5f, -0.5f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(-0.5f, -0.5f, -0.5f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec2(0.0f, 1.0f)},
+		Vertex{alglm::vec3(-0.5f, -0.5f, 0.5f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec2(0.0f, 0.0f)},
+
+		Vertex{alglm::vec3(0.5f, 0.5f, 0.5f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(0.5f, 0.5f, -0.5f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, -0.5f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec2(0.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, 0.5f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec2(0.0f, 0.0f)},
+
+		Vertex{alglm::vec3(-0.5f, -0.5f, -0.5f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(0.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, -0.5f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, -0.5f, 0.5f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(-0.5f, -0.5f, 0.5f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(0.0f, 0.0f)},
+
+		Vertex{alglm::vec3(-0.5f, 0.5f, -0.5f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(0.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, 0.5f, -0.5f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(1.0f, 1.0f)},
+		Vertex{alglm::vec3(0.5f, 0.5f, 0.5f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(1.0f, 0.0f)},
+		Vertex{alglm::vec3(-0.5f, 0.5f, 0.5f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(0.0f, 0.0f)},
+	};
+
+	std::vector<uint32_t> indices = {0,	 1,	 1,	 2,	 2,	 3,	 3,	 0,	 4,	 5,	 5,	 6,	 6,	 7,	 7,	 4,
+									 8,	 9,	 9,	 10, 10, 11, 11, 8,	 12, 13, 13, 14, 14, 15, 15, 12,
+									 16, 17, 17, 18, 18, 19, 19, 16, 20, 21, 21, 22, 22, 23, 23, 20};
+
+	return createMesh(vertices, indices);
+}
+
 void Mesh::cleanup()
 {
 	m_vertexBuffer->cleanup();
@@ -291,8 +332,15 @@ void Mesh::draw(VkCommandBuffer commandBuffer)
 
 void Mesh::initMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices)
 {
-	calculateTangents(vertices, indices);
-	calculateAABB(vertices);
+	try
+	{
+		calculateTangents(vertices, indices);
+		calculateAABB(vertices);
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << "Error: " << e.what() << std::endl;
+	}
 
 	m_vertexBuffer = VertexBuffer::createVertexBuffer(vertices);
 	m_indexBuffer = IndexBuffer::createIndexBuffer(indices);
@@ -302,6 +350,10 @@ void Mesh::calculateTangents(std::vector<Vertex> &vertices, const std::vector<ui
 {
 	for (size_t i = 0; i < indices.size(); i += 3)
 	{
+		if (indices[i] >= vertices.size() || indices[i + 1] >= vertices.size() || indices[i + 2] >= vertices.size())
+		{
+			continue;
+		}
 		Vertex &v0 = vertices[indices[i]];
 		Vertex &v1 = vertices[indices[i + 1]];
 		Vertex &v2 = vertices[indices[i + 2]];

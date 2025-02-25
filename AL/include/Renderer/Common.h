@@ -168,10 +168,10 @@ struct GeometryPassVertexUniformBufferObject
 	ALIGN16 alglm::mat4 view;  // 64바이트
 	ALIGN16 alglm::mat4 proj;  // 64바이트
 	ALIGN16 alglm::mat4 finalBonesMatrices[MAX_BONES];
-	ALIGN4 bool heightFlag;		// 4바이트
-	ALIGN4 float heightScale;	// 4바이트
+	ALIGN4 bool heightFlag;	  // 4바이트
+	ALIGN4 float heightScale; // 4바이트
 	ALIGN4 uint32_t padding1;
-	ALIGN4 uint32_t padding2;  // 8바이트 (패딩)
+	ALIGN4 uint32_t padding2; // 8바이트 (패딩)
 };
 
 struct GeometryPassFragmentUniformBufferObject
@@ -192,10 +192,10 @@ struct GeometryPassFragmentUniformBufferObject
 
 struct Light
 {
-	ALIGN4 float intensity;		   // 광원의 강도
-	ALIGN4 float innerCutoff;	   // 스포트라이트 내부 각도 (cosine 값)
-	ALIGN4 float outerCutoff;	   // 스포트라이트 외부 각도 (cosine 값)
-	ALIGN4 uint32_t type;		   // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
+	ALIGN4 float intensity;	  // 광원의 강도
+	ALIGN4 float innerCutoff; // 스포트라이트 내부 각도 (cosine 값)
+	ALIGN4 float outerCutoff; // 스포트라이트 외부 각도 (cosine 값)
+	ALIGN4 uint32_t type;	  // 광원 타입 (0: 점광원, 1: 스포트라이트, 2: 방향성 광원)
 	ALIGN4 uint32_t onShadowMap;
 	ALIGN4 uint32_t padding1;
 	ALIGN4 uint32_t padding2;
@@ -253,6 +253,13 @@ struct BackgroundUniformBufferObject
 {
 	ALIGN16 alglm::mat4 proj;
 	ALIGN16 alglm::mat4 view;
+};
+
+struct ColliderUniformBufferObject
+{
+	alignas(16) alglm::mat4 model;
+	alignas(16) alglm::mat4 view;
+	alignas(16) alglm::mat4 proj;
 };
 
 } // namespace ale

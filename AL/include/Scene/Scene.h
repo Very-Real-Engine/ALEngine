@@ -233,6 +233,8 @@ class Scene
 	void unsetNoneInCullTree(Entity &entity);
 	void printCullTree();
 
+	void removeColliderShaderResourceManager(Entity &entity);
+
   private:
 	template <typename T> void onComponentAdded(Entity entity, T &component);
 
@@ -268,6 +270,7 @@ class Scene
 	std::shared_ptr<Model> m_groundModel;
 	std::shared_ptr<Model> m_capsuleModel;
 	std::shared_ptr<Model> m_cylinderModel;
+	std::shared_ptr<Model> m_colliderBoxModel;
 
 	World *m_World = nullptr;
 

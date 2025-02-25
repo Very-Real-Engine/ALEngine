@@ -18,6 +18,7 @@ class DescriptorSetLayout
 	static std::unique_ptr<DescriptorSetLayout> createViewPortDescriptorSetLayout();
 	static std::unique_ptr<DescriptorSetLayout> createSphericalMapDescriptorSetLayout();
 	static std::unique_ptr<DescriptorSetLayout> createBackgroundDescriptorSetLayout();
+	static std::unique_ptr<DescriptorSetLayout> createColliderDescriptorSetLayout();
 
 	~DescriptorSetLayout() = default;
 
@@ -39,6 +40,7 @@ class DescriptorSetLayout
 	void initViewPortDescriptorSetLayout();
 	void initSphericalMapDescriptorSetLayout();
 	void initBackgroundDescriptorSetLayout();
+	void initColliderDescriptorSetLayout();
 };
 } // namespace ale
 

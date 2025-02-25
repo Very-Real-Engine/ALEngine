@@ -239,6 +239,8 @@ void VulkanContext::createLogicalDevice()
 	deviceFeatures.samplerAnisotropy = VK_TRUE; // 이방성 필터링 사용 설정
 	deviceFeatures.sampleRateShading = VK_TRUE; // 디바이스에 샘플 셰이딩 기능 활성화
 	deviceFeatures.multiViewport = VK_TRUE;		// 멀티 뷰포트 활성화
+	deviceFeatures.fillModeNonSolid = VK_TRUE;	// 와이어프레임 모드 활성화
+	deviceFeatures.wideLines = VK_TRUE;			// 아래 오류 해결을 위해 와이드 라인도 활성화
 
 	// 논리적 장치 생성을 위한 정보 등록
 	VkDeviceCreateInfo createInfo{};
@@ -470,7 +472,7 @@ QueueFamilyIndices VulkanContext::findQueueFamilies(VkPhysicalDevice device)
 // 디스크립터 풀 생성
 void VulkanContext::createDescriptorPool()
 {
-	size_t MAX_OBJECTS = 10000;
+	size_t MAX_OBJECTS = 1000000;
 
 	// 디스크립터 풀의 타입별 디스크립터 개수를 설정하는 구조체
 	std::array<VkDescriptorPoolSize, 5> poolSizes{};

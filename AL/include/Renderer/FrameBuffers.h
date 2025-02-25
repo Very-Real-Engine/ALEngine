@@ -18,6 +18,8 @@ class FrameBuffers
 	static std::unique_ptr<FrameBuffers> createSphericalMapFrameBuffers(VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createBackgroundFrameBuffers(alglm::vec2 viewPortSize,
 																	  VkRenderPass renderPass);
+	static std::unique_ptr<FrameBuffers> createColliderFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass,
+																	VkImageView viewPortImageView);
 
 	~FrameBuffers() = default;
 
@@ -29,6 +31,7 @@ class FrameBuffers
 	void initShadowCubeMapFrameBuffers(VkRenderPass renderPass);
 	void initSphericalMapFrameBuffers(VkRenderPass renderPass);
 	void initBackgroundFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass);
+	void initColliderFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass, VkImageView viewPortImageView);
 
 	VkFramebuffer &getSphericalMapFramebuffer()
 	{

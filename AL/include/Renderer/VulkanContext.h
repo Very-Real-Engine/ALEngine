@@ -71,6 +71,10 @@ class VulkanContext
 	{
 		return shadowCubeMapDescriptorSetLayout;
 	}
+	VkDescriptorSetLayout getColliderDescriptorSetLayout()
+	{
+		return colliderDescriptorSetLayout;
+	}
 
 	void setGeometryPassDescriptorSetLayout(VkDescriptorSetLayout descriptorSetLayout)
 	{
@@ -83,6 +87,10 @@ class VulkanContext
 	void setShadowCubeMapDescriptorSetLayout(VkDescriptorSetLayout descriptorSetLayout)
 	{
 		shadowCubeMapDescriptorSetLayout = descriptorSetLayout;
+	}
+	void setColliderDescriptorSetLayout(VkDescriptorSetLayout descriptorSetLayout)
+	{
+		colliderDescriptorSetLayout = descriptorSetLayout;
 	}
 
   private:
@@ -105,6 +113,7 @@ class VulkanContext
 	VkDescriptorSetLayout geometryPassDescriptorSetLayout;
 	VkDescriptorSetLayout shadowMapDescriptorSetLayout;
 	VkDescriptorSetLayout shadowCubeMapDescriptorSetLayout;
+	VkDescriptorSetLayout colliderDescriptorSetLayout;
 
 	void createInstance();
 	bool checkValidationLayerSupport();

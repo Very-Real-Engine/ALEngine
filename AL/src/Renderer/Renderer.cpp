@@ -122,6 +122,21 @@ void Renderer::init(GLFWwindow *window)
 	viewPortImageView = m_viewPortFrameBuffers->getViewPortImageView();
 	viewPortSampler = VulkanUtil::createSampler();
 
+	m_colliderRenderPass = RenderPass::createColliderRenderPass();
+	colliderRenderPass = m_colliderRenderPass->getRenderPass();
+
+	m_colliderFrameBuffers =
+		FrameBuffers::createColliderFrameBuffers(viewPortSize, colliderRenderPass, viewPortImageView);
+	colliderFramebuffers = m_colliderFrameBuffers->getFramebuffers();
+
+	m_colliderDescriptorSetLayout = DescriptorSetLayout::createColliderDescriptorSetLayout();
+	colliderDescriptorSetLayout = m_colliderDescriptorSetLayout->getDescriptorSetLayout();
+	context.setColliderDescriptorSetLayout(colliderDescriptorSetLayout);
+
+	m_colliderPipeline = Pipeline::createColliderPipeline(colliderRenderPass, colliderDescriptorSetLayout);
+	colliderPipelineLayout = m_colliderPipeline->getPipelineLayout();
+	colliderGraphicsPipeline = m_colliderPipeline->getPipeline();
+
 	m_ImGuiSwapChainFrameBuffers = FrameBuffers::createImGuiFrameBuffers(m_swapChain.get(), imGuiRenderPass);
 	imGuiSwapChainFrameBuffers = m_ImGuiSwapChainFrameBuffers->getFramebuffers();
 
@@ -224,6 +239,7 @@ void Renderer::cleanup()
 	m_noCamTexture->cleanup();
 
 	// framebuffer
+	m_colliderFrameBuffers->cleanup();
 	m_viewPortFrameBuffers->cleanup();
 	m_ImGuiSwapChainFrameBuffers->cleanup();
 	for (size_t i = 0; i < 4; i++)
@@ -252,11 +268,13 @@ void Renderer::cleanup()
 	}
 	m_sphericalMapPipeline->cleanup();
 	m_backgroundPipeline->cleanup();
+	m_colliderPipeline->cleanup();
 
 	// renderpass
 	m_deferredRenderPass->cleanup();
 	m_sphericalMapRenderPass->cleanup();
 	m_backgroundRenderPass->cleanup();
+	m_colliderRenderPass->cleanup();
 	for (size_t i = 0; i < 4; i++)
 	{
 		m_shadowMapRenderPass[i]->cleanup();
@@ -286,6 +304,7 @@ void Renderer::cleanup()
 	m_shadowCubeMapDescriptorSetLayout->cleanup();
 	m_sphericalMapDescriptorSetLayout->cleanup();
 	m_backgroundDescriptorSetLayout->cleanup();
+	m_colliderDescriptorSetLayout->cleanup();
 
 	m_syncObjects->cleanup();
 	VulkanContext::getContext().cleanup();
@@ -339,6 +358,10 @@ void Renderer::recreateViewPort()
 	m_geometryPassPipeline->cleanup();
 	m_lightingPassPipeline->cleanup();
 	m_deferredRenderPass->cleanup();
+
+	m_colliderFrameBuffers->cleanup();
+	m_colliderPipeline->cleanup();
+	m_colliderRenderPass->cleanup();
 
 	m_viewPortFrameBuffers->cleanup();
 	m_viewPortShaderResourceManager->cleanup();
@@ -395,6 +418,16 @@ void Renderer::recreateViewPort()
 	m_noCamShaderResourceManager->initViewPortShaderResourceManager(
 		viewPortDescriptorSetLayout, m_noCamTexture->getImageView(), m_noCamTexture->getSampler());
 	noCamDescriptorSets = m_noCamShaderResourceManager->getDescriptorSets();
+
+	m_colliderRenderPass->initColliderRenderPass();
+	colliderRenderPass = m_colliderRenderPass->getRenderPass();
+
+	m_colliderFrameBuffers->initColliderFrameBuffers(viewPortSize, colliderRenderPass, viewPortImageView);
+	colliderFramebuffers = m_colliderFrameBuffers->getFramebuffers();
+
+	m_colliderPipeline->initColliderPipeline(colliderRenderPass, colliderDescriptorSetLayout);
+	colliderPipelineLayout = m_colliderPipeline->getPipelineLayout();
+	colliderGraphicsPipeline = m_colliderPipeline->getPipeline();
 }
 
 void Renderer::updateSkybox(std::string path)
@@ -588,6 +621,8 @@ void Renderer::drawFrame(Scene *scene)
 	recordBackgroundCommandBuffer(commandBuffers[currentFrame]);
 	recordDeferredRenderPassCommandBuffer(scene, commandBuffers[currentFrame], imageIndex,
 										  shadowMapIndex); // 현재 작업할 image의 index와 commandBuffer를 전송
+
+	recordColliderCommandBuffer(scene, commandBuffers[currentFrame]);
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1349,4 +1384,151 @@ void Renderer::recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer)
 	vkCmdEndRenderPass(commandBuffer);
 }
 
+void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer)
+{
+	VkClearValue clearValue{};
+	clearValue.color = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = colliderRenderPass;
+	renderPassInfo.framebuffer = colliderFramebuffers[0];
+	renderPassInfo.renderArea.offset = {0, 0};
+	renderPassInfo.renderArea.extent = {static_cast<uint32_t>(viewPortSize.x), static_cast<uint32_t>(viewPortSize.y)};
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearValue;
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderGraphicsPipeline);
+
+	ColliderUniformBufferObject ubo{};
+	ubo.proj = projMatrix;
+	ubo.proj[1][1] *= -1;
+	ubo.view = viewMatirx;
+
+	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, SphereColliderComponent>();
+	for (auto entity : view)
+	{
+		if (!view.get<TagComponent>(entity).m_isActive || !view.get<SphereColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		SphereColliderComponent &sphereColliderComponent = view.get<SphereColliderComponent>(entity);
+		float radius = sphereColliderComponent.m_Radius;
+		alglm::vec3 center = sphereColliderComponent.m_Center;
+
+		auto &transform = view.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f));
+
+		auto &shaderResourceManager = sphereColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["sphere"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view2 = scene->getAllEntitiesWith<TransformComponent, TagComponent, BoxColliderComponent>();
+	for (auto entity : view2)
+	{
+		if (!view2.get<TagComponent>(entity).m_isActive || !view2.get<BoxColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		BoxColliderComponent &boxColliderComponent = view2.get<BoxColliderComponent>(entity);
+		alglm::vec3 size = boxColliderComponent.m_Size;
+		alglm::vec3 center = boxColliderComponent.m_Center;
+
+		auto &transform = view2.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, size);
+
+		auto &shaderResourceManager = boxColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["colliderBox"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view3 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CapsuleColliderComponent>();
+	for (auto entity : view3)
+	{
+		if (!view3.get<TagComponent>(entity).m_isActive || !view3.get<CapsuleColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		CapsuleColliderComponent &capsuleColliderComponent = view3.get<CapsuleColliderComponent>(entity);
+		float radius = capsuleColliderComponent.m_Radius;
+		float height = capsuleColliderComponent.m_Height;
+		alglm::vec3 center = capsuleColliderComponent.m_Center;
+
+		auto &transform = view3.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f, height, radius * 2.0f));
+
+		auto &shaderResourceManager = capsuleColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["capsule"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	auto view4 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CylinderColliderComponent>();
+	for (auto entity : view4)
+	{
+		if (!view4.get<TagComponent>(entity).m_isActive || !view4.get<CylinderColliderComponent>(entity).m_IsActive)
+		{
+			continue;
+		}
+		CylinderColliderComponent &cylinderColliderComponent = view4.get<CylinderColliderComponent>(entity);
+		float radius = cylinderColliderComponent.m_Radius;
+		float height = cylinderColliderComponent.m_Height;
+		alglm::vec3 center = cylinderColliderComponent.m_Center;
+
+		auto &transform = view4.get<TransformComponent>(entity);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), transform.m_Position);
+		ubo.model = alglm::translate(ubo.model, center);
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.x, alglm::vec3(1.0f, 0.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.y, alglm::vec3(0.0f, 1.0f, 0.0f));
+		ubo.model = alglm::rotate(ubo.model, transform.m_Rotation.z, alglm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(radius * 2.0f, height, radius * 2.0f));
+
+		auto &shaderResourceManager = cylinderColliderComponent.m_colliderShaderResourceManager;
+		auto &uniformBuffer = shaderResourceManager->getUniformBuffers();
+		auto &descriptorSet = shaderResourceManager->getDescriptorSets();
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&descriptorSet[currentFrame], 0, nullptr);
+		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["cylinder"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	vkCmdEndRenderPass(commandBuffer);
+}
 } // namespace ale

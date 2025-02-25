@@ -23,6 +23,7 @@ namespace ale
 {
 Scene::~Scene()
 {
+	m_defaultMaterial->cleanup();
 }
 
 template <typename... Component>
@@ -94,7 +95,8 @@ std::shared_ptr<Scene> Scene::copyScene(std::shared_ptr<Scene> scene)
 		auto &mesh = dstRegistry.get<MeshRendererComponent>(entityHandle);
 		newScene->m_cullTree.changeEntityHandle(mesh.nodeId, static_cast<uint32_t>(entityHandle));
 	}
-	newScene->initScene();
+	// newScene->initScene();
+	newScene->m_cullTree.setScene(newScene.get());
 	return newScene;
 }
 
@@ -172,6 +174,36 @@ void Scene::destroyEntity(Entity entity)
 			if (it != parentRC.children.end())
 				parentRC.children.erase(it);
 		}
+	}
+
+	if (entity.hasComponent<MeshRendererComponent>())
+	{
+		auto &mesh = entity.getComponent<MeshRendererComponent>();
+		mesh.m_RenderingComponent->cleanup();
+	}
+
+	if (entity.hasComponent<BoxColliderComponent>())
+	{
+		auto &box = entity.getComponent<BoxColliderComponent>();
+		box.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<SphereColliderComponent>())
+	{
+		auto &sphere = entity.getComponent<SphereColliderComponent>();
+		sphere.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<CapsuleColliderComponent>())
+	{
+		auto &capsule = entity.getComponent<CapsuleColliderComponent>();
+		capsule.m_colliderShaderResourceManager->cleanup();
+	}
+
+	if (entity.hasComponent<CylinderColliderComponent>())
+	{
+		auto &cylinder = entity.getComponent<CylinderColliderComponent>();
+		cylinder.m_colliderShaderResourceManager->cleanup();
 	}
 
 	removeEntityInCullTree(entity);
@@ -379,6 +411,7 @@ void Scene::initScene()
 	m_groundModel = Model::createGroundModel(m_defaultMaterial);
 	m_capsuleModel = Model::createCapsuleModel(m_defaultMaterial);
 	m_cylinderModel = Model::createCylinderModel(m_defaultMaterial);
+	m_colliderBoxModel = Model::createColliderBoxModel(m_defaultMaterial);
 
 	m_cullTree.setScene(this);
 }
@@ -446,8 +479,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = boxShape.clone();
-			fDef.friction = 0.7f;
-			fDef.restitution = 0.4f;
+			fDef.friction = bc.m_Friction;
+			fDef.restitution = bc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -472,8 +505,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = spShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.8f;
+			fDef.friction = sc.m_Friction;
+			fDef.restitution = sc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -511,8 +544,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = csShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -540,8 +573,8 @@ void Scene::onPhysicsStart()
 
 			FixtureDef fDef;
 			fDef.shape = cyShape.clone();
-			fDef.friction = 0.4f;
-			fDef.restitution = 0.4f;
+			fDef.friction = cc.m_Friction;
+			fDef.restitution = cc.m_Restitution;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -628,9 +661,33 @@ void Scene::removeEntityInCullTree(Entity &entity)
 		auto &mc = entity.getComponent<MeshRendererComponent>();
 		if (mc.m_RenderingComponent == nullptr)
 			return;
-
+		mc.m_RenderingComponent->cleanup();
 		m_cullTree.destroyNode(mc.nodeId);
 		mc.nodeId = NULL_NODE;
+	}
+}
+
+void Scene::removeColliderShaderResourceManager(Entity &entity)
+{
+	if (entity.hasComponent<BoxColliderComponent>())
+	{
+		auto &bc = entity.getComponent<BoxColliderComponent>();
+		bc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<SphereColliderComponent>())
+	{
+		auto &sc = entity.getComponent<SphereColliderComponent>();
+		sc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<CapsuleColliderComponent>())
+	{
+		auto &cc = entity.getComponent<CapsuleColliderComponent>();
+		cc.m_colliderShaderResourceManager->cleanup();
+	}
+	else if (entity.hasComponent<CylinderColliderComponent>())
+	{
+		auto &cy = entity.getComponent<CylinderColliderComponent>();
+		cy.m_colliderShaderResourceManager->cleanup();
 	}
 }
 
@@ -752,24 +809,36 @@ template <> void Scene::onComponentAdded<BoxColliderComponent>(Entity entity, Bo
 	auto &tc = entity.getComponent<TransformComponent>();
 
 	component.m_Size = tc.m_Scale;
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
 }
 
 template <> void Scene::onComponentAdded<SphereColliderComponent>(Entity entity, SphereColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
 	auto &tc = entity.getComponent<TransformComponent>();
 
 	float maxScale = std::max({tc.m_Scale.x, tc.m_Scale.y, tc.m_Scale.z});
-	component.m_Radius = maxScale;
+	component.m_Radius = maxScale / 2;
 }
 
 template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity, CapsuleColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
 	component.m_Radius = 0.5f;
 	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<CylinderColliderComponent>(Entity entity, CylinderColliderComponent &component)
 {
+	auto &context = VulkanContext::getContext();
+	component.m_colliderShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
 	component.m_Radius = 0.5f;
 	component.m_Height = 1.0f;
 }
@@ -803,6 +872,7 @@ void Scene::cleanup()
 	m_groundModel->cleanup();
 	m_capsuleModel->cleanup();
 	m_cylinderModel->cleanup();
+	m_colliderBoxModel->cleanup();
 
 	m_defaultMaterial->cleanup();
 
@@ -811,6 +881,34 @@ void Scene::cleanup()
 	{
 		auto &mesh = view.get<MeshRendererComponent>(e);
 		mesh.m_RenderingComponent->cleanup();
+	}
+
+	auto view2 = m_Registry.view<BoxColliderComponent>();
+	for (auto e : view2)
+	{
+		auto &box = view2.get<BoxColliderComponent>(e);
+		box.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view3 = m_Registry.view<SphereColliderComponent>();
+	for (auto e : view3)
+	{
+		auto &sphere = view3.get<SphereColliderComponent>(e);
+		sphere.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view4 = m_Registry.view<CapsuleColliderComponent>();
+	for (auto e : view4)
+	{
+		auto &capsule = view4.get<CapsuleColliderComponent>(e);
+		capsule.m_colliderShaderResourceManager->cleanup();
+	}
+
+	auto view5 = m_Registry.view<CylinderColliderComponent>();
+	for (auto e : view5)
+	{
+		auto &cylinder = view5.get<CylinderColliderComponent>(e);
+		cylinder.m_colliderShaderResourceManager->cleanup();
 	}
 }
 

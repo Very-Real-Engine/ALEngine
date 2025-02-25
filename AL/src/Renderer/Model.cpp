@@ -35,6 +35,20 @@ std::shared_ptr<Model> Model::createBoxModel(std::shared_ptr<Material> &defaultM
 	return model;
 }
 
+std::shared_ptr<Model> Model::createColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	auto &renderer = App::get().getRenderer();
+	auto &modelsMap = renderer.getModelsMap();
+	if (modelsMap.find("colliderBox") != modelsMap.end())
+	{
+		return modelsMap["colliderBox"];
+	}
+	std::shared_ptr<Model> model = std::shared_ptr<Model>(new Model());
+	model->initColliderBoxModel(defaultMaterial);
+	modelsMap["colliderBox"] = model;
+	return model;
+}
+
 std::shared_ptr<Model> Model::createSphereModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	auto &renderer = App::get().getRenderer();
@@ -243,6 +257,12 @@ void Model::initCylinderModel(std::shared_ptr<Material> &defaultMaterial)
 {
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCylinder());
+}
+
+void Model::initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
+{
+	m_materials.push_back(defaultMaterial);
+	m_meshes.push_back(Mesh::createColliderBox());
 }
 
 void Model::loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
