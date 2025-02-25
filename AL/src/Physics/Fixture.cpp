@@ -1,6 +1,7 @@
 #include "Physics/Fixture.h"
 #include "Physics/BroadPhase.h"
 #include "Physics/Rigidbody.h"
+#include <iostream>
 
 namespace ale
 {
@@ -131,11 +132,13 @@ int32_t Fixture::getTouchNum() const
 void Fixture::increaseTouchNum()
 {
 	++m_touchNum;
+	std::cout << "Touch start!! - " << m_touchNum << "\n";
 }
 
 void Fixture::decreaseTouchNum()
 {
 	--m_touchNum;
+	std::cout << "Touch end!! - " << m_touchNum << "\n";
 }
 
 

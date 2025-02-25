@@ -72,6 +72,7 @@ Contact::Contact(Fixture *fixtureA, Fixture *fixtureB, int32_t indexA, int32_t i
 	m_prev = nullptr;
 	m_next = nullptr;
 
+	m_wasTouched = false;
 	m_nodeA.contact = nullptr;
 	m_nodeA.prev = nullptr;
 	m_nodeA.next = nullptr;
@@ -105,7 +106,7 @@ Contact *Contact::create(Fixture *fixtureA, Fixture *fixtureB, int32_t indexA, i
 	return createContactFunctions[type1 | type2](fixtureA, fixtureB, indexA, indexB);
 }
 
-void Contact::evaluate(Manifold &manifold, const Transform &transformA, const Transform &transformB)
+void Contact::evaluate(Manifold &manifold, const Transform &transformA, const Transform &transformB, bool isSensor)
 {
 	Shape *shapeA = m_fixtureA->getShape();
 	Shape *shapeB = m_fixtureB->getShape();
@@ -123,6 +124,13 @@ void Contact::evaluate(Manifold &manifold, const Transform &transformA, const Tr
 
 	if (isCollide)
 	{
+		if (isSensor)
+		{
+			manifold.pointsCount = 1;
+			freeConvexInfo(convexA, convexB);
+			return ;
+		}
+
 		EpaInfo epaInfo = getEpaResult(convexA, convexB, simplexArray);
 
 		if (epaInfo.distance == -1.0f)
@@ -150,35 +158,62 @@ void Contact::update()
 	const Transform &transformA = bodyA->getTransform();
 	const Transform &transformB = bodyB->getTransform();
 
-	// Evaluate
-	// 두 shape의 변환 상태를 적용해 world space에서의 충돌 정보를 계산
-	// 1. 두 도형이 실제로 충돌하는지 검사
-	// 2. 충돌에 따른 manifold 생성
-	// 3. manifold의 내부 값을 impulse를 제외하고 채워줌
-	// 4. 실제 충돌이 일어나지 않은 경우 manifold.pointCount = 0인 충돌 생성
-	m_manifold.pointsCount = 0;
-	evaluate(m_manifold, transformA, transformB);
-	touching = m_manifold.pointsCount > 0;
-
-	// manifold의 충격량 0으로 초기화 및 old manifold 중
-	// 같은 충돌이 있는경우 Impulse 재사용
-	// id 는 충돌 도형의 type과 vertex 또는 line의 index 정보를 압축하여 결정
-
-	for (int32_t i = 0; i < m_manifold.pointsCount; ++i)
+	bool isSensor = false;
+	if (m_fixtureA->isSeonsor() || m_fixtureB->isSeonsor())
 	{
-		ManifoldPoint &manifoldPoint = m_manifold.points[i];
+		isSensor = true;
+		m_manifold.pointsCount = 0;
+		evaluate(m_manifold, transformA, transformB, isSensor);
+		touching = m_manifold.pointsCount > 0;
+	}
+	else
+	{
+		// Evaluate
+		// 두 shape의 변환 상태를 적용해 world space에서의 충돌 정보를 계산
+		// 1. 두 도형이 실제로 충돌하는지 검사
+		// 2. 충돌에 따른 manifold 생성
+		// 3. manifold의 내부 값을 impulse를 제외하고 채워줌
+		// 4. 실제 충돌이 일어나지 않은 경우 manifold.pointCount = 0인 충돌 생성
+		
+		// manifold의 충격량 0으로 초기화 및 old manifold 중
+		// 같은 충돌이 있는경우 Impulse 재사용
+		// id 는 충돌 도형의 type과 vertex 또는 line의 index 정보를 압축하여 결정
+		m_manifold.pointsCount = 0;
+		evaluate(m_manifold, transformA, transformB, isSensor);
+		touching = m_manifold.pointsCount > 0;
+		
+		for (int32_t i = 0; i < m_manifold.pointsCount; ++i)
+		{
+			ManifoldPoint &manifoldPoint = m_manifold.points[i];
+	
+			manifoldPoint.normalImpulse = 0.0f;
+			manifoldPoint.tangentImpulse = 0.0f;
+		}
+	}
 
-		manifoldPoint.normalImpulse = 0.0f;
-		manifoldPoint.tangentImpulse = 0.0f;
+	if (isSensor)
+	{
+		if (m_wasTouched && !touching)
+		{
+			m_fixtureA->decreaseTouchNum();
+			m_fixtureB->decreaseTouchNum();
+		}
+		if (!m_wasTouched && touching)
+		{
+			m_fixtureA->increaseTouchNum();
+			m_fixtureB->increaseTouchNum();
+		}
 	}
 
 	if (touching)
 	{
 		m_flags = m_flags | EContactFlag::TOUCHING;
+		m_wasTouched = true;
 	}
 	else
 	{
 		m_flags = m_flags & ~EContactFlag::TOUCHING;
+		m_wasTouched = false;
 	}
 }
 

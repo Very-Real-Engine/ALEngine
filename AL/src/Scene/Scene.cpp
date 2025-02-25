@@ -481,6 +481,8 @@ void Scene::onPhysicsStart()
 			fDef.shape = boxShape.clone();
 			fDef.friction = bc.m_Friction;
 			fDef.restitution = bc.m_Restitution;
+			fDef.isSensor = bc.m_IsTrigger;
+			fDef.touchNum = 0;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -507,6 +509,8 @@ void Scene::onPhysicsStart()
 			fDef.shape = spShape.clone();
 			fDef.friction = sc.m_Friction;
 			fDef.restitution = sc.m_Restitution;
+			fDef.isSensor = sc.m_IsTrigger;
+			fDef.touchNum = 0;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -546,6 +550,8 @@ void Scene::onPhysicsStart()
 			fDef.shape = csShape.clone();
 			fDef.friction = cc.m_Friction;
 			fDef.restitution = cc.m_Restitution;
+			fDef.isSensor = cc.m_IsTrigger;
+			fDef.touchNum = 0;
 
 			// create fixture
 			body->createFixture(&fDef);
@@ -575,7 +581,9 @@ void Scene::onPhysicsStart()
 			fDef.shape = cyShape.clone();
 			fDef.friction = cc.m_Friction;
 			fDef.restitution = cc.m_Restitution;
-
+			fDef.isSensor = cc.m_IsTrigger;
+			fDef.touchNum = 0;
+			
 			// create fixture
 			body->createFixture(&fDef);
 		}

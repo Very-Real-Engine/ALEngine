@@ -123,7 +123,7 @@ class Contact
 
 	Contact(Fixture *fixtureA, Fixture *fixtureB, int32_t indexA, int32_t indexB);
 	void update();
-	void evaluate(Manifold &manifold, const Transform &transformA, const Transform &transformB);
+	void evaluate(Manifold &manifold, const Transform &transformA, const Transform &transformB, bool isSensor);
 
 	void generateManifolds(CollisionInfo &collisionInfo, Manifold &manifold, Fixture *m_fixtureA, Fixture *m_fixtureB);
 	float getFriction() const;
@@ -184,6 +184,7 @@ class Contact
 	void sizeUpFaceArray(FaceArray &faceArray, int32_t newMaxCount);
 	void freeConvexInfo(ConvexInfo &convexA, ConvexInfo &convexB);
 
+	bool m_wasTouched;
 	float m_friction;
 	float m_restitution;
 	int32_t m_flags;
