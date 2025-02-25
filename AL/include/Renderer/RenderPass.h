@@ -17,6 +17,7 @@ class RenderPass
 	static std::unique_ptr<RenderPass> createShadowMapRenderPass();
 	static std::unique_ptr<RenderPass> createSphericalMapRenderPass();
 	static std::unique_ptr<RenderPass> createBackgroundRenderPass();
+	static std::unique_ptr<RenderPass> createColliderRenderPass();
 
 	void initRenderPass(VkFormat swapChainImageFormat);
 	void initDeferredRenderPass();
@@ -24,6 +25,7 @@ class RenderPass
 	void initShadowMapRenderPass();
 	void initSphericalMapRenderPass();
 	void initBackgroundRenderPass();
+	void initColliderRenderPass();
 
 	~RenderPass() = default;
 

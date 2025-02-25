@@ -64,6 +64,7 @@ class Model
 	static std::shared_ptr<Model> createGroundModel(std::shared_ptr<Material> &defaultMaterial);
 	static std::shared_ptr<Model> createCapsuleModel(std::shared_ptr<Material> &defaultMaterial);
 	static std::shared_ptr<Model> createCylinderModel(std::shared_ptr<Material> &defaultMaterial);
+	static std::shared_ptr<Model> createColliderBoxModel(std::shared_ptr<Material> &defaultMaterial);
 
 	~Model() = default;
 	void cleanup();
@@ -116,6 +117,7 @@ class Model
 	void initGroundModel(std::shared_ptr<Material> &defaultMaterial);
 	void initCapsuleModel(std::shared_ptr<Material> &defaultMaterial);
 	void initCylinderModel(std::shared_ptr<Material> &defaultMaterial);
+	void initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial);
 
 	void loadModel(std::string path, std::shared_ptr<Material> &defaultMaterial);
 	void loadGLTFModel(std::string path, std::shared_ptr<Material> &defaultMaterial);

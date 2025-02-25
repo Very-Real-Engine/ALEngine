@@ -23,6 +23,8 @@ class Pipeline
 																VkDescriptorSetLayout descriptorSetLayout);
 	static std::unique_ptr<Pipeline> createBackgroundPipeline(VkRenderPass renderPass,
 															  VkDescriptorSetLayout descriptorSetLayout);
+	static std::unique_ptr<Pipeline> createColliderPipeline(VkRenderPass renderPass,
+															VkDescriptorSetLayout descriptorSetLayout);
 
 	void initGeometryPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	void initLightingPassPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
@@ -30,6 +32,7 @@ class Pipeline
 	void initShadowCubeMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	void initSphericalMapPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 	void initBackgroundPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
+	void initColliderPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 
 	~Pipeline() = default;
 
