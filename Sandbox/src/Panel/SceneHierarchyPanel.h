@@ -28,7 +28,7 @@ class SceneHierarchyPanel
 	 * @param context 변경할 씬 객체의 공유 포인터.
 	 */
 	void setContext(const std::shared_ptr<Scene> &context);
-	
+
 	/**
 	 * @brief ImGui를 사용하여 씬 계층 구조 패널 UI를 렌더링합니다.
 	 */
@@ -56,6 +56,8 @@ class SceneHierarchyPanel
 	 * @param entryName UI에서 표시할 컴포넌트 이름.
 	 */
 	template <typename T> void displayAddComponentEntry(const std::string &entryName);
+
+	template <> void displayAddComponentEntry<MeshRendererComponent>(const std::string &entryName);
 
 	/**
 	 * @brief 특정 엔티티의 노드를 계층 구조에서 그립니다.

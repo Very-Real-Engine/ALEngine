@@ -3,8 +3,8 @@
 #include "Core/UUID.h"
 
 #include "Renderer/Model.h"
-#include "Renderer/Texture.h"
 #include "Renderer/SAComponent.h"
+#include "Renderer/Texture.h"
 
 #include "Scene/SceneCamera.h"
 
@@ -138,8 +138,6 @@ struct SkeletalAnimatorComponent
 	std::vector<bool> m_Repeats;
 	std::map<std::string, std::function<bool()>> m_Methods;
 
-
-
 	SkeletalAnimatorComponent() = default;
 	SkeletalAnimatorComponent(const SkeletalAnimatorComponent &) = default;
 };
@@ -147,7 +145,7 @@ struct SkeletalAnimatorComponent
 /**
  * @struct LightComponent
  * @brief 빛 설정을 위한 컴포넌트.
-*/
+ */
 struct LightComponent
 {
 	// Color
@@ -315,8 +313,8 @@ template <typename... Component> struct ComponentGroup
  * @brief 엔티티에 포함될 수 있는 모든 컴포넌트 그룹.
  */
 using AllComponents =
-	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, TextureComponent, CameraComponent,
-				   ScriptComponent, LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
+	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, CameraComponent, ScriptComponent,
+				   LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
 				   CapsuleColliderComponent, CylinderColliderComponent, SkeletalAnimatorComponent>;
 
 } // namespace ale
