@@ -29,7 +29,7 @@ class Scene
   public:
 	/// @brief Scene 기본 생성자.
 	Scene() = default;
-	
+
 	/// @brief Scene 기본 소멸자.
 	~Scene();
 
@@ -218,8 +218,7 @@ class Scene
 		return m_Registry.get<Components...>(entity);
 	}
 
-	template <typename Component>
-	auto tryGet(entt::entity entity)
+	template <typename Component> auto tryGet(entt::entity entity)
 	{
 		return m_Registry.try_get<Component>(entity);
 	}
@@ -232,6 +231,8 @@ class Scene
 	void setNoneInCullTree(Entity &entity);
 	void unsetNoneInCullTree(Entity &entity);
 	void printCullTree();
+
+	void removeColliderShaderResourceManager(Entity &entity);
 
   private:
 	template <typename T> void onComponentAdded(Entity entity, T &component);
@@ -268,6 +269,7 @@ class Scene
 	std::shared_ptr<Model> m_groundModel;
 	std::shared_ptr<Model> m_capsuleModel;
 	std::shared_ptr<Model> m_cylinderModel;
+	std::shared_ptr<Model> m_colliderBoxModel;
 
 	World *m_World = nullptr;
 

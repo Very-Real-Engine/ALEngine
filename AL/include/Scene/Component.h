@@ -2,9 +2,8 @@
 
 #include "Core/UUID.h"
 
-#include "Renderer/Model.h"
-#include "Renderer/Texture.h"
 #include "Renderer/SAComponent.h"
+#include "Renderer/Texture.h"
 
 #include "Scene/SceneCamera.h"
 
@@ -138,8 +137,6 @@ struct SkeletalAnimatorComponent
 	std::vector<bool> m_Repeats;
 	std::map<std::string, std::function<bool()>> m_Methods;
 
-
-
 	SkeletalAnimatorComponent() = default;
 	SkeletalAnimatorComponent(const SkeletalAnimatorComponent &) = default;
 };
@@ -147,7 +144,7 @@ struct SkeletalAnimatorComponent
 /**
  * @struct LightComponent
  * @brief 빛 설정을 위한 컴포넌트.
-*/
+ */
 struct LightComponent
 {
 	// Color
@@ -206,6 +203,8 @@ struct RigidbodyComponent
 	RigidbodyComponent(const RigidbodyComponent &) = default;
 };
 
+class ShaderResourceManager;
+
 /**
  * @struct BoxColliderComponent
  * @brief 박스 콜라이더 설정을 위한 컴포넌트.
@@ -215,6 +214,8 @@ struct BoxColliderComponent
 	glm::vec3 m_Center = {0.0f, 0.0f, 0.0f};
 	glm::vec3 m_Size = {1.0f, 1.0f, 1.0f};
 	bool m_IsTrigger = false;
+	bool m_IsActive = true;
+	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
 	BoxColliderComponent() = default;
 	BoxColliderComponent(const BoxColliderComponent &) = default;
@@ -229,6 +230,8 @@ struct SphereColliderComponent
 	glm::vec3 m_Center;
 	float m_Radius;
 	bool m_IsTrigger = false;
+	bool m_IsActive = true;
+	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
 	SphereColliderComponent() = default;
 	SphereColliderComponent(const SphereColliderComponent &) = default;
@@ -243,8 +246,9 @@ struct CapsuleColliderComponent
 	glm::vec3 m_Center;
 	float m_Radius;
 	float m_Height;
-
 	bool m_IsTrigger = false;
+	bool m_IsActive = true;
+	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
 	CapsuleColliderComponent() = default;
 	CapsuleColliderComponent(const CapsuleColliderComponent &) = default;
@@ -259,8 +263,9 @@ struct CylinderColliderComponent
 	glm::vec3 m_Center;
 	float m_Radius;
 	float m_Height;
-
 	bool m_IsTrigger = false;
+	bool m_IsActive = true;
+	std::shared_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
 
 	CylinderColliderComponent() = default;
 	CylinderColliderComponent(const CylinderColliderComponent &) = default;
@@ -315,8 +320,8 @@ template <typename... Component> struct ComponentGroup
  * @brief 엔티티에 포함될 수 있는 모든 컴포넌트 그룹.
  */
 using AllComponents =
-	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, TextureComponent, CameraComponent,
-				   ScriptComponent, LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
+	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, CameraComponent, ScriptComponent,
+				   LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
 				   CapsuleColliderComponent, CylinderColliderComponent, SkeletalAnimatorComponent>;
 
 } // namespace ale

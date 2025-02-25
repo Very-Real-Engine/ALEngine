@@ -24,7 +24,7 @@
 #include <stdexcept>
 #include <vector>
 
-//헤더위치가 좀 애매
+// 헤더위치가 좀 애매
 #include "Renderer/Animation/Bones.h"
 
 namespace ale
@@ -138,7 +138,7 @@ struct Vertex
 		attributeDescriptions[5].location = 5;
 		attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
 		attributeDescriptions[5].offset = offsetof(Vertex, weights);
-    
+
 		return attributeDescriptions;
 	}
 };
@@ -160,15 +160,16 @@ struct UniformBufferObject
 // 	alignas(4) float heightScale; // 4바이트
 // 	alignas(8) glm::vec2 padding; // 8바이트 (패딩)
 // };
-  
-struct GeometryPassVertexUniformBufferObject {
-	alignas(16) glm::mat4 model;      // 64바이트
-	alignas(16) glm::mat4 view;       // 64바이트
-	alignas(16) glm::mat4 proj;       // 64바이트
+
+struct GeometryPassVertexUniformBufferObject
+{
+	alignas(16) glm::mat4 model; // 64바이트
+	alignas(16) glm::mat4 view;	 // 64바이트
+	alignas(16) glm::mat4 proj;	 // 64바이트
 	glm::mat4 finalBonesMatrices[MAX_BONES];
-	alignas(4) bool heightFlag;       // 4바이트
-	alignas(4) float heightScale;     // 4바이트
-	alignas(8) glm::vec2 padding;     // 8바이트 (패딩)
+	alignas(4) bool heightFlag;	  // 4바이트
+	alignas(4) float heightScale; // 4바이트
+	alignas(8) glm::vec2 padding; // 8바이트 (패딩)
 };
 
 struct GeometryPassFragmentUniformBufferObject
@@ -247,6 +248,13 @@ struct BackgroundUniformBufferObject
 {
 	alignas(16) glm::mat4 proj;
 	alignas(16) glm::mat4 view;
+};
+
+struct ColliderUniformBufferObject
+{
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
 };
 
 } // namespace ale

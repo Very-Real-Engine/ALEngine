@@ -26,6 +26,8 @@ class ShaderResourceManager
 		VkDescriptorSetLayout descriptorSetLayout, VkImageView sphericalMapImageView, VkSampler sphericalMapSampler);
 	static std::unique_ptr<ShaderResourceManager> createBackgroundShaderResourceManager(
 		VkDescriptorSetLayout descriptorSetLayout, VkImageView skyboxImageView, VkSampler skyboxSampler);
+	static std::unique_ptr<ShaderResourceManager> createColliderShaderResourceManager(
+		VkDescriptorSetLayout descriptorSetLayout);
 
 	void initLightingPassShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout, VkImageView positionImageView,
 											   VkImageView normalImageView, VkImageView albedoImageView,
@@ -43,6 +45,8 @@ class ShaderResourceManager
 
 	void initSphericalMapShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout,
 											   VkImageView sphericalMapImageView, VkSampler sphericalMapSampler);
+
+	void initColliderShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout);
 	~ShaderResourceManager() = default;
 
 	void cleanup();
@@ -109,6 +113,9 @@ class ShaderResourceManager
 	void createBackgroundUniformBuffers();
 	void createBackgroundDescriptorSets(VkDescriptorSetLayout descriptorSetLayout, VkImageView skyboxImageView,
 										VkSampler skyboxSampler);
+
+	void createColliderUniformBuffers();
+	void createColliderDescriptorSets(VkDescriptorSetLayout descriptorSetLayout);
 };
 } // namespace ale
 

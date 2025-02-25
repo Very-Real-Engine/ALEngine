@@ -4,6 +4,11 @@ namespace ale
 {
 void ShaderResourceManager::cleanup()
 {
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+	VkDescriptorPool descriptorPool = context.getDescriptorPool();
+
+	vkDeviceWaitIdle(device);
 	if (!m_uniformBuffers.empty())
 	{
 		for (size_t i = 0; i < m_uniformBuffers.size(); i++)
@@ -40,10 +45,6 @@ void ShaderResourceManager::cleanup()
 		}
 	}
 	m_fragmentUniformBuffers.clear();
-
-	auto &context = VulkanContext::getContext();
-	VkDevice device = context.getDevice();
-	VkDescriptorPool descriptorPool = context.getDescriptorPool();
 
 	if (!descriptorSets.empty())
 	{
@@ -893,4 +894,68 @@ void ShaderResourceManager::createBackgroundDescriptorSets(VkDescriptorSetLayout
 	}
 }
 
+std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createColliderShaderResourceManager(
+	VkDescriptorSetLayout descriptorSetLayout)
+{
+	std::unique_ptr<ShaderResourceManager> shaderResourceManager =
+		std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+	shaderResourceManager->initColliderShaderResourceManager(descriptorSetLayout);
+	return shaderResourceManager;
+}
+
+void ShaderResourceManager::initColliderShaderResourceManager(VkDescriptorSetLayout descriptorSetLayout)
+{
+	createColliderUniformBuffers();
+	createColliderDescriptorSets(descriptorSetLayout);
+}
+
+void ShaderResourceManager::createColliderUniformBuffers()
+{
+	VkDeviceSize bufferSize = sizeof(ColliderUniformBufferObject);
+	m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		m_uniformBuffers[i] = UniformBuffer::createUniformBuffer(bufferSize);
+	}
+}
+
+void ShaderResourceManager::createColliderDescriptorSets(VkDescriptorSetLayout descriptorSetLayout)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+	VkDescriptorPool descriptorPool = context.getDescriptorPool();
+
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	allocInfo.pSetLayouts = layouts.data();
+
+	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate collider descriptor sets!");
+	}
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(ColliderUniformBufferObject);
+
+		std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0,
+							   nullptr);
+	}
+}
 } // namespace ale

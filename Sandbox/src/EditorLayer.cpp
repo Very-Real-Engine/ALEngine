@@ -46,8 +46,8 @@ void EditorLayer::onAttach()
 		App::get().close();
 	}
 
-	m_EditorScene = Scene::createScene();
-	m_ActiveScene = m_EditorScene;
+	// m_EditorScene = Scene::createScene();
+	// m_ActiveScene = m_EditorScene;
 
 	auto projectFilePath = cmdLineArgs[1];
 	openProject(projectFilePath);

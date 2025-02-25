@@ -89,6 +89,42 @@ class Entity
 	}
 
 	/**
+	 * @brief BoxColliderComponent의 특수화된 삭제 함수.
+	 */
+	template <> void removeComponent<BoxColliderComponent>()
+	{
+		m_Scene->removeColliderShaderResourceManager(*this);
+		m_Scene->m_Registry.remove<BoxColliderComponent>(m_EntityHandle);
+	}
+
+	/**
+	 * @brief SphereColliderComponent의 특수화된 삭제 함수.
+	 */
+	template <> void removeComponent<SphereColliderComponent>()
+	{
+		m_Scene->removeColliderShaderResourceManager(*this);
+		m_Scene->m_Registry.remove<SphereColliderComponent>(m_EntityHandle);
+	}
+
+	/**
+	 * @brief CapsuleColliderComponent의 특수화된 삭제 함수.
+	 */
+	template <> void removeComponent<CapsuleColliderComponent>()
+	{
+		m_Scene->removeColliderShaderResourceManager(*this);
+		m_Scene->m_Registry.remove<CapsuleColliderComponent>(m_EntityHandle);
+	}
+
+	/**
+	 * @brief CylinderColliderComponent의 특수화된 삭제 함수.
+	 */
+	template <> void removeComponent<CylinderColliderComponent>()
+	{
+		m_Scene->removeColliderShaderResourceManager(*this);
+		m_Scene->m_Registry.remove<CylinderColliderComponent>(m_EntityHandle);
+	}
+
+	/**
 	 * @brief 엔티티가 특정 컴포넌트를 가지고 있는지 확인합니다.
 	 * @tparam T 확인할 컴포넌트 타입.
 	 * @return true 컴포넌트를 가지고 있음.
