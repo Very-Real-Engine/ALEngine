@@ -1,12 +1,31 @@
-#ifndef KEYCODE_H
-#define KEYCODE_H
+#pragma once
+
+/**
+ * @file KeyCode.h
+ * @brief 키보드 키 코드를 정의하는 헤더 파일
+ *
+ * 이 파일은 `KeyCode` 타입과 키보드 입력을 나타내는 `Key` 네임스페이스 내의 열거형을 정의합니다.
+ */
 
 namespace ale
 {
+/**
+ * @typedef KeyCode
+ * @brief 키 코드를 표현하는 타입
+ *
+ * 키 입력을 나타내는 16비트 정수형(`uint16_t`) 타입을 `KeyCode`로 정의합니다.
+ */
 using KeyCode = uint16_t;
 
 namespace Key
 {
+/**
+ * @enum Key
+ * @brief 키보드 키 코드 열거형
+ *
+ * 이 열거형은 키보드에서 사용되는 다양한 키 코드 값을 정의합니다.
+ * 값은 `GLFW`의 키 코드와 일치합니다.
+ */
 enum : KeyCode
 {
 	// From glfw3.h
@@ -143,5 +162,3 @@ enum : KeyCode
 };
 } // namespace Key
 } // namespace ale
-
-#endif

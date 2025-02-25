@@ -46,10 +46,6 @@ void EditorCamera::onEvent(Event &e)
 	dispatcher.dispatch<WindowResizeEvent>(AL_BIND_EVENT_FN(EditorCamera::onWindowResized));
 }
 
-void EditorCamera::onResize()
-{
-}
-
 bool EditorCamera::onMousePressed(MouseButtonPressedEvent &e)
 {
 	if (e.getMouseButton() == Mouse::ButtonRight)

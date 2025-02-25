@@ -733,14 +733,6 @@ template <> void Scene::onComponentAdded<MeshRendererComponent>(Entity entity, M
 	}
 }
 
-template <> void Scene::onComponentAdded<ModelComponent>(Entity entity, ModelComponent &component)
-{
-}
-
-template <> void Scene::onComponentAdded<TextureComponent>(Entity entity, TextureComponent &component)
-{
-}
-
 template <> void Scene::onComponentAdded<LightComponent>(Entity entity, LightComponent &component)
 {
 	auto &tc = entity.getComponent<TransformComponent>();

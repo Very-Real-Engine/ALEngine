@@ -134,28 +134,6 @@ void ImGuiLayer::renderDrawData(VkCommandBuffer commandBuffer)
 	}
 }
 
-void ImGuiLayer::renderTest(VkDescriptorSet descriptorSet, VkCommandBuffer commandBuffer)
-{
-	auto &context = VulkanContext::getContext();
-
-	// Viewport 띄운다면 이런식으로
-	ImGui::Begin("ALENGINE TEST");
-
-	ImGui::Image(reinterpret_cast<ImTextureID>(descriptorSet), ImVec2{640, 360});
-
-	ImGui::End();
-
-	ImGui::Render();
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-
-	ImGuiIO &io = ImGui::GetIO();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-	}
-}
-
 void ImGuiLayer::setDarkThemeColors()
 {
 	auto &colors = ImGui::GetStyle().Colors;

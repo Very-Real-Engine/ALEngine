@@ -1,5 +1,12 @@
-#ifndef INSTRUMENTOR_H
-#define INSTRUMENTOR_H
+#pragma once
+
+/**
+ * @file Instrumentor.h
+ * @brief 성능 분석을 위한 프로파일링 유틸리티
+ *
+ * 이 파일은 성능 프로파일링을 위한 `Instrumentor` 및 `InstrumentationTimer` 클래스를 정의합니다.
+ * 코드 실행 시간을 측정하고 JSON 형식의 결과 파일을 생성하여 성능 분석을 도와줍니다.
+ */
 
 #include "Core/Base.h"
 #include "Core/Log.h"
@@ -15,9 +22,16 @@
 
 namespace ale
 {
-
+/**
+ * @typedef FloatingPointMicroseconds
+ * @brief 마이크로초 단위의 부동소수점 지속시간 타입
+ */
 using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
+/**
+ * @struct ProfileResult
+ * @brief 개별 함수 또는 코드 블록의 프로파일링 결과를 저장하는 구조체
+ */
 struct ProfileResult
 {
 	std::string Name;
@@ -27,17 +41,34 @@ struct ProfileResult
 	std::thread::id ThreadID;
 };
 
+/**
+ * @struct InstrumentationSession
+ * @brief 프로파일링 세션을 나타내는 구조체
+ */
 struct InstrumentationSession
 {
 	std::string Name;
 };
 
+/**
+ * @class Instrumentor
+ * @brief 성능 분석을 위한 프로파일러 클래스
+ *
+ * `Instrumentor` 클래스는 실행 시간을 측정하고 JSON 형식으로 결과를 저장하는 역할을 합니다.
+ * 싱글톤 패턴으로 구현되었으며, 여러 코드 블록을 프로파일링할 수 있습니다.
+ */
 class Instrumentor
 {
   public:
 	Instrumentor(const Instrumentor &) = delete;
 	Instrumentor(Instrumentor &&) = delete;
 
+	/**
+     * @brief 새로운 프로파일링 세션을 시작합니다.
+     *
+     * @param name 세션 이름
+     * @param filepath 결과를 저장할 파일 경로 (기본값: "results.json")
+     */
 	void beginSession(const std::string &name, const std::string &filepath = "results.json")
 	{
 		std::lock_guard lock(m_Mutex);
@@ -72,12 +103,20 @@ class Instrumentor
 		}
 	}
 
+	/**
+     * @brief 현재 진행 중인 프로파일링 세션을 종료합니다.
+     */
 	void EndSession()
 	{
 		std::lock_guard lock(m_Mutex);
 		internalEndSession();
 	}
 
+	/**
+     * @brief 프로파일링 데이터를 기록합니다.
+     *
+     * @param result 프로파일링 결과 (`ProfileResult`)
+     */
 	void writeProfile(const ProfileResult &result)
 	{
 		std::stringstream json;
@@ -101,6 +140,11 @@ class Instrumentor
 		}
 	}
 
+	/**
+     * @brief 싱글톤 인스턴스를 반환합니다.
+     *
+     * @return `Instrumentor`의 전역 인스턴스
+     */
 	static Instrumentor &get()
 	{
 		static Instrumentor instance;
@@ -117,20 +161,27 @@ class Instrumentor
 		EndSession();
 	}
 
+	/**
+     * @brief JSON 헤더를 작성합니다.
+     */
 	void writeHeader()
 	{
 		m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
 		m_OutputStream.flush();
 	}
 
+	/**
+     * @brief JSON 푸터를 작성합니다.
+     */
 	void writeFooter()
 	{
 		m_OutputStream << "]}";
 		m_OutputStream.flush();
 	}
 
-	// Note: you must already own lock on m_Mutex before
-	// calling internalEndSession()
+	/**
+     * @brief 내부적으로 세션을 종료하는 함수 (락을 이미 보유한 상태에서 호출해야 함)
+     */
 	void internalEndSession()
 	{
 		if (m_CurrentSession)
@@ -148,20 +199,37 @@ class Instrumentor
 	std::ofstream m_OutputStream;
 };
 
+/**
+ * @class InstrumentationTimer
+ * @brief 코드 실행 시간을 측정하는 타이머 클래스
+ *
+ * `InstrumentationTimer` 클래스는 특정 코드 블록의 실행 시간을 측정하여 `Instrumentor`에 기록합니다.
+ */
 class InstrumentationTimer
 {
   public:
+	/**
+     * @brief 프로파일링 타이머를 생성합니다.
+     *
+     * @param name 프로파일링할 코드 블록의 이름
+     */
 	InstrumentationTimer(const char *name) : m_Name(name), m_Stopped(false)
 	{
 		m_StartTimepoint = std::chrono::steady_clock::now();
 	}
 
+	/**
+     * @brief 소멸자에서 자동으로 프로파일링 데이터를 기록합니다.
+     */
 	~InstrumentationTimer()
 	{
 		if (!m_Stopped)
 			stop();
 	}
 
+	/**
+     * @brief 프로파일링을 종료하고 실행 시간을 기록합니다.
+     */
 	void stop()
 	{
 		auto endTimepoint = std::chrono::steady_clock::now();
@@ -180,14 +248,31 @@ class InstrumentationTimer
 	bool m_Stopped;
 };
 
+/**
+ * @namespace InstrumentorUtils
+ * @brief 문자열 처리를 위한 유틸리티 함수 모음
+ */
 namespace InstrumentorUtils
 {
 
+/**
+ * @struct ChangeResult
+ * @brief 문자열 변환 결과를 저장하는 구조체
+ */
 template <size_t N> struct ChangeResult
 {
 	char Data[N];
 };
 
+/**
+ * @brief 특정 문자열에서 불필요한 부분을 제거하는 함수
+ *
+ * @tparam N 원본 문자열 크기
+ * @tparam K 제거할 문자열 크기
+ * @param expr 원본 문자열
+ * @param remove 제거할 문자열
+ * @return 변환된 문자열 (`ChangeResult<N>`)
+ */
 template <size_t N, size_t K> constexpr auto cleanupOutputString(const char (&expr)[N], const char (&remove)[K])
 {
 	ChangeResult<N> result = {};
@@ -209,6 +294,11 @@ template <size_t N, size_t K> constexpr auto cleanupOutputString(const char (&ex
 } // namespace InstrumentorUtils
 } // namespace ale
 
+/**
+ * @defgroup InstrumentorMacros 프로파일링 매크로
+ * @brief 성능 분석을 위한 프로파일링 매크로 정의
+ * @{
+ */
 #if AL_PROFILE
 #define AL_PROFILE_BEGIN_SESSION(name, filepath) ::ale::Instrumentor().get().beginSession(name, filepath)
 #define AL_PROFILE_END_SESSION() ::ale::Instrumentor().get().endSession()
@@ -225,6 +315,4 @@ template <size_t N, size_t K> constexpr auto cleanupOutputString(const char (&ex
 #define AL_PROFILE_SCOPE_LINE()
 #define AL_PROFILE_SCOPE()
 #define AL_PROFILE_FUNCTION()
-#endif
-
 #endif
