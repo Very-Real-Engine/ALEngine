@@ -470,7 +470,7 @@ QueueFamilyIndices VulkanContext::findQueueFamilies(VkPhysicalDevice device)
 // 디스크립터 풀 생성
 void VulkanContext::createDescriptorPool()
 {
-	size_t MAX_OBJECTS = 10000;
+	size_t MAX_OBJECTS = 1000000;
 
 	// 디스크립터 풀의 타입별 디스크립터 개수를 설정하는 구조체
 	std::array<VkDescriptorPoolSize, 5> poolSizes{};
