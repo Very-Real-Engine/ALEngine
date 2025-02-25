@@ -438,7 +438,10 @@ void Scene::onPhysicsStart()
 		auto &rb = entity.getComponent<RigidbodyComponent>();
 
 		BodyDef bdDef;
-		bdDef.m_type = EBodyType::DYNAMIC_BODY;
+		if (rb.m_Type == RigidbodyComponent::EBodyType::Static)
+			bdDef.m_type = EBodyType::STATIC_BODY;
+		else
+			bdDef.m_type = EBodyType::DYNAMIC_BODY;
 		bdDef.m_position = tf.m_Position;
 		bdDef.m_orientation = glm::quat(tf.m_Rotation);
 		bdDef.m_linearDamping = rb.m_Damping;
@@ -777,8 +780,6 @@ template <> void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraC
 
 template <> void Scene::onComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent &component)
 {
-	component.type = 0;
-
 	// 이미 SAC가 존재하는 경우 새로 생긴 모델 갱신
 	if (entity.hasComponent<SkeletalAnimatorComponent>())
 	{
@@ -818,6 +819,10 @@ template <> void Scene::onComponentAdded<SphereColliderComponent>(Entity entity,
 	auto &context = VulkanContext::getContext();
 	component.m_colliderShaderResourceManager =
 		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	auto &tc = entity.getComponent<TransformComponent>();
+
+	float maxScale = std::max({tc.m_Scale.x, tc.m_Scale.y, tc.m_Scale.z});
+	component.m_Radius = maxScale;
 }
 
 template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity, CapsuleColliderComponent &component)
@@ -825,6 +830,8 @@ template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity
 	auto &context = VulkanContext::getContext();
 	component.m_colliderShaderResourceManager =
 		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<CylinderColliderComponent>(Entity entity, CylinderColliderComponent &component)
@@ -832,6 +839,8 @@ template <> void Scene::onComponentAdded<CylinderColliderComponent>(Entity entit
 	auto &context = VulkanContext::getContext();
 	component.m_colliderShaderResourceManager =
 		ShaderResourceManager::createColliderShaderResourceManager(context.getColliderDescriptorSetLayout());
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent &component)

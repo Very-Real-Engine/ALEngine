@@ -50,7 +50,9 @@ void EditorLayer::onAttach()
 	// m_ActiveScene = m_EditorScene;
 
 	auto projectFilePath = cmdLineArgs[1];
-	openProject(projectFilePath);
+
+	if (!openProject(projectFilePath))
+		throw std::runtime_error("Failed to load project file!");
 
 	// editor camera setting
 }
@@ -165,8 +167,8 @@ bool EditorLayer::onKeyPressed(KeyPressedEvent &e)
 		break;
 	case Key::D:
 		if (control)
-			duplicateEntity();
-		break;
+			// duplicateEntity();
+			break;
 	case Key::Delete:
 		break;
 	case Key::Escape:
