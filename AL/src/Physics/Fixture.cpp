@@ -13,6 +13,8 @@ Fixture::Fixture()
 	m_restitution = 0.0f;
 	m_proxies = nullptr;
 	m_proxyCount = 0;
+	m_isSensor = false;
+	m_touchNum = 0;
 }
 
 void Fixture::create(Rigidbody *body, const FixtureDef *fd)
@@ -20,6 +22,8 @@ void Fixture::create(Rigidbody *body, const FixtureDef *fd)
 	m_shape = fd->shape;
 	m_friction = fd->friction;
 	m_restitution = fd->restitution;
+	m_isSensor = fd->isSensor;
+	m_touchNum = fd->touchNum;
 	this->m_body = body;
 
 	m_proxyCount = m_shape->getChildCount();
@@ -113,4 +117,26 @@ const FixtureProxy *Fixture::getFixtureProxy() const
 {
 	return m_proxies;
 }
+
+bool Fixture::isSeonsor() const 
+{
+	return m_isSensor;
+}
+
+int32_t Fixture::getTouchNum() const 
+{
+	return m_touchNum;
+}
+
+void Fixture::increaseTouchNum()
+{
+	++m_touchNum;
+}
+
+void Fixture::decreaseTouchNum()
+{
+	--m_touchNum;
+}
+
+
 } // namespace ale

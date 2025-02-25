@@ -17,11 +17,15 @@ struct FixtureDef
 		userData = nullptr;
 		friction = 0.0f;
 		restitution = 0.0f;
+		isSensor = false;
+		touchNum = 0;
 	}
 	Shape *shape;
 	void *userData;
 	float friction;
 	float restitution;
+	bool isSensor;
+	int32_t touchNum;
 };
 
 struct FixtureProxy
@@ -49,6 +53,10 @@ class Fixture
 	Rigidbody *getBody() const;
 	EType getType() const;
 	Shape *getShape();
+	bool isSeonsor() const;
+	int32_t getTouchNum() const ;
+	void increaseTouchNum();
+	void decreaseTouchNum();
 	const FixtureProxy *getFixtureProxy() const;
 
   protected:
@@ -57,6 +65,8 @@ class Fixture
 	float m_density;
 	float m_friction;
 	float m_restitution;
+	bool m_isSensor;
+	int32_t m_touchNum;
 
 	FixtureProxy *m_proxies;
 	int32_t m_proxyCount;
