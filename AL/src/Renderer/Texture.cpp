@@ -430,4 +430,38 @@ void Texture::initTextureFromMemory(const aiTexture *aiTexture)
 	createTextureSampler();
 }
 
+std::shared_ptr<Texture> Texture::createHDRTexture(std::string path)
+{
+	std::shared_ptr<Texture> texture = std::shared_ptr<Texture>(new Texture());
+	texture->initHDRTexture(path);
+	return texture;
+}
+
+void Texture::initHDRTexture(std::string path)
+{
+	m_imageBuffer = ImageBuffer::createHDRImageBuffer(path);
+	if (!m_imageBuffer)
+	{
+		m_imageBuffer = ImageBuffer::createDefaultImageBuffer(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+		mipLevels = m_imageBuffer->getMipLevels();
+		createDefaultTextureImageView();
+		createDefaultTextureSampler();
+	}
+	else
+	{
+		mipLevels = m_imageBuffer->getMipLevels();
+		createHDRTextureImageView();
+		createTextureSampler();
+	}
+}
+
+void Texture::createHDRTextureImageView()
+{
+	auto &context = VulkanContext::getContext();
+	auto device = context.getDevice();
+
+	textureImageView = VulkanUtil::createImageView(m_imageBuffer->getImage(), VK_FORMAT_R32G32B32A32_SFLOAT,
+												   VK_IMAGE_ASPECT_COLOR_BIT, mipLevels);
+}
+
 } // namespace ale
