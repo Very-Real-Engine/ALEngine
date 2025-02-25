@@ -241,7 +241,6 @@ void Scene::onRuntimeStart()
 					}
 				}
 				stateManager->setTransitions(std::move(transitions));
-				AL_CORE_INFO("{0}: done setup connect transition method", entity.getTag());
 			}
 			sa.m_IsPlaying = true;
 		}
