@@ -7,8 +7,8 @@ namespace ale
 
 struct Position
 {
-	glm::vec3 position;
-	glm::vec3 positionBuffer;
+	alglm::vec3 position;
+	alglm::vec3 positionBuffer;
 	bool isNormalStop{true};
 	bool isTangentStop{true};
 	bool isNormal{false};
@@ -16,10 +16,10 @@ struct Position
 
 struct Velocity
 {
-	glm::vec3 linearVelocity;
-	glm::vec3 angularVelocity;
-	glm::vec3 linearVelocityBuffer;
-	glm::vec3 angularVelocityBuffer;
+	alglm::vec3 linearVelocity;
+	alglm::vec3 angularVelocity;
+	alglm::vec3 linearVelocityBuffer;
+	alglm::vec3 angularVelocityBuffer;
 };
 
 class Island

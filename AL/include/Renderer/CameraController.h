@@ -25,9 +25,9 @@ class CameraController
 	void setCamera(VkExtent2D swapChainExtent, float fov, float _near, float _far);
 
 	static CameraController &get();
-	glm::mat4 getViewMatrix();
-	glm::mat4 getProjMatrix(VkExtent2D swapChainExtent);
-	glm::vec3 &getPosition()
+	alglm::mat4 getViewMatrix();
+	alglm::mat4 getProjMatrix(VkExtent2D swapChainExtent);
+	alglm::vec3 &getPosition()
 	{
 		return m_Camera.getPosition();
 	}
@@ -40,12 +40,12 @@ class CameraController
 
   private:
 	Camera m_Camera;
-	glm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
-	glm::vec2 m_prevMousePos{0.0f, 0.0f};
+	alglm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
+	alglm::vec2 m_prevMousePos{0.0f, 0.0f};
 	bool m_CameraControl{false};
 	float m_AspectRatio;
-	glm::vec3 m_CameraFront{0.0f, 0.0f, -1.0f};
-	glm::vec3 m_CameraUp{0.0f, 1.0f, 0.0f};
+	alglm::vec3 m_CameraFront{0.0f, 0.0f, -1.0f};
+	alglm::vec3 m_CameraUp{0.0f, 1.0f, 0.0f};
 	const float m_Speed{0.05f};
 	const float m_RotSpeed{0.8f};
 	float m_CameraPitch{0.0f};

@@ -12,15 +12,15 @@ class Object
 {
   public:
 	static std::unique_ptr<Object> createObject(std::string name, std::shared_ptr<Model> model,
-												std::shared_ptr<Texture> texture, glm::vec3 position,
-												glm::vec3 rotation, glm::vec3 scale);
+												std::shared_ptr<Texture> texture, alglm::vec3 position,
+												alglm::vec3 rotation, alglm::vec3 scale);
 	~Object()
 	{
 	}
 
 	void draw(VkCommandBuffer commandBuffer);
 
-	glm::mat4 getModelMatrix();
+	alglm::mat4 getModelMatrix();
 	const std::shared_ptr<Texture> &getTexture()
 	{
 		return m_texture;
@@ -30,27 +30,27 @@ class Object
 	{
 		return m_name;
 	}
-	glm::vec3 &getPosition()
+	alglm::vec3 &getPosition()
 	{
 		return m_position;
 	}
-	glm::vec3 &getRotation()
+	alglm::vec3 &getRotation()
 	{
 		return m_rotation;
 	}
-	glm::vec3 &getScale()
+	alglm::vec3 &getScale()
 	{
 		return m_scale;
 	}
-	void setPosition(glm::vec3 position)
+	void setPosition(alglm::vec3 position)
 	{
 		m_position = position;
 	}
-	void setRotation(glm::vec3 rotation)
+	void setRotation(alglm::vec3 rotation)
 	{
 		m_rotation = rotation;
 	}
-	void setScale(glm::vec3 scale)
+	void setScale(alglm::vec3 scale)
 	{
 		m_scale = scale;
 	}
@@ -62,13 +62,13 @@ class Object
 
 	std::shared_ptr<Model> m_model;
 	std::shared_ptr<Texture> m_texture;
-	glm::vec3 m_position;
-	glm::vec3 m_rotation;
-	glm::vec3 m_scale;
+	alglm::vec3 m_position;
+	alglm::vec3 m_rotation;
+	alglm::vec3 m_scale;
 	std::string m_name;
 
 	void initObject(std::string name, std::shared_ptr<Model> model, std::shared_ptr<Texture> texture,
-					glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
+					alglm::vec3 position, alglm::vec3 rotation, alglm::vec3 scale);
 };
 } // namespace ale
 

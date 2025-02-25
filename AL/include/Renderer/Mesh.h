@@ -25,14 +25,14 @@ class Mesh
 	void draw(VkCommandBuffer commandBuffer);
 
 	void calculateAABB(std::vector<Vertex> &vertices);
-	glm::vec3 getMaxPos();
-	glm::vec3 getMinPos();
+	alglm::vec3 getMaxPos();
+	alglm::vec3 getMinPos();
 
   private:
 	Mesh() = default;
 
-	glm::vec3 m_minPos;
-	glm::vec3 m_maxPos;
+	alglm::vec3 m_minPos;
+	alglm::vec3 m_maxPos;
 	std::unique_ptr<VertexBuffer> m_vertexBuffer;
 	std::unique_ptr<IndexBuffer> m_indexBuffer;
 

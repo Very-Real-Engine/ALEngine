@@ -17,9 +17,9 @@ struct SubMesh
 
 struct MTL
 {
-	glm::vec3 Ka = glm::vec3(0.0f);
-	glm::vec3 Kd = glm::vec3(0.0f);
-	glm::vec3 Ks = glm::vec3(0.0f);
+	alglm::vec3 Ka = alglm::vec3(0.0f);
+	alglm::vec3 Kd = alglm::vec3(0.0f);
+	alglm::vec3 Ks = alglm::vec3(0.0f);
 	float Ns = 0.0f;
 	float Ni = 0.0f;
 	float d = 0.0f;
@@ -54,9 +54,9 @@ class OBJLoader
 	bool flag = false;
 
 	std::unordered_map<std::string, int32_t> vertexCache;
-	std::vector<glm::vec3> globalPosition;
-	std::vector<glm::vec3> globalNormal;
-	std::vector<glm::vec2> globalTexCoord;
+	std::vector<alglm::vec3> globalPosition;
+	std::vector<alglm::vec3> globalNormal;
+	std::vector<alglm::vec2> globalTexCoord;
 	std::map<std::string, SubMesh> subMeshMap;
 	std::unordered_map<std::string, MTL> mtlMap;
 

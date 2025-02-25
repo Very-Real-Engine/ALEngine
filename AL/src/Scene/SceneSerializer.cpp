@@ -13,9 +13,9 @@
 
 namespace YAML
 {
-template <> struct convert<glm::vec2>
+template <> struct convert<alglm::vec2>
 {
-	static Node encode(const glm::vec2 &rhs)
+	static Node encode(const alglm::vec2 &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -24,7 +24,7 @@ template <> struct convert<glm::vec2>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec2 &rhs)
+	static bool decode(const Node &node, alglm::vec2 &rhs)
 	{
 		if (!node.IsSequence() || node.size() != 2)
 			return false;
@@ -35,9 +35,9 @@ template <> struct convert<glm::vec2>
 	}
 };
 
-template <> struct convert<glm::vec3>
+template <> struct convert<alglm::vec3>
 {
-	static Node encode(const glm::vec3 &rhs)
+	static Node encode(const alglm::vec3 &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -47,7 +47,7 @@ template <> struct convert<glm::vec3>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec3 &rhs)
+	static bool decode(const Node &node, alglm::vec3 &rhs)
 	{
 		if (!node.IsSequence() || node.size() != 3)
 			return false;
@@ -59,9 +59,9 @@ template <> struct convert<glm::vec3>
 	}
 };
 
-template <> struct convert<glm::vec4>
+template <> struct convert<alglm::vec4>
 {
-	static Node encode(const glm::vec4 &rhs)
+	static Node encode(const alglm::vec4 &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -72,7 +72,7 @@ template <> struct convert<glm::vec4>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec4 &rhs)
+	static bool decode(const Node &node, alglm::vec4 &rhs)
 	{
 		if (!node.IsSequence() || node.size() != 4)
 			return false;
@@ -112,7 +112,7 @@ template <> struct convert<ale::AnimationState>
 		node["looping"] = state.looping;
 		node["interruptible"] = state.interruptible;
 		node["defaultBlendTime"] = state.defaultBlendTime;
-	
+
 		return node;
 	};
 
@@ -142,7 +142,7 @@ template <> struct convert<ale::AnimationStateTransition>
 		node["conditionName"] = transition.conditionName;
 		node["blendTime"] = transition.blendTime;
 		node["invertCondition"] = transition.invertCondition;
-	
+
 		return node;
 	};
 
@@ -177,21 +177,21 @@ namespace ale
 		break;                                                                                                         \
 	}
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec2 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const alglm::vec2 &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const alglm::vec3 &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const alglm::vec4 &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -341,9 +341,9 @@ static void serializeEntity(YAML::Emitter &out, Entity entity, Scene *scene)
 					WRITE_SCRIPT_FIELD(USHORT, uint16_t);
 					WRITE_SCRIPT_FIELD(UINT, uint32_t);
 					WRITE_SCRIPT_FIELD(ULONG, uint64_t);
-					WRITE_SCRIPT_FIELD(VECTOR2, glm::vec2);
-					WRITE_SCRIPT_FIELD(VECTOR3, glm::vec3);
-					WRITE_SCRIPT_FIELD(VECTOR4, glm::vec4);
+					WRITE_SCRIPT_FIELD(VECTOR2, alglm::vec2);
+					WRITE_SCRIPT_FIELD(VECTOR3, alglm::vec3);
+					WRITE_SCRIPT_FIELD(VECTOR4, alglm::vec4);
 					WRITE_SCRIPT_FIELD(ENTITY, UUID);
 				}
 				out << YAML::EndMap;
@@ -435,27 +435,27 @@ static void serializeEntity(YAML::Emitter &out, Entity entity, Scene *scene)
 	{
 		out << YAML::Key << "SkeletalAnimatorComponent";
 		out << YAML::BeginMap;
-		auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+		auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
 		out << YAML::Key << "SpeedFactor" << YAML::Value << sa.m_SpeedFactor;
 		out << YAML::Key << "Repeats" << YAML::Value << sa.sac->getRepeatAll();
 
-		auto& stateManager = sa.sac->getStateManager();
+		auto &stateManager = sa.sac->getStateManager();
 		out << YAML::Key << "AnimationStateManager";
-			out << YAML::BeginMap;
-			auto& states = stateManager->getStates();
-			auto& transitions = stateManager->getTransitions();
+		out << YAML::BeginMap;
+		auto &states = stateManager->getStates();
+		auto &transitions = stateManager->getTransitions();
 
-			YAML::Node statesNode(YAML::NodeType::Map), transitionsNode(YAML::NodeType::Sequence);
-			for (const auto& pair : states)
-				statesNode[pair.first] = pair.second;
+		YAML::Node statesNode(YAML::NodeType::Map), transitionsNode(YAML::NodeType::Sequence);
+		for (const auto &pair : states)
+			statesNode[pair.first] = pair.second;
 
-			for (const auto& transition : transitions) 
-				transitionsNode.push_back(transition);
+		for (const auto &transition : transitions)
+			transitionsNode.push_back(transition);
 
-			out << YAML::Key << "AnimationStates" << YAML::Value << statesNode;
-			out << YAML::Key << "AnimationTransitions" << YAML::Value << transitionsNode;
-			out << YAML::EndMap; // AnimationStateManager;
+		out << YAML::Key << "AnimationStates" << YAML::Value << statesNode;
+		out << YAML::Key << "AnimationTransitions" << YAML::Value << transitionsNode;
+		out << YAML::EndMap; // AnimationStateManager;
 		out << YAML::EndMap; // SkeletalAnimatorComponent;
 	}
 
@@ -533,9 +533,9 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			if (tfComponent)
 			{
 				auto &tf = deserializedEntity.getComponent<TransformComponent>();
-				tf.m_Position = tfComponent["Position"].as<glm::vec3>();
-				tf.m_Rotation = tfComponent["Rotation"].as<glm::vec3>();
-				tf.m_Scale = tfComponent["Scale"].as<glm::vec3>();
+				tf.m_Position = tfComponent["Position"].as<alglm::vec3>();
+				tf.m_Rotation = tfComponent["Rotation"].as<alglm::vec3>();
+				tf.m_Scale = tfComponent["Scale"].as<alglm::vec3>();
 				tf.m_WorldTransform = tf.getTransform();
 			}
 
@@ -635,9 +635,9 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 				Light &light = *deserializedEntity.addComponent<LightComponent>().m_Light.get();
 				light.type = lightComponent["Type"].as<uint32_t>();
 				light.onShadowMap = lightComponent["ShadowMap"].as<uint32_t>();
-				light.position = lightComponent["Position"].as<glm::vec3>();
-				light.direction = lightComponent["Direction"].as<glm::vec3>();
-				light.color = lightComponent["Color"].as<glm::vec3>();
+				light.position = lightComponent["Position"].as<alglm::vec3>();
+				light.direction = lightComponent["Direction"].as<alglm::vec3>();
+				light.color = lightComponent["Color"].as<alglm::vec3>();
 				light.intensity = lightComponent["Intensity"].as<float>();
 				light.innerCutoff = lightComponent["InnerCutoff"].as<float>();
 				light.outerCutoff = lightComponent["OuterCutoff"].as<float>();
@@ -685,9 +685,9 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 								READ_SCRIPT_FIELD(USHORT, uint16_t);
 								READ_SCRIPT_FIELD(UINT, uint32_t);
 								READ_SCRIPT_FIELD(ULONG, uint64_t);
-								READ_SCRIPT_FIELD(VECTOR2, glm::vec2);
-								READ_SCRIPT_FIELD(VECTOR3, glm::vec3);
-								READ_SCRIPT_FIELD(VECTOR4, glm::vec4);
+								READ_SCRIPT_FIELD(VECTOR2, alglm::vec2);
+								READ_SCRIPT_FIELD(VECTOR3, alglm::vec3);
+								READ_SCRIPT_FIELD(VECTOR4, alglm::vec4);
 								READ_SCRIPT_FIELD(ENTITY, UUID);
 							}
 						}
@@ -699,10 +699,10 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			auto skeletalAnimatorComponent = entity["SkeletalAnimatorComponent"];
 			if (skeletalAnimatorComponent)
 			{
-				auto& sa = deserializedEntity.addComponent<SkeletalAnimatorComponent>();
+				auto &sa = deserializedEntity.addComponent<SkeletalAnimatorComponent>();
 				sa.m_SpeedFactor = skeletalAnimatorComponent["SpeedFactor"].as<float>();
-				sa.m_Repeats	 = skeletalAnimatorComponent["Repeats"].as<std::vector<bool>>();
-			
+				sa.m_Repeats = skeletalAnimatorComponent["Repeats"].as<std::vector<bool>>();
+
 				for (size_t repeatIndex = 0; repeatIndex < sa.m_Repeats.size(); ++repeatIndex)
 				{
 					sa.sac->setRepeat(sa.m_Repeats[repeatIndex], repeatIndex);
@@ -715,7 +715,7 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 					auto statesNode = animationStateManager["AnimationStates"];
 					if (statesNode && statesNode.size() > 0)
 					{
-						auto& stateManager = sa.sac->getStateManager();
+						auto &stateManager = sa.sac->getStateManager();
 						std::unordered_map<std::string, AnimationState> states;
 						for (auto it = statesNode.begin(); it != statesNode.end(); ++it)
 						{
@@ -725,12 +725,12 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 						}
 						stateManager->setStates(std::move(states));
 					}
-			
+
 					// AnimationTransitions 처리
 					auto transitionsNode = animationStateManager["AnimationTransitions"];
 					if (transitionsNode && transitionsNode.size() > 0)
 					{
-						auto& stateManager = sa.sac->getStateManager();
+						auto &stateManager = sa.sac->getStateManager();
 						std::vector<AnimationStateTransition> transitions =
 							transitionsNode.as<std::vector<AnimationStateTransition>>();
 						stateManager->setTransitions(std::move(transitions));
@@ -753,8 +753,8 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			if (bcComponent)
 			{
 				auto &bc = deserializedEntity.addComponent<BoxColliderComponent>();
-				bc.m_Center = bcComponent["Center"].as<glm::vec3>();
-				bc.m_Size = bcComponent["Size"].as<glm::vec3>();
+				bc.m_Center = bcComponent["Center"].as<alglm::vec3>();
+				bc.m_Size = bcComponent["Size"].as<alglm::vec3>();
 				bc.m_IsTrigger = bcComponent["IsTrigger"].as<bool>();
 			}
 			// SphereColliderComponent
@@ -762,7 +762,7 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			if (scComponent)
 			{
 				auto &sc = deserializedEntity.addComponent<SphereColliderComponent>();
-				sc.m_Center = scComponent["Center"].as<glm::vec3>();
+				sc.m_Center = scComponent["Center"].as<alglm::vec3>();
 				sc.m_Radius = scComponent["Radius"].as<float>();
 				sc.m_IsTrigger = scComponent["IsTrigger"].as<bool>();
 			}
@@ -771,7 +771,7 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			if (capcComponent)
 			{
 				auto &cc = deserializedEntity.addComponent<CapsuleColliderComponent>();
-				cc.m_Center = capcComponent["Center"].as<glm::vec3>();
+				cc.m_Center = capcComponent["Center"].as<alglm::vec3>();
 				cc.m_Radius = capcComponent["Radius"].as<float>();
 				cc.m_Height = capcComponent["Height"].as<float>();
 				cc.m_IsTrigger = capcComponent["IsTrigger"].as<bool>();
@@ -781,7 +781,7 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 			if (cycComponent)
 			{
 				auto &cc = deserializedEntity.addComponent<CylinderColliderComponent>();
-				cc.m_Center = cycComponent["Center"].as<glm::vec3>();
+				cc.m_Center = cycComponent["Center"].as<alglm::vec3>();
 				cc.m_Radius = cycComponent["Radius"].as<float>();
 				cc.m_Height = cycComponent["Height"].as<float>();
 				cc.m_IsTrigger = cycComponent["IsTrigger"].as<bool>();

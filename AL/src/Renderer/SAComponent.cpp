@@ -3,8 +3,7 @@
 namespace ale
 {
 
-SAComponent::SAComponent() :
-	m_SpeedFactor(1.0f)
+SAComponent::SAComponent() : m_SpeedFactor(1.0f)
 {
 	m_CurrentAnimation = nullptr;
 	m_StateManager = std::make_shared<AnimationStateManager>();
@@ -17,8 +16,7 @@ SAComponent::SAComponent() :
 	}
 }
 
-SAComponent::SAComponent(std::shared_ptr<Model>& model) :
-	m_SpeedFactor(1.0f)
+SAComponent::SAComponent(std::shared_ptr<Model> &model) : m_SpeedFactor(1.0f)
 {
 	m_CurrentAnimation = nullptr;
 	m_StateManager = std::make_shared<AnimationStateManager>();
@@ -43,7 +41,7 @@ SAComponent::SAComponent(std::shared_ptr<Model>& model) :
 		if (m_Animations->size() > 0)
 			m_CurrentAnimation = &(*m_Animations)[0]; // basic animation init
 
-		//init state-animation
+		// init state-animation
 		if (m_StateManager->getStates().size() == 0)
 			initStateManager();
 	}
@@ -55,17 +53,11 @@ void SAComponent::initStateManager()
 	for (size_t animationIndex = 0; animationIndex < m_Animations->size(); ++animationIndex)
 	{
 		std::string name = (*m_Animations)[animationIndex].getName();
-		m_StateManager->addState({
-			name,
-			name,
-			false,
-			false,
-			0.5f
-		});
+		m_StateManager->addState({name, name, false, false, 0.5f});
 	}
 }
 
-void SAComponent::setModel(std::shared_ptr<Model>& model)
+void SAComponent::setModel(std::shared_ptr<Model> &model)
 {
 	m_Model = model;
 	if (m_Model->m_SkeletalAnimations)
@@ -84,7 +76,7 @@ void SAComponent::setModel(std::shared_ptr<Model>& model)
 	}
 }
 
-void SAComponent::start(std::string const& animation)
+void SAComponent::start(std::string const &animation)
 {
 	m_Animations->start(animation);
 	init(&(*m_Animations)[animation]);
@@ -138,34 +130,34 @@ void SAComponent::setCurrentRepeat(bool repeat)
 	}
 }
 
-void SAComponent::setCurrentAnimation(SkeletalAnimation* animation)
+void SAComponent::setCurrentAnimation(SkeletalAnimation *animation)
 {
 	if (animation)
 		start(animation->getName());
 }
 
-void SAComponent::init(SkeletalAnimation* animation)
+void SAComponent::init(SkeletalAnimation *animation)
 {
 	m_CurrentAnimation = animation;
 	m_Data[0] = animation->getData();
 	m_FrameCounter = m_Animations->getCurrentFrame();
 
-	AnimationState* state = m_StateManager->getState(animation->getName());
+	AnimationState *state = m_StateManager->getState(animation->getName());
 	if (state)
 		m_StateManager->currentState = *state;
 }
 
-void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFrame)
+void SAComponent::updateAnimation(const Timestep &timestep, uint32_t currentFrame)
 {
 	if (m_StateManager->inTransition) // BLENDING-ANIMATION (2)
 	{
 		if (m_StateManager->currentState.animationName != m_CurrentAnimation->getName())
 		{
-			auto& prevAnim = (*m_Animations)[m_StateManager->prevState.animationName];
+			auto &prevAnim = (*m_Animations)[m_StateManager->prevState.animationName];
 			// if (!getAnimRepeat(&prevAnim))
-				// prevAnim.start();
+			// prevAnim.start();
 			setData(m_FrameCounter, prevAnim.getData(), 0);
-			
+
 			m_CurrentAnimation = &(*m_Animations)[m_StateManager->currentState.animationName];
 			if (!getAnimRepeat(m_CurrentAnimation))
 				m_CurrentAnimation->start();
@@ -184,26 +176,21 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 	}
 	else if (m_CurrentAnimation && m_Model->m_SkeletalAnimations) // SINGLE-ANIMATION
 	{
-		m_CurrentAnimation->uploadData(this->getData(),
-			m_Repeats[getAnimIndex(m_CurrentAnimation->getName())]);
+		m_CurrentAnimation->uploadData(this->getData(), m_Repeats[getAnimIndex(m_CurrentAnimation->getName())]);
 		m_Animations->uploadData(m_CurrentAnimation, m_FrameCounter);
 		m_Animations->update(timestep, *m_Skeleton, currentFrame);
 		m_Skeleton->update();
 
 		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
-		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), 0);
+		this->setData(m_Animations->getCurrentFrame(), m_CurrentAnimation->getData(), 0);
 	}
 	m_StateManager->update(timestep);
 }
 
-void SAComponent::blendUpdate(
-	const Timestep& timestep,
-	Armature::Skeleton& skeleton,
-	uint32_t currentFrame
-)
+void SAComponent::blendUpdate(const Timestep &timestep, Armature::Skeleton &skeleton, uint32_t currentFrame)
 {
-	auto& animA = (*m_Animations)[m_StateManager->prevState.animationName];
-	auto& animB = (*m_Animations)[m_StateManager->currentState.animationName];
+	auto &animA = (*m_Animations)[m_StateManager->prevState.animationName];
+	auto &animB = (*m_Animations)[m_StateManager->currentState.animationName];
 	animA.uploadData(getData(0), getAnimRepeat(&animA));
 	animB.uploadData(getData(1), getAnimRepeat(&animB));
 
@@ -215,16 +202,18 @@ void SAComponent::blendUpdate(
 		m_Animations->uploadData(&animA, m_FrameCounter);
 		m_Animations->update(timestep, *m_Skeleton, currentFrame);
 		poseFrom = m_Skeleton->m_Bones;
-		this->setData(m_FrameCounter, animA.getData(), 0); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
+		this->setData(m_FrameCounter, animA.getData(),
+					  0); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
 	}
-	else 
+	else
 	{
 		if (m_StateManager->transitionTime == 0.0f)
 		{
 			m_Animations->uploadData(&animA, m_FrameCounter);
 			m_Animations->update(timestep, *m_Skeleton, currentFrame);
 			m_CapturedPose = m_Skeleton->m_Bones;
-			this->setData(m_FrameCounter, animA.getData(), 0); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
+			this->setData(m_FrameCounter, animA.getData(),
+						  0); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
 		}
 		poseFrom = m_CapturedPose;
 	}
@@ -240,7 +229,7 @@ void SAComponent::blendUpdate(
 	m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 }
 
-SAComponent::Bones SAComponent::blendBones(Bones& to, Bones& from, float blendFactor)
+SAComponent::Bones SAComponent::blendBones(Bones &to, Bones &from, float blendFactor)
 {
 	if (to.size() != from.size())
 	{
@@ -252,17 +241,11 @@ SAComponent::Bones SAComponent::blendBones(Bones& to, Bones& from, float blendFa
 	for (size_t boneIndex = 0; boneIndex < numberOfBones; ++boneIndex)
 	{
 		to[boneIndex].m_DeformedNodeTranslation =
-			glm::mix(from[boneIndex].m_DeformedNodeTranslation,
-					 to[boneIndex].m_DeformedNodeTranslation,
-					 blendFactor);
-		to[boneIndex].m_DeformedNodeRotation =
-			glm::normalize(glm::slerp(from[boneIndex].m_DeformedNodeRotation,
-					 to[boneIndex].m_DeformedNodeRotation,
-					 blendFactor));
+			alglm::mix(from[boneIndex].m_DeformedNodeTranslation, to[boneIndex].m_DeformedNodeTranslation, blendFactor);
+		to[boneIndex].m_DeformedNodeRotation = alglm::normalize(
+			alglm::slerp(from[boneIndex].m_DeformedNodeRotation, to[boneIndex].m_DeformedNodeRotation, blendFactor));
 		to[boneIndex].m_DeformedNodeScale =
-			glm::mix(from[boneIndex].m_DeformedNodeScale,
-					 to[boneIndex].m_DeformedNodeScale,
-					 blendFactor);
+			alglm::mix(from[boneIndex].m_DeformedNodeScale, to[boneIndex].m_DeformedNodeScale, blendFactor);
 	}
 
 	return to;
@@ -273,7 +256,7 @@ struct SAData SAComponent::getData(unsigned int index) const
 	return m_Data[index];
 }
 
-void SAComponent::setData(uint16_t currentFrame, const SAData& data, unsigned int index)
+void SAComponent::setData(uint16_t currentFrame, const SAData &data, unsigned int index)
 {
 	m_FrameCounter = currentFrame; //??
 
@@ -293,12 +276,12 @@ void SAComponent::setSpeedFactor(float factor)
 	m_SpeedFactor = factor;
 }
 
-int SAComponent::getAnimIndex(const std::string& name)
+int SAComponent::getAnimIndex(const std::string &name)
 {
 	return m_Animations->getIndex(name);
 }
 
-bool SAComponent::getAnimRepeat(SkeletalAnimation* animation)
+bool SAComponent::getAnimRepeat(SkeletalAnimation *animation)
 {
 	return m_Repeats[getAnimIndex(animation->getName())];
 }
@@ -338,7 +321,7 @@ bool SAComponent::isRunning() const
 	return NON_CURRENT_ANIMATION_BOOL;
 }
 
-bool SAComponent::willExpire(const Timestep& timestep) const
+bool SAComponent::willExpire(const Timestep &timestep) const
 {
 	if (m_CurrentAnimation)
 		return m_CurrentAnimation->willExpire(timestep);
@@ -352,4 +335,4 @@ int SAComponent::getCurrentAnimationIndex()
 	return NON_CURRENT_ANIMATION_INT;
 }
 
-} //namespace ale
+} // namespace ale

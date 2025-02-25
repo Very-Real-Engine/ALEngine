@@ -73,7 +73,7 @@ class ImageBuffer : public Buffer
 	static std::unique_ptr<ImageBuffer> createImageBuffer(std::string path, bool flipVertically = false);
 	static std::unique_ptr<ImageBuffer> createMaterialImageBuffer(std::string path, bool flipVertically = false);
 	static std::unique_ptr<ImageBuffer> createImageBufferFromMemory(const aiTexture *texture);
-	static std::unique_ptr<ImageBuffer> createDefaultImageBuffer(glm::vec4 color);
+	static std::unique_ptr<ImageBuffer> createDefaultImageBuffer(alglm::vec4 color);
 	static std::unique_ptr<ImageBuffer> createDefaultSingleChannelImageBuffer(float value);
 	static std::unique_ptr<ImageBuffer> createHDRImageBuffer(std::string path);
 
@@ -102,7 +102,7 @@ class ImageBuffer : public Buffer
 	bool initImageBuffer(std::string path, bool flipVertically);
 	bool initMaterialImageBuffer(std::string path, bool flipVertically);
 	void initImageBufferFromMemory(const aiTexture *texture);
-	void initDefaultImageBuffer(glm::vec4 color);
+	void initDefaultImageBuffer(alglm::vec4 color);
 	void initDefaultSingleChannelImageBuffer(float value);
 	bool initHDRImageBuffer(std::string path);
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout,

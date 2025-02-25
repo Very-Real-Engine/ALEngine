@@ -413,14 +413,14 @@ void ImageBuffer::initImageBufferFromMemory(const aiTexture *texture)
 	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_UNORM, texWidth, texHeight, mipLevels);
 }
 
-std::unique_ptr<ImageBuffer> ImageBuffer::createDefaultImageBuffer(glm::vec4 color)
+std::unique_ptr<ImageBuffer> ImageBuffer::createDefaultImageBuffer(alglm::vec4 color)
 {
 	std::unique_ptr<ImageBuffer> imageBuffer = std::unique_ptr<ImageBuffer>(new ImageBuffer());
 	imageBuffer->initDefaultImageBuffer(color);
 	return imageBuffer;
 }
 
-void ImageBuffer::initDefaultImageBuffer(glm::vec4 color)
+void ImageBuffer::initDefaultImageBuffer(alglm::vec4 color)
 {
 	auto &context = VulkanContext::getContext();
 	m_device = context.getDevice();

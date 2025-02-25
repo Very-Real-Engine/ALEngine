@@ -4,6 +4,7 @@
 
 #include "Core/Timestep.h"
 #include "Core/UUID.h"
+#include <alglm/include/alglm.h>
 #include <glm/glm.hpp>
 
 #include "Renderer/EditorCamera.h"
@@ -29,7 +30,7 @@ class Scene
   public:
 	/// @brief Scene 기본 생성자.
 	Scene() = default;
-	
+
 	/// @brief Scene 기본 소멸자.
 	~Scene();
 
@@ -144,7 +145,7 @@ class Scene
 		return m_IsRunning;
 	}
 
-	glm::vec3 &getCamPos()
+	alglm::vec3 &getCamPos()
 	{
 		return m_CameraPos;
 	}
@@ -218,8 +219,7 @@ class Scene
 		return m_Registry.get<Components...>(entity);
 	}
 
-	template <typename Component>
-	auto tryGet(entt::entity entity)
+	template <typename Component> auto tryGet(entt::entity entity)
 	{
 		return m_Registry.try_get<Component>(entity);
 	}
@@ -242,7 +242,7 @@ class Scene
 	void onPhysicsStop();
 	void findMoveObject();
 
-	void setCamPos(glm::vec3 &pos)
+	void setCamPos(alglm::vec3 &pos)
 	{
 		m_CameraPos = pos;
 	}
@@ -251,8 +251,8 @@ class Scene
 	entt::registry m_Registry;
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
-	glm::vec3 m_lightPos{0.0f, 1.0f, 0.0f};
-	glm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
+	alglm::vec3 m_lightPos{0.0f, 1.0f, 0.0f};
+	alglm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
 	bool m_IsPaused = false;
 	bool m_IsRunning = false;
 	int32_t m_StepFrames = 0;

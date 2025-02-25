@@ -12,28 +12,28 @@ Contact *CylinderToCapsuleContact::create(Fixture *fixtureA, Fixture *fixtureB, 
 		CylinderToCapsuleContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 CylinderToCapsuleContact::supportA(const ConvexInfo &cylinder, glm::vec3 dir)
+alglm::vec3 CylinderToCapsuleContact::supportA(const ConvexInfo &cylinder, alglm::vec3 dir)
 {
 	// 원기둥 정보
-	glm::vec3 center = cylinder.center;				   // 중심점
-	glm::vec3 axis = glm::normalize(cylinder.axes[0]); // 높이 축 (단위 벡터)
+	alglm::vec3 center = cylinder.center;				   // 중심점
+	alglm::vec3 axis = alglm::normalize(cylinder.axes[0]); // 높이 축 (단위 벡터)
 	float height = cylinder.height;
 
 	// 1. 축 방향으로 윗면/아랫면 선택
 
 	bool isUpSide = true;
-	float dotResult = glm::dot(dir, axis);
+	float dotResult = alglm::dot(dir, axis);
 
 	if (dotResult < 0)
 	{
 		isUpSide = false;
 	}
 
-	glm::vec3 circleDir = dir - glm::dot(dir, axis) * axis; // 축에 수직한 방향
+	alglm::vec3 circleDir = dir - alglm::dot(dir, axis) * axis; // 축에 수직한 방향
 
-	if (glm::length2(circleDir) > 1e-8f)
+	if (alglm::length2(circleDir) > 1e-8f)
 	{
-		circleDir = glm::normalize(circleDir); // 정규화
+		circleDir = alglm::normalize(circleDir); // 정규화
 
 		int32_t maxIdx;
 		int32_t segments = 20;
@@ -41,7 +41,7 @@ glm::vec3 CylinderToCapsuleContact::supportA(const ConvexInfo &cylinder, glm::ve
 		float max = -FLT_MAX;
 		for (int32_t i = 0; i < segments; ++i)
 		{
-			dotResult = glm::dot(cylinder.points[i], dir);
+			dotResult = alglm::dot(cylinder.points[i], dir);
 			if (dotResult > max)
 			{
 				maxIdx = i;
@@ -69,11 +69,11 @@ glm::vec3 CylinderToCapsuleContact::supportA(const ConvexInfo &cylinder, glm::ve
 	}
 }
 
-glm::vec3 CylinderToCapsuleContact::supportB(const ConvexInfo &capsule, glm::vec3 dir)
+alglm::vec3 CylinderToCapsuleContact::supportB(const ConvexInfo &capsule, alglm::vec3 dir)
 {
-	float dotResult = glm::dot(dir, capsule.axes[0]);
+	float dotResult = alglm::dot(dir, capsule.axes[0]);
 
-	glm::vec3 move(0.0f);
+	alglm::vec3 move(0.0f);
 
 	if (dotResult > 0)
 	{
@@ -96,15 +96,15 @@ void CylinderToCapsuleContact::findCollisionPoints(const ConvexInfo &cylinder, c
 		collisionInfo.normal[0] = epaInfo.normal;
 		collisionInfo.seperation[0] = epaInfo.distance;
 
-		if (glm::dot(capsule.axes[0], collisionInfo.normal[0]) < 0)
+		if (alglm::dot(capsule.axes[0], collisionInfo.normal[0]) < 0)
 		{
-			glm::vec3 hemisphereCenter = capsule.center + capsule.axes[0] * 0.5f * capsule.height;
+			alglm::vec3 hemisphereCenter = capsule.center + capsule.axes[0] * 0.5f * capsule.height;
 			collisionInfo.pointB[0] = hemisphereCenter - collisionInfo.normal[0] * capsule.radius;
 			collisionInfo.pointA[0] = collisionInfo.pointB[0] + collisionInfo.normal[0] * collisionInfo.seperation[0];
 		}
 		else
 		{
-			glm::vec3 hemisphereCenter = capsule.center - capsule.axes[0] * 0.5f * capsule.height;
+			alglm::vec3 hemisphereCenter = capsule.center - capsule.axes[0] * 0.5f * capsule.height;
 			collisionInfo.pointB[0] = hemisphereCenter - collisionInfo.normal[0] * capsule.radius;
 			collisionInfo.pointA[0] = collisionInfo.pointB[0] + collisionInfo.normal[0] * collisionInfo.seperation[0];
 		}

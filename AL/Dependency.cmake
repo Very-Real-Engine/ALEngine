@@ -165,6 +165,22 @@ set(DEP_LIST ${DEP_LIST} dep_mono)
 set(MONO_LIB_DEBUG ${DEP_INSTALL_DIR}/lib/libmono-static-sgen-debug.lib)
 set(MONO_LIB_RELEASE ${DEP_INSTALL_DIR}/lib/libmono-static-sgen.lib)
 
+# alglm 추가
+ExternalProject_Add(
+    dep_alglm
+    GIT_REPOSITORY "https://github.com/Very-Real-Engine/ALGLM"
+    GIT_TAG "main"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND "" PATCH_COMMAND "" TEST_COMMAND ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
+
+)
+set(DEP_LIST ${DEP_LIST} dep_alglm)
+set(DEP_LIBS ${DEP_LIBS}
+    $<$<CONFIG:Debug>:alglmd>
+    $<$<CONFIG:Release>:alglm>
+)
 # CMake에서 빌드 타입에 따라 올바른 라이브러리를 링크
 set(DEP_LIBS ${DEP_LIBS} 
     $<$<CONFIG:Debug>:${MONO_LIB_DEBUG}>

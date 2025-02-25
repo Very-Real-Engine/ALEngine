@@ -9,11 +9,11 @@
 #include "Renderer/FrameBuffers.h"
 #include "Renderer/Pipeline.h"
 #include "Renderer/RenderPass.h"
+#include "Renderer/SAComponent.h"
 #include "Renderer/ShaderResourceManager.h"
 #include "Renderer/SwapChain.h"
 #include "Renderer/SyncObjects.h"
 #include "Renderer/VulkanContext.h"
-#include "Renderer/SAComponent.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneCamera.h"
@@ -174,10 +174,10 @@ class Renderer
 	std::unique_ptr<ShaderResourceManager> m_viewPortShaderResourceManager;
 	std::vector<VkDescriptorSet> viewPortDescriptorSets;
 
-	glm::vec2 viewPortSize;
+	alglm::vec2 viewPortSize;
 
-	glm::mat4 projMatrix;
-	glm::mat4 viewMatirx;
+	alglm::mat4 projMatrix;
+	alglm::mat4 viewMatirx;
 
 	std::unordered_map<std::string, std::shared_ptr<Model>> m_modelsMap;
 

@@ -36,3 +36,6 @@
 // glm
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+
+// alglm
+#include <alglm/include/alglm.h>

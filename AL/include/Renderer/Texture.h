@@ -13,7 +13,7 @@ class Texture : public Buffer
   public:
 	static std::shared_ptr<Texture> createTexture(std::string path, bool flipVertically = false);
 	static std::shared_ptr<Texture> createMaterialTexture(std::string path, bool flipVertically = false);
-	static std::shared_ptr<Texture> createDefaultTexture(glm::vec4 color);
+	static std::shared_ptr<Texture> createDefaultTexture(alglm::vec4 color);
 	static std::shared_ptr<Texture> createDefaultSingleChannelTexture(float value);
 	static std::shared_ptr<Texture> createTextureFromMemory(const aiTexture *aiTexture);
 	static std::shared_ptr<Texture> createHDRTexture(std::string path);
@@ -53,7 +53,7 @@ class Texture : public Buffer
 	void loadMaterialTexture(std::string path, bool flipVertically = false);
 	void createMaterialTextureImageView();
 
-	void initDefaultTexture(glm::vec4 color);
+	void initDefaultTexture(alglm::vec4 color);
 	void createDefaultTextureImageView();
 	void createDefaultTextureSampler();
 

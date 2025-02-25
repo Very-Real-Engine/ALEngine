@@ -3,6 +3,7 @@
 #include "Core/Base.h"
 #include "Core/Timestep.h"
 #include "Scene/CullTree.h"
+#include <alglm/include/alglm.h>
 #include <glm/glm.hpp>
 
 namespace ale
@@ -34,7 +35,7 @@ class Camera
 	 * @param ratio 새로운 화면 비율(Aspect Ratio).
 	 */
 	void setAspectRatio(float ratio);
-	
+
 	/**
 	 * @brief 카메라의 FOV(시야각)를 설정합니다.
 	 * @param fov 새로운 시야각(FOV).
@@ -68,7 +69,7 @@ class Camera
 	 * @param dir 카메라 방향 벡터.
 	 * @param up 상단 방향 벡터.
 	 */
-	void setViewMatrix(glm::vec3 &pos, glm::vec3 &dir, glm::vec3 &up);
+	void setViewMatrix(alglm::vec3 &pos, alglm::vec3 &dir, alglm::vec3 &up);
 
 	/**
 	 * @brief 뷰포트 크기를 설정합니다.
@@ -81,14 +82,14 @@ class Camera
 	 * @brief 카메라의 위치를 설정합니다.
 	 * @param pos 새로운 위치 벡터.
 	 */
-	void setPosition(glm::vec3 &pos);
+	void setPosition(alglm::vec3 &pos);
 
 	/**
 	 * @brief 카메라의 회전값을 설정합니다.
 	 * @param rot 새로운 회전 벡터.
 	 */
-	void setRotation(glm::vec3 &rot);
-	
+	void setRotation(alglm::vec3 &rot);
+
 	/**
 	 * @brief 현재 카메라의 시야각(FOV)을 반환합니다.
 	 * @return float 현재 FOV 값.
@@ -109,9 +110,9 @@ class Camera
 
 	/**
 	 * @brief 현재 카메라의 위치를 반환합니다.
-	 * @return glm::vec3& 카메라 위치 벡터.
+	 * @return alglm::vec3& 카메라 위치 벡터.
 	 */
-	glm::vec3 &getPosition();
+	alglm::vec3 &getPosition();
 
 	/**
 	 * @brief 현재 카메라의 프러스텀(Frustum) 데이터를 반환합니다.
@@ -121,16 +122,16 @@ class Camera
 
 	/**
 	 * @brief 현재 카메라의 투영 행렬을 반환합니다.
-	 * @return const glm::mat4& 투영 행렬.
+	 * @return const alglm::mat4& 투영 행렬.
 	 */
-	const glm::mat4 &getProjection() const;
+	const alglm::mat4 &getProjection() const;
 
 	/**
 	 * @brief 현재 카메라의 뷰 행렬을 반환합니다.
-	 * @return const glm::mat4& 뷰 행렬.
+	 * @return const alglm::mat4& 뷰 행렬.
 	 */
-	const glm::mat4 &getView() const;
-	
+	const alglm::mat4 &getView() const;
+
 	/// @brief 카메라의 투영 행렬을 갱신합니다.
 	void updateProjMatrix();
 
@@ -138,18 +139,18 @@ class Camera
 	void updateViewMatrix();
 
   protected:
-	glm::mat4 m_projection = glm::mat4(1.0f);
-	glm::mat4 m_view;
+	alglm::mat4 m_projection = alglm::mat4(1.0f);
+	alglm::mat4 m_view;
 
-	glm::vec3 m_cameraPos{0.0f, 0.0f, 10.0f};
-	glm::vec3 m_cameraFront{0.0f, 0.0f, -1.0f};
-	glm::vec3 m_cameraUp{0.0f, 1.0f, 0.0f};
+	alglm::vec3 m_cameraPos{0.0f, 0.0f, 10.0f};
+	alglm::vec3 m_cameraFront{0.0f, 0.0f, -1.0f};
+	alglm::vec3 m_cameraUp{0.0f, 1.0f, 0.0f};
 
 	float m_CameraPitch{0.0f};
 	float m_CameraYaw{0.0f};
 
 	Frustum m_frustum;
-	float m_fov = glm::radians(45.0f);
+	float m_fov = alglm::radians(45.0f);
 	float m_near = 0.001f;
 	float m_aspect = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 	float m_far = 1000.0f;

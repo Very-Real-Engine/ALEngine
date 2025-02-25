@@ -48,9 +48,9 @@ void Island::solve(float duration)
 		m_velocities[i].linearVelocity = body->getLinearVelocity();
 		m_velocities[i].angularVelocity = body->getAngularVelocity();
 
-		m_positions[i].positionBuffer = glm::vec3(0.0f);
-		m_velocities[i].linearVelocityBuffer = glm::vec3(0.0f);
-		m_velocities[i].angularVelocityBuffer = glm::vec3(0.0f);
+		m_positions[i].positionBuffer = alglm::vec3(0.0f);
+		m_velocities[i].linearVelocityBuffer = alglm::vec3(0.0f);
+		m_velocities[i].angularVelocityBuffer = alglm::vec3(0.0f);
 	}
 
 	ContactSolver contactSolver(duration, m_contacts, m_positions, m_velocities, m_bodyCount, m_contactCount);
@@ -81,11 +81,11 @@ void Island::solve(float duration)
 		}
 
 		if (m_positions[i].isNormalStop && m_positions[i].isTangentStop && m_positions[i].isNormal &&
-			glm::length(m_velocities[i].linearVelocity) < STOP_LINEAR_VELOCITY &&
-			glm::length(m_velocities[i].angularVelocity) < STOP_ANGULAR_VELOCITY)
+			alglm::length(m_velocities[i].linearVelocity) < STOP_LINEAR_VELOCITY &&
+			alglm::length(m_velocities[i].angularVelocity) < STOP_ANGULAR_VELOCITY)
 		{
-			m_velocities[i].linearVelocity = glm::vec3(0.0f);
-			m_velocities[i].angularVelocity = glm::vec3(0.0f);
+			m_velocities[i].linearVelocity = alglm::vec3(0.0f);
+			m_velocities[i].angularVelocity = alglm::vec3(0.0f);
 			body->setSleep(duration);
 		}
 		else

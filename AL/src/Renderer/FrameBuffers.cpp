@@ -4,7 +4,8 @@
 namespace ale
 {
 
-std::unique_ptr<FrameBuffers> FrameBuffers::createViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+std::unique_ptr<FrameBuffers> FrameBuffers::createViewPortFrameBuffers(alglm::vec2 viewPortSize,
+																	   VkRenderPass renderPass)
 {
 	std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
 	frameBuffers->initViewPortFrameBuffers(viewPortSize, renderPass);
@@ -61,7 +62,7 @@ void FrameBuffers::cleanup()
 	}
 }
 
-void FrameBuffers::initViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+void FrameBuffers::initViewPortFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass)
 {
 	auto &context = VulkanContext::getContext();
 	VkDevice device = context.getDevice();
@@ -291,7 +292,7 @@ void FrameBuffers::initSphericalMapFrameBuffers(VkRenderPass renderPass)
 	}
 }
 
-std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(glm::vec2 viewPortSize,
+std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(alglm::vec2 viewPortSize,
 																		 VkRenderPass renderPass)
 {
 	std::unique_ptr<FrameBuffers> frameBuffers = std::unique_ptr<FrameBuffers>(new FrameBuffers());
@@ -299,7 +300,7 @@ std::unique_ptr<FrameBuffers> FrameBuffers::createBackgroundFrameBuffers(glm::ve
 	return frameBuffers;
 }
 
-void FrameBuffers::initBackgroundFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass)
+void FrameBuffers::initBackgroundFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass)
 {
 	auto &context = VulkanContext::getContext();
 	VkDevice device = context.getDevice();

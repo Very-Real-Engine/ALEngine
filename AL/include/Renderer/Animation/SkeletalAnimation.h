@@ -16,63 +16,81 @@ struct SAData
 class Timestep;
 class SkeletalAnimation
 {
-	public:
-		enum class EPath
-		{
-			TRANSLATION,
-			ROTATION,
-			SCALE
-		};
+  public:
+	enum class EPath
+	{
+		TRANSLATION,
+		ROTATION,
+		SCALE
+	};
 
-		enum class EInterpolationMethod
-		{
-			LINEAR,
-			STEP,
-			CUBICSPLINE
-		};
-		
-		struct Channel
-		{
-			size_t		m_samplerIndex;
-			std::string	m_NodeName;
-			EPath		m_Path;
-		};
+	enum class EInterpolationMethod
+	{
+		LINEAR,
+		STEP,
+		CUBICSPLINE
+	};
 
-		struct Sampler
-		{
-			EInterpolationMethod	m_Interpolation;
-			std::vector<float>		m_Timestamps;
-			std::vector<glm::vec4>	m_TRSoutputValuesToBeInterpolated;
-		};
+	struct Channel
+	{
+		size_t m_samplerIndex;
+		std::string m_NodeName;
+		EPath m_Path;
+	};
 
-	public:
-		SkeletalAnimation(std::string const& name);
+	struct Sampler
+	{
+		EInterpolationMethod m_Interpolation;
+		std::vector<float> m_Timestamps;
+		std::vector<alglm::vec4> m_TRSoutputValuesToBeInterpolated;
+	};
 
-		void start();
-		void stop();
-		bool isRunning() const;
-		bool willExpire(const Timestep& timestep) const;
-		std::string const& getName() const { return m_Name; }
-		void setRepeat(bool repeat) { m_Repeat = repeat; }
-		void uploadData(const SAData& data, bool repeat);
-		void update(const Timestep& timestep, Armature::Skeleton& skeleton);
-		float getDuration() const { return m_LastKeyFrameTime - m_FirstKeyFrameTime; }
-		float getCurrentTime() const { return m_CurrentKeyFrameTime - m_FirstKeyFrameTime; }
-		struct SAData getData() const;
+  public:
+	SkeletalAnimation(std::string const &name);
 
-		std::vector<SkeletalAnimation::Sampler> m_Samplers;
-		std::vector<SkeletalAnimation::Channel> m_Channels;
+	void start();
+	void stop();
+	bool isRunning() const;
+	bool willExpire(const Timestep &timestep) const;
+	std::string const &getName() const
+	{
+		return m_Name;
+	}
+	void setRepeat(bool repeat)
+	{
+		m_Repeat = repeat;
+	}
+	void uploadData(const SAData &data, bool repeat);
+	void update(const Timestep &timestep, Armature::Skeleton &skeleton);
+	float getDuration() const
+	{
+		return m_LastKeyFrameTime - m_FirstKeyFrameTime;
+	}
+	float getCurrentTime() const
+	{
+		return m_CurrentKeyFrameTime - m_FirstKeyFrameTime;
+	}
+	struct SAData getData() const;
 
-		void setFirstKeyFrameTime(float firstKeyFrameTime) { m_FirstKeyFrameTime = firstKeyFrameTime; }
-		void setLastKeyFrameTime(float lastKeyFrameTime) { m_LastKeyFrameTime = lastKeyFrameTime; }
+	std::vector<SkeletalAnimation::Sampler> m_Samplers;
+	std::vector<SkeletalAnimation::Channel> m_Channels;
 
-	private:
-		std::string m_Name;
-		bool m_Repeat;
+	void setFirstKeyFrameTime(float firstKeyFrameTime)
+	{
+		m_FirstKeyFrameTime = firstKeyFrameTime;
+	}
+	void setLastKeyFrameTime(float lastKeyFrameTime)
+	{
+		m_LastKeyFrameTime = lastKeyFrameTime;
+	}
 
-		float m_FirstKeyFrameTime;
-		float m_LastKeyFrameTime;
-		float m_CurrentKeyFrameTime = 0.0f;
+  private:
+	std::string m_Name;
+	bool m_Repeat;
+
+	float m_FirstKeyFrameTime;
+	float m_LastKeyFrameTime;
+	float m_CurrentKeyFrameTime = 0.0f;
 };
-}
+} // namespace ale
 #endif

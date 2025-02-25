@@ -44,10 +44,10 @@ static void nativeLog(MonoString *string, int parameter)
 	std::cout << str << '\n';
 }
 
-static void nativeLog_Vector(glm::vec3 *parameter, glm::vec3 *outResult)
+static void nativeLog_Vector(alglm::vec3 *parameter, alglm::vec3 *outResult)
 {
 	// AL_CORE_WARN("Value: {0}", *parameter);
-	*outResult = glm::normalize(*parameter);
+	*outResult = alglm::normalize(*parameter);
 }
 
 // Entity
@@ -114,7 +114,7 @@ static MonoObject *getScriptInstance(UUID entityID)
 }
 
 // Transform
-static void TransformComponent_getPosition(UUID entityID, glm::vec3 *outPosition)
+static void TransformComponent_getPosition(UUID entityID, alglm::vec3 *outPosition)
 {
 	Scene *scene = ScriptingEngine::getSceneContext();
 	Entity entity = scene->getEntityByUUID(entityID);
@@ -122,7 +122,7 @@ static void TransformComponent_getPosition(UUID entityID, glm::vec3 *outPosition
 	*outPosition = entity.getComponent<TransformComponent>().m_Position;
 }
 
-static void TransformComponent_setPosition(UUID entityID, glm::vec3 *position)
+static void TransformComponent_setPosition(UUID entityID, alglm::vec3 *position)
 {
 	Scene *scene = ScriptingEngine::getSceneContext();
 	Entity entity = scene->getEntityByUUID(entityID);
@@ -132,7 +132,7 @@ static void TransformComponent_setPosition(UUID entityID, glm::vec3 *position)
 	tc.m_WorldTransform = tc.getTransform();
 }
 
-static void TransformComponent_getRotation(UUID entityID, glm::vec3 *outRotation)
+static void TransformComponent_getRotation(UUID entityID, alglm::vec3 *outRotation)
 {
 	Scene *scene = ScriptingEngine::getSceneContext();
 	Entity entity = scene->getEntityByUUID(entityID);
@@ -140,7 +140,7 @@ static void TransformComponent_getRotation(UUID entityID, glm::vec3 *outRotation
 	*outRotation = entity.getComponent<TransformComponent>().m_Rotation;
 }
 
-static void TransformComponent_setRotation(UUID entityID, glm::vec3 *outRotation)
+static void TransformComponent_setRotation(UUID entityID, alglm::vec3 *outRotation)
 {
 	Scene *scene = ScriptingEngine::getSceneContext();
 	Entity entity = scene->getEntityByUUID(entityID);
@@ -157,7 +157,7 @@ static bool Input_isKeyDown(KeyCode keycode)
 }
 
 // Physics
-static void RigidbodyComponent_addForce(UUID entityID, glm::vec3 *force)
+static void RigidbodyComponent_addForce(UUID entityID, alglm::vec3 *force)
 {
 	Scene *scene = ScriptingEngine::getSceneContext();
 	Entity entity = scene->getEntityByUUID(entityID);

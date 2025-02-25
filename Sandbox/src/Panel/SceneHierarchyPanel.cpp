@@ -120,19 +120,18 @@ void SceneHierarchyPanel::onImGuiRender()
 	ImGui::End();
 }
 
-static bool decomposeMatrix(const glm::mat4 &transform, glm::vec3 &outScale, glm::vec3 &outRotation,
-							glm::vec3 &outTranslation)
+static bool decomposeMatrix(const alglm::mat4 &transform, alglm::vec3 &outScale, alglm::vec3 &outRotation,
+							alglm::vec3 &outTranslation)
 {
-	glm::vec3 skew;
-	glm::vec4 perspective;
+	alglm::vec4 perspective;
 
-	glm::quat &orientation = glm::quat(glm::radians(outRotation));
+	alglm::quat &orientation = alglm::quat(alglm::radians(outRotation));
 
-	// glm::decompose(매트릭스, 스케일, 로테이션, 위치, skew, perspective)
-	if (!glm::decompose(transform, outScale, orientation, outTranslation, skew, perspective))
+	// alglm::decompose(매트릭스, 스케일, 로테이션, 위치, skew, perspective)
+	if (!alglm::decompose(transform, outScale, orientation, outTranslation, perspective))
 		return false;
 
-	outRotation = glm::eulerAngles(orientation);
+	outRotation = alglm::eulerAngles(orientation);
 
 	return true;
 }
@@ -160,10 +159,10 @@ void SceneHierarchyPanel::updateRelationship(Entity &newParent, Entity &child)
 
 	// 4. 자식의 위치를 부모 기준 local좌표로 변환
 	auto &tc = child.getComponent<TransformComponent>();
-	glm::mat4 parentWorld = newParent.getComponent<TransformComponent>().m_WorldTransform; // 부모의 월드 매트릭스
-	glm::mat4 childWorld = child.getComponent<TransformComponent>().m_WorldTransform;	   // 자식의 현재 월드 매트릭스
-	// tc.m_LocalTransform = glm::inverse(parentWorld) * childWorld;
-	glm::mat4 childLocalMat = glm::inverse(parentWorld) * childWorld;
+	alglm::mat4 parentWorld = newParent.getComponent<TransformComponent>().m_WorldTransform; // 부모의 월드 매트릭스
+	alglm::mat4 childWorld = child.getComponent<TransformComponent>().m_WorldTransform; // 자식의 현재 월드 매트릭스
+	// tc.m_LocalTransform = alglm::inverse(parentWorld) * childWorld;
+	alglm::mat4 childLocalMat = alglm::inverse(parentWorld) * childWorld;
 
 	decomposeMatrix(childLocalMat, tc.m_Scale, tc.m_Rotation, tc.m_Position);
 	// updateTransforms(newParent);
@@ -198,7 +197,7 @@ void SceneHierarchyPanel::updateTransforms(Entity entity)
 	}
 
 	Entity t{top, m_Context.get()};
-	updateTransformRecursive(t, glm::mat4(1.0f));
+	updateTransformRecursive(t, alglm::mat4(1.0f));
 }
 
 void SceneHierarchyPanel::updateActiveInfo(Entity &entity, bool parentEffectiveActive)
@@ -216,7 +215,7 @@ void SceneHierarchyPanel::updateActiveInfo(Entity &entity, bool parentEffectiveA
 	}
 }
 
-void SceneHierarchyPanel::updateTransformRecursive(Entity entity, const glm::mat4 &parentWorldTransform)
+void SceneHierarchyPanel::updateTransformRecursive(Entity entity, const alglm::mat4 &parentWorldTransform)
 {
 	auto &transform = entity.getComponent<TransformComponent>();
 	auto &relation = entity.getComponent<RelationshipComponent>();
@@ -307,7 +306,7 @@ void SceneHierarchyPanel::drawEntityNode(Entity entity)
 	}
 }
 
-static void drawVec3Control(const std::string &label, glm::vec3 &values, float resetValue = 0.0f,
+static void drawVec3Control(const std::string &label, alglm::vec3 &values, float resetValue = 0.0f,
 							float columnWidth = 100.0f)
 {
 	ImGuiIO &io = ImGui::GetIO();
@@ -416,7 +415,7 @@ static void drawFloatControl(const std::string &label, float &value, float reset
 	ImGui::PopID();
 }
 
-static void drawColorControl(const std::string &label, glm::vec3 &color, float columnWidth = 100.0f)
+static void drawColorControl(const std::string &label, alglm::vec3 &color, float columnWidth = 100.0f)
 {
 	ImGuiIO &io = ImGui::GetIO();
 	auto boldFont = io.Fonts->Fonts[0];
@@ -430,8 +429,8 @@ static void drawColorControl(const std::string &label, glm::vec3 &color, float c
 	ImGui::NextColumn();
 
 	// ColorEdit3을 사용하여 색상 조정
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});						 // 패딩 조정
-	ImGui::ColorEdit3("##Color", glm::value_ptr(color), ImGuiColorEditFlags_DisplayRGB); // 컬러 조정
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{2, 2});						   // 패딩 조정
+	ImGui::ColorEdit3("##Color", alglm::value_ptr(color), ImGuiColorEditFlags_DisplayRGB); // 컬러 조정
 	ImGui::PopStyleVar();
 
 	// 컬럼 마무리
@@ -663,9 +662,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	drawComponent<TransformComponent>("Transform", entity, [this, entity](auto &component) mutable {
 		// Update Recursively
 		drawVec3Control("Position", component.m_Position);
-		auto &rotation = glm::degrees(component.m_Rotation);
+		auto &rotation = alglm::degrees(component.m_Rotation);
 		drawVec3Control("Rotation", rotation);
-		component.m_Rotation = glm::radians(rotation);
+		component.m_Rotation = alglm::radians(rotation);
 		drawVec3Control("Scale", component.m_Scale, 1.0f);
 		updateTransforms(entity);
 	});
@@ -673,9 +672,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	drawComponent<CameraComponent>("Camera", entity, [](auto &component) {
 		auto &camera = component.m_Camera;
 
-		float perspectiveVerticalFov = glm::degrees(camera.getFov());
+		float perspectiveVerticalFov = alglm::degrees(camera.getFov());
 		if (ImGui::DragFloat("Vertical FOV", &perspectiveVerticalFov))
-			camera.setFov(glm::radians(perspectiveVerticalFov));
+			camera.setFov(alglm::radians(perspectiveVerticalFov));
 
 		float perspectiveNear = camera.getNear();
 		if (ImGui::DragFloat("Near", &perspectiveNear))

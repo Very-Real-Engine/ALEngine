@@ -67,8 +67,8 @@ void OBJLoader::parse(const std::string &path)
 	auto getVertex = [&](uint32_t vIndex, uint32_t tIndex, uint32_t nIndex, uint32_t smoothingGroup) -> Vertex {
 		Vertex tmp;
 		tmp.pos = globalPosition[vIndex];
-		tmp.normal = tIndex != -1 ? globalNormal[nIndex] : glm::vec3(0.0f);
-		tmp.texCoord = tIndex != -1 ? globalTexCoord[tIndex] : glm::vec2(0.0f);
+		tmp.normal = tIndex != -1 ? globalNormal[nIndex] : alglm::vec3(0.0f);
+		tmp.texCoord = tIndex != -1 ? globalTexCoord[tIndex] : alglm::vec2(0.0f);
 		return tmp;
 	};
 
@@ -216,7 +216,7 @@ void OBJLoader::parse(const std::string &path)
 			}
 			else if (type == "v")
 			{
-				glm::vec3 position;
+				alglm::vec3 position;
 				if (!(ss >> position.x >> position.y >> position.z))
 				{
 					std::cerr << "Failed to read position" << std::endl;
@@ -226,7 +226,7 @@ void OBJLoader::parse(const std::string &path)
 			}
 			else if (type == "vn")
 			{
-				glm::vec3 normal;
+				alglm::vec3 normal;
 				if (!(ss >> normal.x >> normal.y >> normal.z))
 				{
 					std::cerr << "Failed to read normal" << std::endl;
@@ -236,7 +236,7 @@ void OBJLoader::parse(const std::string &path)
 			}
 			else if (type == "vt")
 			{
-				glm::vec2 texCoord;
+				alglm::vec2 texCoord;
 				if (!(ss >> texCoord.x >> texCoord.y))
 				{
 					std::cerr << "Failed to read texCoord" << std::endl;
@@ -281,7 +281,7 @@ void OBJLoader::parseMTL(const std::string &path)
 		}
 		else if (type == "Ka")
 		{
-			glm::vec3 Ka;
+			alglm::vec3 Ka;
 			if (!(ss >> Ka.x >> Ka.y >> Ka.z))
 			{
 				std::cerr << "Failed to read Ka" << std::endl;
@@ -292,7 +292,7 @@ void OBJLoader::parseMTL(const std::string &path)
 		}
 		else if (type == "Kd")
 		{
-			glm::vec3 Kd;
+			alglm::vec3 Kd;
 			if (!(ss >> Kd.x >> Kd.y >> Kd.z))
 			{
 				std::cerr << "Failed to read Kd" << std::endl;
@@ -303,7 +303,7 @@ void OBJLoader::parseMTL(const std::string &path)
 		}
 		else if (type == "Ks")
 		{
-			glm::vec3 Ks;
+			alglm::vec3 Ks;
 			if (!(ss >> Ks.x >> Ks.y >> Ks.z))
 			{
 				std::cerr << "Failed to read Ks" << std::endl;

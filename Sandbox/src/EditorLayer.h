@@ -103,7 +103,7 @@ class EditorLayer : public Layer
 	 * @brief 현재 선택된 엔티티를 복제합니다.
 	 */
 	void duplicateEntity();
-	
+
   private:
 	CameraController m_CameraController;
 	EditorCamera m_EditorCamera;
@@ -120,7 +120,7 @@ class EditorLayer : public Layer
 	VkDescriptorPool descriptorPool;
 	VkDevice device;
 
-	glm::vec2 m_ViewportSize = {0.0f, 0.0f};
+	alglm::vec2 m_ViewportSize = {0.0f, 0.0f};
 
 	enum class ESceneState
 	{

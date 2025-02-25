@@ -272,7 +272,7 @@ void Scene::onUpdateRuntime(Timestep ts)
 				Rigidbody *body = (Rigidbody *)rb.body;
 
 				tf.m_Position = body->getTransform().position;
-				tf.m_Rotation = glm::eulerAngles(body->getTransform().orientation);
+				tf.m_Rotation = alglm::eulerAngles(body->getTransform().orientation);
 				tf.m_WorldTransform = tf.getTransform();
 			}
 		}
@@ -361,15 +361,15 @@ void Scene::step(int32_t frames)
 
 void Scene::initScene()
 {
-	m_defaultTextures.albedo = Texture::createDefaultTexture(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_defaultTextures.normal = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_defaultTextures.roughness = Texture::createDefaultTexture(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	m_defaultTextures.metallic = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	m_defaultTextures.ao = Texture::createDefaultTexture(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	m_defaultTextures.height = Texture::createDefaultTexture(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.albedo = Texture::createDefaultTexture(alglm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_defaultTextures.normal = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.roughness = Texture::createDefaultTexture(alglm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	m_defaultTextures.metallic = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	m_defaultTextures.ao = Texture::createDefaultTexture(alglm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_defaultTextures.height = Texture::createDefaultTexture(alglm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 	m_defaultMaterial = Material::createMaterial(
-		{glm::vec3(1.0f, 1.0f, 1.0f), m_defaultTextures.albedo, false}, {m_defaultTextures.normal, false},
+		{alglm::vec3(1.0f, 1.0f, 1.0f), m_defaultTextures.albedo, false}, {m_defaultTextures.normal, false},
 		{0.5f, m_defaultTextures.roughness, false}, {0.0f, m_defaultTextures.metallic, false},
 		{1.0f, m_defaultTextures.ao, false}, {0.0f, m_defaultTextures.height, false});
 
@@ -410,7 +410,7 @@ void Scene::onPhysicsStart()
 		else
 			bdDef.m_type = EBodyType::DYNAMIC_BODY;
 		bdDef.m_position = tf.m_Position;
-		bdDef.m_orientation = glm::quat(tf.m_Rotation);
+		bdDef.m_orientation = alglm::quat(tf.m_Rotation);
 		bdDef.m_linearDamping = rb.m_Damping;
 		bdDef.m_angularDamping = rb.m_AngularDamping;
 		bdDef.m_gravityScale = 15.0f;
@@ -440,7 +440,7 @@ void Scene::onPhysicsStart()
 			float Ixx = (1.0f / 12.0f) * (h * h + d * d) * rb.m_Mass;
 			float Iyy = (1.0f / 12.0f) * (w * w + d * d) * rb.m_Mass;
 			float Izz = (1.0f / 12.0f) * (w * w + h * h) * rb.m_Mass;
-			glm::mat3 m(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 m(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			body->setMassData(rb.m_Mass, m);
 
@@ -466,7 +466,7 @@ void Scene::onPhysicsStart()
 			// set mass data(mass, inertia mass)
 			float r = spShape.m_radius;
 			float val = (2.0f / 5.0f) * rb.m_Mass * r * r;
-			glm::mat3 m(glm::vec3(val, 0.0f, 0.0f), glm::vec3(0.0f, val, 0.0f), glm::vec3(0.0f, 0.0f, val));
+			alglm::mat3 m(alglm::vec3(val, 0.0f, 0.0f), alglm::vec3(0.0f, val, 0.0f), alglm::vec3(0.0f, 0.0f, val));
 
 			body->setMassData(rb.m_Mass, m);
 
@@ -496,16 +496,16 @@ void Scene::onPhysicsStart()
 			float h = csShape.m_height;
 			float d = (3.0f * r / 8.0f);
 			float val = (2.0f / 5.0f) * mh * r * r + (h / 2.0f * d * d);
-			glm::mat3 ih(glm::vec3(val, 0.0f, 0.0f), glm::vec3(0.0f, val, 0.0f), glm::vec3(0.0f, 0.0f, val));
+			alglm::mat3 ih(alglm::vec3(val, 0.0f, 0.0f), alglm::vec3(0.0f, val, 0.0f), alglm::vec3(0.0f, 0.0f, val));
 
 			float mc = rb.m_Mass * 0.75f;
 			float Ixx = (1.0f / 12.0f) * (3.0f * r * r + h * h) * mc;
 			float Iyy = Ixx;
 			float Izz = (1.0f / 2.0f) * (r * r) * mc;
-			glm::mat3 ic(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 ic(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			float mass = mh * 2.0f + mc;
-			glm::mat3 m = ih * 2.0f + ic;
+			alglm::mat3 m = ih * 2.0f + ic;
 
 			body->setMassData(mass, m);
 
@@ -534,7 +534,7 @@ void Scene::onPhysicsStart()
 			float Ixx = (1.0f / 12.0f) * (3.0f * r * r + h * h) * rb.m_Mass;
 			float Iyy = (1.0f / 2.0f) * (r * r) * rb.m_Mass;
 			float Izz = Ixx;
-			glm::mat3 m(glm::vec3(Ixx, 0.0f, 0.0f), glm::vec3(0.0f, Iyy, 0.0f), glm::vec3(0.0f, 0.0f, Izz));
+			alglm::mat3 m(alglm::vec3(Ixx, 0.0f, 0.0f), alglm::vec3(0.0f, Iyy, 0.0f), alglm::vec3(0.0f, 0.0f, Izz));
 
 			body->setMassData(rb.m_Mass, m);
 
@@ -608,7 +608,7 @@ void Scene::insertEntityInCullTree(Entity &entity)
 	{
 		TransformComponent &tc = entity.getComponent<TransformComponent>();
 
-		CullSphere sphere(tc.getTransform() * glm::vec4(mc.cullSphere.center, 1.0f),
+		CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
 						  mc.cullSphere.radius * tc.getMaxScale());
 
 		mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
@@ -667,7 +667,7 @@ void Scene::findMoveObject()
 		float limit = transform.getMaxScale() * mesh.cullSphere.radius * 0.1f;
 		limit = limit * limit;
 
-		if (glm::length2(transform.m_Position - transform.m_LastPosition) > limit)
+		if (alglm::length2(transform.m_Position - transform.m_LastPosition) > limit)
 		{
 			transform.m_LastPosition = transform.m_Position;
 			transform.m_isMoved = true;
@@ -738,9 +738,9 @@ template <> void Scene::onComponentAdded<LightComponent>(Entity entity, LightCom
 {
 	auto &tc = entity.getComponent<TransformComponent>();
 
-	component.m_Light = std::make_shared<Light>(Light{tc.m_Position, glm::vec3(0.0f, -1.0f, 0.0f),
-													  glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, glm::cos(glm::radians(12.5f)),
-													  glm::cos(glm::radians(17.5f)), 1, 1, 0, glm::vec2(0.0f, 0.0f)});
+	component.m_Light = std::make_shared<Light>(Light{1.0f, std::cos(alglm::radians(12.5f)),
+													  std::cos(alglm::radians(17.5f)), 1, 1, 0, 0, 0, tc.m_Position,
+													  alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec3(1.0f, 1.0f, 1.0f)});
 }
 
 template <> void Scene::onComponentAdded<RigidbodyComponent>(Entity entity, RigidbodyComponent &component)

@@ -485,7 +485,7 @@ void Renderer::beginScene(Scene *scene, EditorCamera &camera)
 void Renderer::beginScene(Scene *scene, Camera &camera)
 {
 	// projMatrix = camera.getProjection();
-	// projMatrix = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	// projMatrix = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	camera.setAspectRatio(viewPortSize.x / viewPortSize.y);
 	projMatrix = camera.getProjection();
 	viewMatirx = camera.getView();
@@ -542,7 +542,7 @@ void Renderer::drawFrame(Scene *scene)
 		ImVec2 guiViewPortSize = ImGui::GetContentRegionAvail();
 		if (guiViewPortSize.x != viewPortSize.x || guiViewPortSize.y != viewPortSize.y)
 		{
-			viewPortSize = glm::vec2(guiViewPortSize.x, guiViewPortSize.y);
+			viewPortSize = alglm::vec2(guiViewPortSize.x, guiViewPortSize.y);
 			recreateViewPort();
 		}
 		ImGui::Image(reinterpret_cast<ImTextureID>(viewPortDescriptorSets[0]), ImVec2{viewPortSize.x, viewPortSize.y});
@@ -718,7 +718,7 @@ void Renderer::drawNoCamFrame()
 		ImVec2 guiViewPortSize = ImGui::GetContentRegionAvail();
 		if (guiViewPortSize.x != viewPortSize.x || guiViewPortSize.y != viewPortSize.y)
 		{
-			viewPortSize = glm::vec2(guiViewPortSize.x, guiViewPortSize.y);
+			viewPortSize = alglm::vec2(guiViewPortSize.x, guiViewPortSize.y);
 			recreateViewPort();
 		}
 		ImGui::Image(reinterpret_cast<ImTextureID>(noCamDescriptorSets[0]), ImVec2{viewPortSize.x, viewPortSize.y});
@@ -892,10 +892,10 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	drawInfo.commandBuffer = commandBuffer;
 	drawInfo.view = viewMatirx;
 	drawInfo.projection = projMatrix;
-	// drawInfo.projection = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	// drawInfo.projection = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	drawInfo.projection[1][1] *= -1;
 	for (size_t i = 0; i < MAX_BONES; ++i) // 항등행렬 초기화
-		drawInfo.finalBonesMatrices[i] = glm::mat4(1.0f);
+		drawInfo.finalBonesMatrices[i] = alglm::mat4(1.0f);
 
 	// int32_t drawNum = 0;
 	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
@@ -909,7 +909,7 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 		if (auto *sa = scene->tryGet<SkeletalAnimatorComponent>(entity)) // SA 컴포넌트 있으면 데이터 전달
 		{
 			auto *sac = (SAComponent *)sa->sac.get();
-			std::vector<glm::mat4> matrices = sac->getCurrentPose();
+			std::vector<alglm::mat4> matrices = sac->getCurrentPose();
 
 			for (size_t i = 0; i < matrices.size(); ++i)
 				drawInfo.finalBonesMatrices[i] = matrices[i];
@@ -949,43 +949,44 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	for (auto entity : lightView)
 	{
 		std::shared_ptr<Light> light = lightView.get<LightComponent>(entity).m_Light;
-		glm::vec3 lightPos = light->position;
-		glm::vec3 lightDir = glm::normalize(light->direction);
+		alglm::vec3 lightPos = light->position;
+		alglm::vec3 lightDir = alglm::normalize(light->direction);
 		float outerCutoff = light->outerCutoff;
 		lightingPassUbo.lights[i] = *light.get();
-		glm::vec3 up = (glm::abs(lightDir.y) > 0.99f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
+		alglm::vec3 up =
+			(alglm::abs(lightDir.y) > 0.99f) ? alglm::vec3(0.0f, 0.0f, 1.0f) : alglm::vec3(0.0f, 1.0f, 0.0f);
 
 		if (light->onShadowMap == 1 && index < shadowMapIndex)
 		{
 			if (light->type == 0)
 			{
 				lightingPassUbo.view[index][0] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][1] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][2] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
 				lightingPassUbo.view[index][3] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
 				lightingPassUbo.view[index][4] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
 				lightingPassUbo.view[index][5] =
-					glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
-				lightingPassUbo.proj[index] = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+					alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
+				lightingPassUbo.proj[index] = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 				// lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			else if (light->type == 1)
 			{
-				lightingPassUbo.view[index][0] = glm::lookAt(lightPos, lightPos + lightDir, up);
-				lightingPassUbo.proj[index] = glm::perspective(glm::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
+				lightingPassUbo.view[index][0] = alglm::lookAt(lightPos, lightPos + lightDir, up);
+				lightingPassUbo.proj[index] = alglm::perspective(std::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
 				lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			else if (light->type == 2)
 			{
-				lightPos = glm::vec3(0.0f) - lightDir * 10.0f;
-				lightingPassUbo.view[index][0] = glm::lookAt(lightPos, glm::vec3(0.0f), up);
+				lightPos = alglm::vec3(0.0f) - lightDir * 10.0f;
+				lightingPassUbo.view[index][0] = alglm::lookAt(lightPos, alglm::vec3(0.0f), up);
 				float orthoSize = 10.0f;
-				lightingPassUbo.proj[index] = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -10.0f, 20.0f);
+				lightingPassUbo.proj[index] = alglm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, -10.0f, 20.0f);
 				lightingPassUbo.proj[index][1][1] *= -1;
 			}
 			index++;
@@ -1079,31 +1080,31 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 	// Depth Bias 설정
 	vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
 
-	glm::vec3 lightPos = lightInfo.position;
-	glm::vec3 lightDir = glm::normalize(lightInfo.direction);
+	alglm::vec3 lightPos = lightInfo.position;
+	alglm::vec3 lightDir = alglm::normalize(lightInfo.direction);
 	float outerCutoff = lightInfo.outerCutoff;
-	glm::vec3 up = (glm::abs(lightDir.y) > 0.99f) ? glm::vec3(0.0f, 0.0f, 1.0f) : glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 lightView = glm::mat4(1.0f);
-	glm::mat4 lightProj = glm::mat4(1.0f);
+	alglm::vec3 up = (alglm::abs(lightDir.y) > 0.99f) ? alglm::vec3(0.0f, 0.0f, 1.0f) : alglm::vec3(0.0f, 1.0f, 0.0f);
+	alglm::mat4 lightView = alglm::mat4(1.0f);
+	alglm::mat4 lightProj = alglm::mat4(1.0f);
 	if (lightInfo.type == 1)
 	{ // spotlight
-		lightView = glm::lookAt(lightPos, lightPos + lightDir, up);
-		lightProj = glm::perspective(glm::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
+		lightView = alglm::lookAt(lightPos, lightPos + lightDir, up);
+		lightProj = alglm::perspective(std::acos(outerCutoff) * 2.0f, 1.0f, 0.1f, 100.0f);
 		lightProj[1][1] *= -1;
 	}
 	else if (lightInfo.type == 2)
-	{												   // directional light
-		lightPos = glm::vec3(0.0f) - lightDir * 10.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
+	{													 // directional light
+		lightPos = alglm::vec3(0.0f) - lightDir * 10.0f; // 광원을 기준으로 카메라처럼 뒤쪽으로 멀어짐
 		// View 행렬 계산
-		lightView = glm::lookAt(lightPos,		 // 광원이 가리키는 가상의 위치
-								glm::vec3(0.0f), // 광원이 비추는 중심 (월드 좌표계 원점)
-								up				 // 카메라의 상단 방향
+		lightView = alglm::lookAt(lightPos,			 // 광원이 가리키는 가상의 위치
+								  alglm::vec3(0.0f), // 광원이 비추는 중심 (월드 좌표계 원점)
+								  up				 // 카메라의 상단 방향
 		);
 		// Projection 행렬 계산 (Orthographic)
-		float orthoSize = 10.0f;					  // 광원의 영향을 받는 영역의 크기
-		lightProj = glm::ortho(-orthoSize, orthoSize, // 좌/우 클립 경계
-							   -orthoSize, orthoSize, // 아래/위 클립 경계
-							   -10.0f, 20.0f		  // 근/원 클립 경계
+		float orthoSize = 10.0f;						// 광원의 영향을 받는 영역의 크기
+		lightProj = alglm::ortho(-orthoSize, orthoSize, // 좌/우 클립 경계
+								 -orthoSize, orthoSize, // 아래/위 클립 경계
+								 -10.0f, 20.0f			// 근/원 클립 경계
 		);
 		// Vulkan 좌표계 보정
 		lightProj[1][1] *= -1;
@@ -1193,17 +1194,17 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 	// Depth Bias 설정
 	vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
 
-	glm::vec3 lightPos = lightInfo.position;
-	glm::mat4 lightProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+	alglm::vec3 lightPos = lightInfo.position;
+	alglm::mat4 lightProj = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
 	// lightProj[1][1] *= -1;
 
 	ShadowCubeMapDrawInfo drawInfo;
-	drawInfo.view[0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0));
-	drawInfo.view[3] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0));
-	drawInfo.view[4] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[5] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[0] = alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[1] = alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[2] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
+	drawInfo.view[3] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
+	drawInfo.view[4] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
+	drawInfo.view[5] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
 	drawInfo.projection = lightProj;
 	drawInfo.commandBuffer = commandBuffer;
 	drawInfo.pipelineLayout = shadowCubeMapPipelineLayout[shadowMapIndex];
@@ -1263,26 +1264,26 @@ void Renderer::recordSphericalMapCommandBuffer()
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, sphericalMapGraphicsPipeline);
 
-	auto projection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	auto projection = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	projection[1][1] *= -1;
-	std::vector<glm::mat4> views = {
+	std::vector<alglm::mat4> views = {
 		// **Right (+X) - layerIndex 0**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(1.0f, 0.0f, 0.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Left (-X) - layerIndex 1**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(-1.0f, 0.0f, 0.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Top (+Y) - layerIndex 2**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec3(0.0f, 0.0f, -1.0f)),
 
 		// **Bottom (-Y) - layerIndex 3**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec3(0.0f, 0.0f, 1.0f)),
 
 		// **Front (+Z) - layerIndex 4**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)),
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 0.0f, 1.0f), alglm::vec3(0.0f, -1.0f, 0.0f)),
 
 		// **Back (-Z) - layerIndex 5**
-		glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))};
+		alglm::lookAt(alglm::vec3(0.0f), alglm::vec3(0.0f, 0.0f, -1.0f), alglm::vec3(0.0f, -1.0f, 0.0f))};
 
 	for (size_t i = 0; i < 6; i++)
 	{
@@ -1330,10 +1331,10 @@ void Renderer::recordBackgroundCommandBuffer(VkCommandBuffer commandBuffer)
 	scissor.extent = {static_cast<uint32_t>(viewPortSize.x), static_cast<uint32_t>(viewPortSize.y)};
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
+	alglm::mat4 projection = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	projection[1][1] *= -1;
 
-	glm::mat4 view = viewMatirx;
+	alglm::mat4 view = viewMatirx;
 
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, backgroundPipelineLayout, 0, 1,
 							&backgroundDescriptorSets[currentFrame], 0, nullptr);

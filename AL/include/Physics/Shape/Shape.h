@@ -9,7 +9,7 @@ namespace ale
 {
 struct Vec3Comparator
 {
-	bool operator()(const glm::vec3 &lhs, const glm::vec3 &rhs) const
+	bool operator()(const alglm::vec3 &lhs, const alglm::vec3 &rhs) const
 	{
 		if (lhs.x != rhs.x)
 			return lhs.x < rhs.x;
@@ -50,7 +50,7 @@ class Shape
 		m_type = type;
 	}
 
-	glm::vec3 m_center;
+	alglm::vec3 m_center;
 	EType m_type;
 };
 

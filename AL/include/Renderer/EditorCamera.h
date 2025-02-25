@@ -55,7 +55,7 @@ class EditorCamera : public Camera
 	 * @return false 이벤트가 처리되지 않음.
 	 */
 	bool onMousePressed(MouseButtonPressedEvent &e);
-	
+
 	/**
 	 * @brief 마우스 버튼이 떼어졌을 때 호출됩니다.
 	 * @param e 마우스 버튼 이벤트 객체.
@@ -63,7 +63,7 @@ class EditorCamera : public Camera
 	 * @return false 이벤트가 처리되지 않음.
 	 */
 	bool onMouseReleased(MouseButtonReleasedEvent &e);
-	
+
 	/**
 	 * @brief 창 크기가 변경되었을 때 호출됩니다.
 	 * @param e 창 크기 변경 이벤트 객체.
@@ -84,7 +84,7 @@ class EditorCamera : public Camera
 	void updateView();
 
   private:
-	glm::vec2 m_prevMousePos{0.0f, 0.0f};
+	alglm::vec2 m_prevMousePos{0.0f, 0.0f};
 	bool m_CameraControl{false};
 	const float m_Speed{0.005f};
 	const float m_RotSpeed{0.8f};

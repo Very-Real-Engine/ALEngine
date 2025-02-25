@@ -6,7 +6,7 @@ namespace ale
 {
 /**
  * @class SceneCamera
- * @brief 씬(Scene) 내에서 사용되는 카메라 클래스. 
+ * @brief 씬(Scene) 내에서 사용되는 카메라 클래스.
  *        Camera 클래스를 상속하며, 향후 다양한 카메라 유형(정사영, 원근 등)으로 확장 가능.
  */
 class SceneCamera : public Camera
@@ -23,6 +23,6 @@ class SceneCamera : public Camera
 	 * @param pos 새로운 위치 벡터.
 	 * @param rot 새로운 회전 벡터.
 	 */
-	void updateSceneCamera(glm::vec3 &pos, glm::vec3 &rot);
+	void updateSceneCamera(alglm::vec3 &pos, alglm::vec3 &rot);
 };
 } // namespace ale

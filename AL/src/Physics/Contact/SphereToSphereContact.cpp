@@ -11,12 +11,12 @@ Contact *SphereToSphereContact::create(Fixture *fixtureA, Fixture *fixtureB, int
 	return new (static_cast<SphereToSphereContact *>(memory)) SphereToSphereContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 SphereToSphereContact::supportA(const ConvexInfo &sphere, glm::vec3 dir)
+alglm::vec3 SphereToSphereContact::supportA(const ConvexInfo &sphere, alglm::vec3 dir)
 {
 	return sphere.center + dir * sphere.radius;
 }
 
-glm::vec3 SphereToSphereContact::supportB(const ConvexInfo &sphere, glm::vec3 dir)
+alglm::vec3 SphereToSphereContact::supportB(const ConvexInfo &sphere, alglm::vec3 dir)
 {
 	return sphere.center + dir * sphere.radius;
 }

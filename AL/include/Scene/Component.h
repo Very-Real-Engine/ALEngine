@@ -10,6 +10,7 @@
 
 #include "Scene/entt.hpp"
 
+#include <alglm/include/alglm.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -52,31 +53,31 @@ struct TagComponent
 struct TransformComponent
 {
 	// 속성
-	glm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
-	glm::vec3 m_Rotation = {0.0f, 0.0f, 0.0f};
-	glm::vec3 m_Scale = {1.0f, 1.0f, 1.0f};
-	glm::vec3 m_LastPosition = {0.0f, 0.0f, 0.0f};
+	alglm::vec3 m_Position = {0.0f, 0.0f, 0.0f};
+	alglm::vec3 m_Rotation = {0.0f, 0.0f, 0.0f};
+	alglm::vec3 m_Scale = {1.0f, 1.0f, 1.0f};
+	alglm::vec3 m_LastPosition = {0.0f, 0.0f, 0.0f};
 
 	bool m_isMoved = false;
 
-	glm::mat4 m_WorldTransform = glm::mat4(1.0f);
+	alglm::mat4 m_WorldTransform = alglm::mat4(1.0f);
 
 	// 생성자
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent &) = default;
-	TransformComponent(const glm::vec3 &position) : m_Position(position), m_LastPosition(position)
+	TransformComponent(const alglm::vec3 &position) : m_Position(position), m_LastPosition(position)
 	{
 	}
 
 	/**
 	 * @brief 현재 변환 정보를 행렬 형태로 반환합니다.
-	 * @return glm::mat4 변환 행렬.
+	 * @return alglm::mat4 변환 행렬.
 	 */
-	glm::mat4 getTransform() const
+	alglm::mat4 getTransform() const
 	{
-		glm::mat4 rotation = glm::toMat4(glm::quat(m_Rotation));
+		alglm::mat4 rotation = alglm::toMat4(alglm::quat(m_Rotation));
 
-		return glm::translate(glm::mat4(1.0f), m_Position) * rotation * glm::scale(glm::mat4(1.0f), m_Scale);
+		return alglm::translate(alglm::mat4(1.0f), m_Position) * rotation * alglm::scale(alglm::mat4(1.0f), m_Scale);
 	}
 
 	/**
@@ -178,8 +179,8 @@ struct CameraComponent
 struct RigidbodyComponent
 {
 	// FLAG
-	glm::vec3 m_FreezePos = {1, 1, 1};
-	glm::vec3 m_FreezeRot = {1, 1, 1};
+	alglm::vec3 m_FreezePos = {1, 1, 1};
+	alglm::vec3 m_FreezeRot = {1, 1, 1};
 
 	void *body = nullptr;
 
@@ -210,8 +211,8 @@ struct RigidbodyComponent
  */
 struct BoxColliderComponent
 {
-	glm::vec3 m_Center = {0.0f, 0.0f, 0.0f};
-	glm::vec3 m_Size = {1.0f, 1.0f, 1.0f};
+	alglm::vec3 m_Center = {0.0f, 0.0f, 0.0f};
+	alglm::vec3 m_Size = {1.0f, 1.0f, 1.0f};
 	bool m_IsTrigger = false;
 
 	BoxColliderComponent() = default;
@@ -224,7 +225,7 @@ struct BoxColliderComponent
  */
 struct SphereColliderComponent
 {
-	glm::vec3 m_Center;
+	alglm::vec3 m_Center;
 	float m_Radius;
 	bool m_IsTrigger = false;
 
@@ -238,7 +239,7 @@ struct SphereColliderComponent
  */
 struct CapsuleColliderComponent
 {
-	glm::vec3 m_Center;
+	alglm::vec3 m_Center;
 	float m_Radius;
 	float m_Height;
 
@@ -254,7 +255,7 @@ struct CapsuleColliderComponent
  */
 struct CylinderColliderComponent
 {
-	glm::vec3 m_Center;
+	alglm::vec3 m_Center;
 	float m_Radius;
 	float m_Height;
 

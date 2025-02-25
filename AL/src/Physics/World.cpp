@@ -180,7 +180,7 @@ Rigidbody *World::createBody(BodyDef &bdDef)
 	return body;
 }
 
-void World::registerBodyForce(int32_t idx, const glm::vec3 &force)
+void World::registerBodyForce(int32_t idx, const alglm::vec3 &force)
 {
 	// check idx
 	Rigidbody *body = m_rigidbodies;

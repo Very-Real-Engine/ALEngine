@@ -19,10 +19,10 @@ class ShaderResourceManager;
 
 struct DrawInfo
 {
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 projection;
-	glm::mat4 finalBonesMatrices[MAX_BONES];
+	alglm::mat4 model;
+	alglm::mat4 view;
+	alglm::mat4 projection;
+	alglm::mat4 finalBonesMatrices[MAX_BONES];
 	ShaderResourceManager *shaderResourceManager;
 	VkCommandBuffer commandBuffer;
 	VkPipelineLayout pipelineLayout;
@@ -32,9 +32,9 @@ struct DrawInfo
 
 struct ShadowMapDrawInfo
 {
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 projection;
+	alglm::mat4 model;
+	alglm::mat4 view;
+	alglm::mat4 projection;
 	ShaderResourceManager *shaderResourceManager;
 	VkCommandBuffer commandBuffer;
 	VkPipelineLayout pipelineLayout;
@@ -43,9 +43,9 @@ struct ShadowMapDrawInfo
 
 struct ShadowCubeMapDrawInfo
 {
-	glm::mat4 model;
-	glm::mat4 view[6];
-	glm::mat4 projection;
+	alglm::mat4 model;
+	alglm::mat4 view[6];
+	alglm::mat4 projection;
 	ShaderResourceManager *shaderResourceManager;
 	VkCommandBuffer commandBuffer;
 	VkPipelineLayout pipelineLayout;
@@ -88,7 +88,7 @@ class Model
 	void updateMaterial(std::vector<std::shared_ptr<Material>> materials);
 	void updateAnimations(SkeletalAnimation *animation, const Timestep &timestep, uint32_t prevImage,
 						  uint32_t currentImage);
-	void setShaderData(const std::vector<glm::mat4> &shaderData);
+	void setShaderData(const std::vector<alglm::mat4> &shaderData);
 	std::shared_ptr<SkeletalAnimations> &getAnimations();
 	std::shared_ptr<Armature::Skeleton> &getSkeleton();
 	bool m_SkeletalAnimations;
@@ -137,7 +137,7 @@ class Model
 	void buildSkeletonBoneArray(const std::vector<aiBone *> &allAiBones);
 	void loadBone(aiNode *node, int parentBoneIndex);
 	void loadAnimations(const aiScene *scene);
-	glm::mat4 convertMatrix(const aiMatrix4x4 &m);
+	alglm::mat4 convertMatrix(const aiMatrix4x4 &m);
 };
 
 } // namespace ale

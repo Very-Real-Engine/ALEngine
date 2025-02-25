@@ -64,7 +64,7 @@ int32_t DynamicTree::createProxy(const AABB &aabb, void *userData)
 {
 	int32_t proxyId = allocateNode();
 
-	glm::vec3 r(0.1, 0.1, 0.1);
+	alglm::vec3 r(0.1, 0.1, 0.1);
 	m_nodes[proxyId].aabb.lowerBound = aabb.lowerBound - r;
 	m_nodes[proxyId].aabb.upperBound = aabb.upperBound + r;
 	m_nodes[proxyId].userData = userData;
@@ -82,7 +82,7 @@ void DynamicTree::destroyProxy(int32_t proxyId)
 	freeNode(proxyId);
 }
 
-bool DynamicTree::moveProxy(int32_t proxyId, const AABB &aabb, const glm::vec3 &displacement)
+bool DynamicTree::moveProxy(int32_t proxyId, const AABB &aabb, const alglm::vec3 &displacement)
 {
 	if (m_nodes[proxyId].aabb.contains(aabb))
 	{
@@ -92,11 +92,11 @@ bool DynamicTree::moveProxy(int32_t proxyId, const AABB &aabb, const glm::vec3 &
 	removeLeaf(proxyId);
 
 	AABB b = aabb;
-	glm::vec3 r(0.1f);
+	alglm::vec3 r(0.1f);
 	b.lowerBound = b.lowerBound - r;
 	b.upperBound = b.upperBound + r;
 
-	glm::vec3 d = 2.0f * displacement;
+	alglm::vec3 d = 2.0f * displacement;
 
 	if (d.x < 0.0f)
 	{

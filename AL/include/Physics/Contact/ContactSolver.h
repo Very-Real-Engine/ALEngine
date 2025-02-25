@@ -10,9 +10,9 @@ struct ContactPositionConstraint
 {
 	ManifoldPoint *points;
 	int32_t pointCount;
-	glm::vec3 worldCenterA;
-	glm::vec3 worldCenterB;
-	glm::mat3 invIA, invIB;
+	alglm::vec3 worldCenterA;
+	alglm::vec3 worldCenterB;
+	alglm::mat3 invIA, invIB;
 	int32_t indexA;
 	int32_t indexB;
 	float invMassA, invMassB;
@@ -24,9 +24,9 @@ struct ContactVelocityConstraint
 {
 	ManifoldPoint *points;
 	int32_t pointCount;
-	glm::vec3 worldCenterA;
-	glm::vec3 worldCenterB;
-	glm::mat3 invIA, invIB;
+	alglm::vec3 worldCenterA;
+	alglm::vec3 worldCenterB;
+	alglm::mat3 invIA, invIB;
 	int32_t indexA, indexB;
 	float invMassA, invMassB;
 	float friction;

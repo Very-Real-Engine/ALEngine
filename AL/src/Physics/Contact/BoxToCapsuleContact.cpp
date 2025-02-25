@@ -11,12 +11,13 @@ Contact *BoxToCapsuleContact::create(Fixture *fixtureA, Fixture *fixtureB, int32
 	return new (static_cast<BoxToCapsuleContact *>(memory)) BoxToCapsuleContact(fixtureA, fixtureB, indexA, indexB);
 }
 
-glm::vec3 BoxToCapsuleContact::supportA(const ConvexInfo &box, glm::vec3 dir)
+alglm::vec3 BoxToCapsuleContact::supportA(const ConvexInfo &box, alglm::vec3 dir)
 {
-	float dotAxes[3] = {glm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f, glm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
-						glm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
+	float dotAxes[3] = {alglm::dot(box.axes[0], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[1], dir) > 0 ? 1.0f : -1.0f,
+						alglm::dot(box.axes[2], dir) > 0 ? 1.0f : -1.0f};
 
-	glm::vec3 point = box.center;
+	alglm::vec3 point = box.center;
 	for (int32_t i = 0; i < 3; ++i)
 	{
 		point += box.axes[i] * (dotAxes[i] * box.halfSize[i]);
@@ -25,11 +26,11 @@ glm::vec3 BoxToCapsuleContact::supportA(const ConvexInfo &box, glm::vec3 dir)
 	return point;
 }
 
-glm::vec3 BoxToCapsuleContact::supportB(const ConvexInfo &capsule, glm::vec3 dir)
+alglm::vec3 BoxToCapsuleContact::supportB(const ConvexInfo &capsule, alglm::vec3 dir)
 {
-	float dotResult = glm::dot(dir, capsule.axes[0]);
+	float dotResult = alglm::dot(dir, capsule.axes[0]);
 
-	glm::vec3 move(0.0f);
+	alglm::vec3 move(0.0f);
 
 	if (dotResult > 0)
 	{
@@ -53,15 +54,15 @@ void BoxToCapsuleContact::findCollisionPoints(const ConvexInfo &box, const Conve
 		collisionInfo.normal[0] = epaInfo.normal;
 		collisionInfo.seperation[0] = epaInfo.distance;
 
-		if (glm::dot(capsule.axes[0], collisionInfo.normal[0]) < 0)
+		if (alglm::dot(capsule.axes[0], collisionInfo.normal[0]) < 0)
 		{
-			glm::vec3 hemisphereCenter = capsule.center + capsule.axes[0] * 0.5f * capsule.height;
+			alglm::vec3 hemisphereCenter = capsule.center + capsule.axes[0] * 0.5f * capsule.height;
 			collisionInfo.pointB[0] = hemisphereCenter - collisionInfo.normal[0] * capsule.radius;
 			collisionInfo.pointA[0] = collisionInfo.pointB[0] + collisionInfo.normal[0] * collisionInfo.seperation[0];
 		}
 		else
 		{
-			glm::vec3 hemisphereCenter = capsule.center - capsule.axes[0] * 0.5f * capsule.height;
+			alglm::vec3 hemisphereCenter = capsule.center - capsule.axes[0] * 0.5f * capsule.height;
 			collisionInfo.pointB[0] = hemisphereCenter - collisionInfo.normal[0] * capsule.radius;
 			collisionInfo.pointA[0] = collisionInfo.pointB[0] + collisionInfo.normal[0] * collisionInfo.seperation[0];
 		}

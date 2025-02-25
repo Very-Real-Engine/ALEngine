@@ -11,23 +11,24 @@ namespace ale
 class FrameBuffers
 {
   public:
-	static std::unique_ptr<FrameBuffers> createViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass);
+	static std::unique_ptr<FrameBuffers> createViewPortFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createImGuiFrameBuffers(SwapChain *swapChain, VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createShadowMapFrameBuffers(VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createShadowCubeMapFrameBuffers(VkRenderPass renderPass);
 	static std::unique_ptr<FrameBuffers> createSphericalMapFrameBuffers(VkRenderPass renderPass);
-	static std::unique_ptr<FrameBuffers> createBackgroundFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass);
+	static std::unique_ptr<FrameBuffers> createBackgroundFrameBuffers(alglm::vec2 viewPortSize,
+																	  VkRenderPass renderPass);
 
 	~FrameBuffers() = default;
 
 	void cleanup();
 
-	void initViewPortFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass);
+	void initViewPortFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass);
 	void initImGuiFrameBuffers(SwapChain *swapChain, VkRenderPass renderPass);
 	void initShadowMapFrameBuffers(VkRenderPass renderPass);
 	void initShadowCubeMapFrameBuffers(VkRenderPass renderPass);
 	void initSphericalMapFrameBuffers(VkRenderPass renderPass);
-	void initBackgroundFrameBuffers(glm::vec2 viewPortSize, VkRenderPass renderPass);
+	void initBackgroundFrameBuffers(alglm::vec2 viewPortSize, VkRenderPass renderPass);
 
 	VkFramebuffer &getSphericalMapFramebuffer()
 	{

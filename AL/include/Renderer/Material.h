@@ -8,7 +8,7 @@ namespace ale
 {
 struct Albedo
 {
-	glm::vec3 albedo = glm::vec3(1.0f);
+	alglm::vec3 albedo = alglm::vec3(1.0f);
 	std::shared_ptr<Texture> albedoTexture = nullptr;
 	bool flag = false;
 };

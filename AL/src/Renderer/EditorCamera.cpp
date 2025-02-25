@@ -23,7 +23,7 @@ void EditorCamera::onUpdate(Timestep ts)
 		m_cameraPos -= m_cameraFront * m_Speed * ts.getMiliSeconds().count();
 	}
 
-	auto cameraRight = glm::normalize(glm::cross(m_cameraUp, -m_cameraFront));
+	auto cameraRight = alglm::normalize(alglm::cross(m_cameraUp, -m_cameraFront));
 	if (Input::isKeyPressed(Key::A))
 	{
 		m_cameraPos -= cameraRight * m_Speed * ts.getMiliSeconds().count();
@@ -71,8 +71,8 @@ bool EditorCamera::onMouseMoved(MouseMovedEvent &e)
 {
 	if (m_CameraControl)
 	{
-		glm::vec2 pos = glm::vec2(e.getX(), e.getY());
-		glm::vec2 deltaPos = pos - m_prevMousePos;
+		alglm::vec2 pos = alglm::vec2(e.getX(), e.getY());
+		alglm::vec2 deltaPos = pos - m_prevMousePos;
 
 		// set camera rotation
 		m_CameraYaw -= deltaPos.x * m_RotSpeed;
@@ -94,10 +94,10 @@ bool EditorCamera::onMouseMoved(MouseMovedEvent &e)
 
 void EditorCamera::updateView()
 {
-	m_cameraFront = glm::rotate(glm::mat4(1.0f), glm::radians(m_CameraYaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-					glm::rotate(glm::mat4(1.0f), glm::radians(m_CameraPitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
-					glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
-	// m_View = glm::lookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
+	m_cameraFront = alglm::rotate(alglm::mat4(1.0f), alglm::radians(m_CameraYaw), alglm::vec3(0.0f, 1.0f, 0.0f)) *
+					alglm::rotate(alglm::mat4(1.0f), alglm::radians(m_CameraPitch), alglm::vec3(1.0f, 0.0f, 0.0f)) *
+					alglm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+	// m_View = alglm::lookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
 	// setViewMatrix(m_cameraPos, m_cameraFront, m_cameraUp);
 	updateViewMatrix();
 }

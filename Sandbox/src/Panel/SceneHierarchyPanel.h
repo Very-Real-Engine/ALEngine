@@ -102,7 +102,7 @@ class SceneHierarchyPanel
 	 * @param entity 업데이트할 엔티티.
 	 * @param parentWorldTransform 부모의 월드 변환 행렬.
 	 */
-	void updateTransformRecursive(Entity entity, const glm::mat4 &parentWorldTransform);
+	void updateTransformRecursive(Entity entity, const alglm::mat4 &parentWorldTransform);
 
   private:
 	std::shared_ptr<Scene> m_Context;

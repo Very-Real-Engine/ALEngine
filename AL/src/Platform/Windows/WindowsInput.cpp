@@ -20,7 +20,7 @@ bool Input::isMouseButtonPressed(const MouseCode button)
 	return state == GLFW_PRESS;
 }
 
-glm::vec2 Input::getMousePosition()
+alglm::vec2 Input::getMousePosition()
 {
 	auto *window = static_cast<GLFWwindow *>(App::get().getWindow().getNativeWindow());
 	double xpos, ypos;

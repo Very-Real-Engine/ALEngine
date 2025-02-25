@@ -79,7 +79,7 @@ void Fixture::synchronize(BroadPhase *broadPhase, const Transform &xf1, const Tr
 
 		proxy.aabb.combine(aabb1, aabb2);
 
-		glm::vec3 displacement = xf2.position - xf1.position;
+		alglm::vec3 displacement = xf2.position - xf1.position;
 		broadPhase->moveProxy(proxy.proxyId, proxy.aabb, displacement);
 	}
 }
