@@ -1,5 +1,4 @@
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#pragma once
 
 #include "Core/UUID.h"
 
@@ -16,6 +15,10 @@
 
 namespace ale
 {
+/**
+ * @struct IDComponent
+ * @brief 개체(Entity)의 고유 ID를 저장하는 컴포넌트.
+ */
 struct IDComponent
 {
 	UUID m_ID;
@@ -24,6 +27,10 @@ struct IDComponent
 	IDComponent(const IDComponent &) = default;
 };
 
+/**
+ * @struct TagComponent
+ * @brief 개체(Entity)의 태그(이름) 및 활성 상태를 저장하는 컴포넌트.
+ */
 struct TagComponent
 {
 	std::string m_Tag;
@@ -37,6 +44,10 @@ struct TagComponent
 	}
 };
 
+/**
+ * @struct TransformComponent
+ * @brief 개체의 위치, 회전, 크기 정보를 저장하는 컴포넌트.
+ */
 struct TransformComponent
 {
 	// 속성
@@ -56,6 +67,10 @@ struct TransformComponent
 	{
 	}
 
+	/**
+	 * @brief 현재 변환 정보를 행렬 형태로 반환합니다.
+	 * @return glm::mat4 변환 행렬.
+	 */
 	glm::mat4 getTransform() const
 	{
 		glm::mat4 rotation = glm::toMat4(glm::quat(m_Rotation));
@@ -63,12 +78,20 @@ struct TransformComponent
 		return glm::translate(glm::mat4(1.0f), m_Position) * rotation * glm::scale(glm::mat4(1.0f), m_Scale);
 	}
 
+	/**
+	 * @brief 크기 중 가장 큰 값을 반환합니다.
+	 * @return float 최대 크기 값.
+	 */
 	float getMaxScale()
 	{
 		return std::max(m_Scale.x, std::max(m_Scale.y, m_Scale.z));
 	}
 };
 
+/**
+ * @struct RelationshipComponent
+ * @brief 개체 간의 부모-자식 관계를 정의하는 컴포넌트.
+ */
 struct RelationshipComponent
 {
 	entt::entity parent = entt::null;
@@ -83,6 +106,10 @@ struct RelationshipComponent
 
 class RenderingComponent;
 
+/**
+ * @struct MeshRendererComponent
+ * @brief 메시 렌더링을 위한 컴포넌트.
+ */
 struct MeshRendererComponent
 {
 	std::shared_ptr<RenderingComponent> m_RenderingComponent;
@@ -100,22 +127,10 @@ struct MeshRendererComponent
 	MeshRendererComponent(const MeshRendererComponent &) = default;
 };
 
-struct ModelComponent
-{
-	std::shared_ptr<Model> m_Model;
-
-	ModelComponent() = default;
-	ModelComponent(const ModelComponent &) = default;
-};
-
-struct TextureComponent
-{
-	std::shared_ptr<Texture> m_Texture;
-
-	TextureComponent() = default;
-	TextureComponent(const TextureComponent &) = default;
-};
-
+/**
+ * @struct LightComponent
+ * @brief 빛 설정을 위한 컴포넌트.
+ */
 struct LightComponent
 {
 	// Color
@@ -126,6 +141,10 @@ struct LightComponent
 	LightComponent(const LightComponent &) = default;
 };
 
+/**
+ * @struct CameraComponent
+ * @brief 카메라 설정을 위한 컴포넌트.
+ */
 struct CameraComponent
 {
 	SceneCamera m_Camera;
@@ -137,7 +156,10 @@ struct CameraComponent
 	CameraComponent(const CameraComponent &) = default;
 };
 
-// PHYSICS
+/**
+ * @struct RigidbodyComponent
+ * @brief 물리 엔진의 리지드바디(Rigidbody) 설정을 위한 컴포넌트.
+ */
 struct RigidbodyComponent
 {
 	// FLAG
@@ -146,7 +168,10 @@ struct RigidbodyComponent
 
 	void *body = nullptr;
 
-	// body type
+	/**
+	 * @enum EBodyType
+	 * @brief 리지드바디의 유형을 정의하는 열거형.
+	 */
 	enum class EBodyType
 	{
 		Static = 0,
@@ -164,6 +189,10 @@ struct RigidbodyComponent
 	RigidbodyComponent(const RigidbodyComponent &) = default;
 };
 
+/**
+ * @struct BoxColliderComponent
+ * @brief 박스 콜라이더 설정을 위한 컴포넌트.
+ */
 struct BoxColliderComponent
 {
 	glm::vec3 m_Center = {0.0f, 0.0f, 0.0f};
@@ -174,6 +203,10 @@ struct BoxColliderComponent
 	BoxColliderComponent(const BoxColliderComponent &) = default;
 };
 
+/**
+ * @struct SphereColliderComponent
+ * @brief 구 콜라이더 설정을 위한 컴포넌트.
+ */
 struct SphereColliderComponent
 {
 	glm::vec3 m_Center;
@@ -184,6 +217,10 @@ struct SphereColliderComponent
 	SphereColliderComponent(const SphereColliderComponent &) = default;
 };
 
+/**
+ * @struct CapsuleColliderComponent
+ * @brief 캡슐 콜라이더 설정을 위한 컴포넌트.
+ */
 struct CapsuleColliderComponent
 {
 	glm::vec3 m_Center;
@@ -196,6 +233,10 @@ struct CapsuleColliderComponent
 	CapsuleColliderComponent(const CapsuleColliderComponent &) = default;
 };
 
+/**
+ * @struct CylinderColliderComponent
+ * @brief 원기둥 콜라이더 설정을 위한 컴포넌트.
+ */
 struct CylinderColliderComponent
 {
 	glm::vec3 m_Center;
@@ -208,7 +249,10 @@ struct CylinderColliderComponent
 	CylinderColliderComponent(const CylinderColliderComponent &) = default;
 };
 
-// SCRIPTS
+/**
+ * @struct ScriptComponent
+ * @brief 스크립트를 지정하는 컴포넌트.
+ */
 struct ScriptComponent
 {
 	std::string m_ClassName;
@@ -219,6 +263,10 @@ struct ScriptComponent
 
 class ScriptableEntity;
 
+/**
+ * @struct NativeScriptComponent
+ * @brief 네이티브 스크립트 컴포넌트.
+ */
 struct NativeScriptComponent
 {
 	ScriptableEntity *instance = nullptr;
@@ -226,6 +274,10 @@ struct NativeScriptComponent
 	ScriptableEntity *(*instantiateScript)();
 	void (*destroyScript)(NativeScriptComponent *);
 
+	/**
+	 * @brief 특정 스크립트 클래스를 바인딩합니다.
+	 * @tparam T 바인딩할 스크립트 클래스.
+	 */
 	template <typename T> void bind()
 	{
 		instantiateScript = []() {
@@ -241,11 +293,13 @@ template <typename... Component> struct ComponentGroup
 {
 };
 
+/**
+ * @typedef AllComponents
+ * @brief 엔티티에 포함될 수 있는 모든 컴포넌트 그룹.
+ */
 using AllComponents =
 	ComponentGroup<TransformComponent, RelationshipComponent, MeshRendererComponent, TextureComponent, CameraComponent,
 				   ScriptComponent, LightComponent, RigidbodyComponent, BoxColliderComponent, SphereColliderComponent,
 				   CapsuleColliderComponent, CylinderColliderComponent>;
 
 } // namespace ale
-
-#endif
