@@ -280,13 +280,13 @@ void Scene::onUpdateRuntime(Timestep ts)
 		// update animations
 		{
 			auto view = m_Registry.view<SkeletalAnimatorComponent>();
-			
+
 			for (auto e : view)
 			{
 				Entity entity = {e, this};
-				auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+				auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-				SAComponent* sac = sa.sac.get();
+				SAComponent *sac = sa.sac.get();
 				if (sa.m_IsPlaying)
 					sac->updateAnimation(ts * sa.m_SpeedFactor, 0);
 			}
@@ -405,7 +405,10 @@ void Scene::onPhysicsStart()
 		auto &rb = entity.getComponent<RigidbodyComponent>();
 
 		BodyDef bdDef;
-		bdDef.m_type = EBodyType::DYNAMIC_BODY;
+		if (rb.m_Type == RigidbodyComponent::EBodyType::Static)
+			bdDef.m_type = EBodyType::STATIC_BODY;
+		else
+			bdDef.m_type = EBodyType::DYNAMIC_BODY;
 		bdDef.m_position = tf.m_Position;
 		bdDef.m_orientation = glm::quat(tf.m_Rotation);
 		bdDef.m_linearDamping = rb.m_Damping;
@@ -720,14 +723,12 @@ template <> void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraC
 
 template <> void Scene::onComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent &component)
 {
-	component.type = 0;
-
 	// 이미 SAC가 존재하는 경우 새로 생긴 모델 갱신
 	if (entity.hasComponent<SkeletalAnimatorComponent>())
 	{
-		auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+		auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-		auto* sac = sa.sac.get();
+		auto *sac = sa.sac.get();
 		if (component.m_RenderingComponent != nullptr)
 			sac->setModel(component.m_RenderingComponent->getModel());
 	}
@@ -755,14 +756,22 @@ template <> void Scene::onComponentAdded<BoxColliderComponent>(Entity entity, Bo
 
 template <> void Scene::onComponentAdded<SphereColliderComponent>(Entity entity, SphereColliderComponent &component)
 {
+	auto &tc = entity.getComponent<TransformComponent>();
+
+	float maxScale = std::max({tc.m_Scale.x, tc.m_Scale.y, tc.m_Scale.z});
+	component.m_Radius = maxScale;
 }
 
 template <> void Scene::onComponentAdded<CapsuleColliderComponent>(Entity entity, CapsuleColliderComponent &component)
 {
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<CylinderColliderComponent>(Entity entity, CylinderColliderComponent &component)
 {
+	component.m_Radius = 0.5f;
+	component.m_Height = 1.0f;
 }
 
 template <> void Scene::onComponentAdded<ScriptComponent>(Entity entity, ScriptComponent &component)
@@ -776,7 +785,7 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 
 	if (entity.hasComponent<MeshRendererComponent>())
 	{
-		auto& mr = entity.getComponent<MeshRendererComponent>();
+		auto &mr = entity.getComponent<MeshRendererComponent>();
 
 		if (mr.m_RenderingComponent != nullptr)
 		{
@@ -784,7 +793,7 @@ template <> void Scene::onComponentAdded<SkeletalAnimatorComponent>(Entity entit
 		}
 	}
 }
-  
+
 void Scene::cleanup()
 {
 	// delete model
