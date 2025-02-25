@@ -884,6 +884,14 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			std::shared_ptr<AnimationStateManager> stateManager = sac->getStateManager();
 			auto& states = stateManager->getStates();
 			auto& transitions = stateManager->getTransitions();
+
+			// current transition
+			char currentTransitionName[128];
+			snprintf(currentTransitionName, 128, "%s -> %s",
+				stateManager->prevState.stateName.c_str(),
+				stateManager->currentState.stateName.c_str());
+			ImGui::Button(currentTransitionName, ImVec2(200, 30));
+			ImGui::Spacing();
 			
 			// 좌측: State 리스트
 			ImGui::BeginChild("StatesList", ImVec2(150, 150), true);
@@ -1011,6 +1019,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					component.m_IsChanged = true;
 				ImGui::Columns(1);
 			}
+
+			if (!selectedStateKey.empty() &&
+				selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
+				ImGui::Separator();
 
 			// Transition 수정창
 			if (selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
