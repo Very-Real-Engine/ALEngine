@@ -81,7 +81,7 @@ void AnimationStateManager::startTransition(const AnimationStateTransition& t)
 	prevState = currentState;
 	currentState = *getState(t.toState);
 
-	AL_INFO("[AnimationStateManager] Transition:" + prevState.stateName + "->" + currentState.stateName);
+	// AL_INFO("[AnimationStateManager] Transition:" + prevState.stateName + "->" + currentState.stateName);
 }
 
 void AnimationStateManager::finishTransition()
@@ -92,7 +92,7 @@ void AnimationStateManager::finishTransition()
 	transitionTime = 0.0f;
 	transitionDuration = 0.0f;
 
-	AL_INFO("[AnimationStateManager] Transition Finished:" + prevState.stateName + "->" + currentState.stateName);
+	// AL_INFO("[AnimationStateManager] Transition Finished:" + prevState.stateName + "->" + currentState.stateName);
 }
 
 AnimationState* AnimationStateManager::getState(const std::string& stateName)
