@@ -1404,6 +1404,20 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 							scriptInstance->setFieldValue(name, data);
 						}
 					}
+					if (field.m_Type == EScriptFieldType::STRING)
+					{
+						char buffer[128];
+						memset(buffer, 0, sizeof(buffer));
+						MonoString* monoStr = (MonoString*)scriptInstance->getFieldValue<MonoString*>(name);
+						if (monoStr)
+						{
+							strncpy_s(buffer, sizeof(buffer), utils::monoStringToString2(monoStr).c_str(), sizeof(buffer));
+							if (ImGui::InputText(name.c_str(), buffer, sizeof(buffer)))
+							{
+								scriptInstance->setFieldValue(name, utils::stringToMonoString(std::string(buffer)));
+							}
+						}
+					}
 				}
 			}
 		}

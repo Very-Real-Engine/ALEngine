@@ -22,7 +22,7 @@ static std::unordered_map<std::string, EScriptFieldType> s_ScriptFieldTypeMap = 
 	{"System.Int16", EScriptFieldType::SHORT},		 {"System.Int32", EScriptFieldType::INT},
 	{"System.Int64", EScriptFieldType::LONG},		 {"System.Byte", EScriptFieldType::BYTE},
 	{"System.UInt16", EScriptFieldType::USHORT},	 {"System.UInt32", EScriptFieldType::UINT},
-	{"System.UInt64", EScriptFieldType::ULONG},
+	{"System.UInt64", EScriptFieldType::ULONG},		 {"System.String", EScriptFieldType::STRING},
 
 	{"ALEngine.Vector2", EScriptFieldType::VECTOR2}, {"ALEngine.Vector3", EScriptFieldType::VECTOR3},
 	{"ALEngine.Vector4", EScriptFieldType::VECTOR4},
@@ -70,6 +70,20 @@ static MonoAssembly *loadMonoAssembly(const std::filesystem::path &assemblyPath,
 	mono_image_close(image);
 
 	return assembly;
+}
+
+std::string monoStringToString2(MonoString *string)
+{
+	char *cStr = mono_string_to_utf8(string);
+	std::string str(cStr);
+	mono_free(cStr);
+	return str;
+}
+
+MonoString* stringToMonoString(std::string& string)
+{
+	MonoDomain* domain = mono_domain_get();
+	return mono_string_new(domain, string.c_str());
 }
 
 // Assembly에 대한 정보를 출력하는 함수. Namespace, Function name등을 알 수 있음.

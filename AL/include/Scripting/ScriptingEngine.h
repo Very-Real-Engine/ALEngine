@@ -45,7 +45,8 @@ enum class EScriptFieldType
 	VECTOR2,
 	VECTOR3,
 	VECTOR4,
-	ENTITY
+	ENTITY,
+	STRING
 };
 
 struct ScriptField
@@ -211,6 +212,9 @@ class ScriptingEngine
 namespace utils
 {
 
+std::string monoStringToString2(MonoString *string);
+MonoString* stringToMonoString(std::string& string);
+
 inline const char *scriptFieldTypeToString(EScriptFieldType fieldType)
 {
 	switch (fieldType)
@@ -249,6 +253,8 @@ inline const char *scriptFieldTypeToString(EScriptFieldType fieldType)
 		return "Vector4";
 	case EScriptFieldType::ENTITY:
 		return "Entity";
+	case EScriptFieldType::STRING:
+		return "String";
 	}
 	return "None";
 }
@@ -289,9 +295,12 @@ inline EScriptFieldType scriptFieldTypeFromString(std::string_view fieldType)
 		return EScriptFieldType::VECTOR4;
 	if (fieldType == "Entity")
 		return EScriptFieldType::ENTITY;
+	if (fieldType == "String")
+		return EScriptFieldType::STRING;
 
 	return EScriptFieldType::NONE;
 }
+
 } // namespace utils
 } // namespace ale
 
