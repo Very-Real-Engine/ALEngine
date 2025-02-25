@@ -214,6 +214,9 @@ struct BoxColliderComponent
 	glm::vec3 m_Size = {1.0f, 1.0f, 1.0f};
 	bool m_IsTrigger = false;
 
+	float m_Friction = 0.7f;
+	float m_Restitution = 0.4f;
+
 	BoxColliderComponent() = default;
 	BoxColliderComponent(const BoxColliderComponent &) = default;
 };
@@ -227,6 +230,9 @@ struct SphereColliderComponent
 	glm::vec3 m_Center;
 	float m_Radius;
 	bool m_IsTrigger = false;
+
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.8f;
 
 	SphereColliderComponent() = default;
 	SphereColliderComponent(const SphereColliderComponent &) = default;
@@ -244,6 +250,9 @@ struct CapsuleColliderComponent
 
 	bool m_IsTrigger = false;
 
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.4f;
+
 	CapsuleColliderComponent() = default;
 	CapsuleColliderComponent(const CapsuleColliderComponent &) = default;
 };
@@ -259,6 +268,9 @@ struct CylinderColliderComponent
 	float m_Height;
 
 	bool m_IsTrigger = false;
+
+	float m_Friction = 0.4f;
+	float m_Restitution = 0.4f;
 
 	CylinderColliderComponent() = default;
 	CylinderColliderComponent(const CylinderColliderComponent &) = default;
