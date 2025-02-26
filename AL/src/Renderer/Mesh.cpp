@@ -133,60 +133,68 @@ std::shared_ptr<Mesh> Mesh::createCapsule()
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
+
 	uint32_t halfLatiSegmentCount = 8;
 	uint32_t latiSegmentCount = halfLatiSegmentCount * 2;
 	uint32_t longiSegmentCount = 20;
 	float radius = 0.5f;
 
+	uint32_t bottomRows = halfLatiSegmentCount + 1;
+	uint32_t topRows = latiSegmentCount - halfLatiSegmentCount;
+	uint32_t totalRows = bottomRows + topRows;
+
 	uint32_t circleVertCount = longiSegmentCount + 1;
-	vertices.resize((halfLatiSegmentCount + 1) * circleVertCount * 2);
+	vertices.resize(totalRows * circleVertCount);
 
-	alglm::vec3 moveVector(0.0f, -radius, 0.0f);
-	for (uint32_t i = 0; i <= halfLatiSegmentCount; i++)
+	alglm::vec3 moveVectorBottom(0.0f, -radius, 0.0f);
+	for (uint32_t i = 0; i < bottomRows; i++)
 	{
 		float v = (float)i / (float)latiSegmentCount;
 		float phi = (v - 0.5f) * alglm::pi<float>();
-		auto cosPhi = cosf(phi);
-		auto sinPhi = sinf(phi);
-		for (uint32_t j = 0; j <= longiSegmentCount; j++)
+		float cosPhi = cosf(phi);
+		float sinPhi = sinf(phi);
+
+		for (uint32_t j = 0; j < circleVertCount; j++)
 		{
 			float u = (float)j / (float)longiSegmentCount;
 			float theta = u * alglm::pi<float>() * 2.0f;
-			auto cosTheta = cosf(theta);
-			auto sinTheta = sinf(theta);
-			auto point = alglm::vec3(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
-
-			vertices[i * circleVertCount + j] = Vertex{point * radius + moveVector, point, alglm::vec2(u, v)};
+			float cosTheta = cosf(theta);
+			float sinTheta = sinf(theta);
+			alglm::vec3 point(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
+			uint32_t index = i * circleVertCount + j;
+			vertices[index] = Vertex{point * radius + moveVectorBottom, point, alglm::vec2(u, v)};
 		}
 	}
 
-	moveVector = -moveVector;
-	for (uint32_t i = halfLatiSegmentCount; i <= latiSegmentCount; i++)
+	alglm::vec3 moveVectorTop(0.0f, radius, 0.0f);
+	for (uint32_t i = halfLatiSegmentCount + 1; i <= latiSegmentCount; i++)
 	{
 		float v = (float)i / (float)latiSegmentCount;
 		float phi = (v - 0.5f) * alglm::pi<float>();
-		auto cosPhi = cosf(phi);
-		auto sinPhi = sinf(phi);
-		for (uint32_t j = 0; j <= longiSegmentCount; j++)
+		float cosPhi = cosf(phi);
+		float sinPhi = sinf(phi);
+
+		uint32_t row = i - halfLatiSegmentCount;
+		for (uint32_t j = 0; j < circleVertCount; j++)
 		{
 			float u = (float)j / (float)longiSegmentCount;
 			float theta = u * alglm::pi<float>() * 2.0f;
-			auto cosTheta = cosf(theta);
-			auto sinTheta = sinf(theta);
-			auto point = alglm::vec3(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
-
-			vertices[(i + 1) * circleVertCount + j] = Vertex{point * radius + moveVector, point, alglm::vec2(u, v)};
+			float cosTheta = cosf(theta);
+			float sinTheta = sinf(theta);
+			alglm::vec3 point(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
+			uint32_t index = (bottomRows + row - 1) * circleVertCount + j;
+			vertices[index] = Vertex{point * radius + moveVectorTop, point, alglm::vec2(u, v)};
 		}
 	}
 
-	indices.resize((latiSegmentCount + 1) * longiSegmentCount * 6);
-	for (uint32_t i = 0; i <= latiSegmentCount; i++)
+	indices.resize((totalRows - 1) * longiSegmentCount * 6);
+	for (uint32_t i = 0; i < totalRows - 1; i++)
 	{
 		for (uint32_t j = 0; j < longiSegmentCount; j++)
 		{
 			uint32_t vertexOffset = i * circleVertCount + j;
 			uint32_t indexOffset = (i * longiSegmentCount + j) * 6;
-			indices[indexOffset] = vertexOffset;
+			indices[indexOffset + 0] = vertexOffset;
 			indices[indexOffset + 1] = vertexOffset + 1;
 			indices[indexOffset + 2] = vertexOffset + 1 + circleVertCount;
 			indices[indexOffset + 3] = vertexOffset;
@@ -201,18 +209,17 @@ std::shared_ptr<Mesh> Mesh::createCapsule()
 std::shared_ptr<Mesh> Mesh::createCylinder()
 {
 	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
-	int32_t segments = 20.0f;
+	int32_t segments = 20; // 원주를 몇 등분할지
 	float halfHeight = 0.5f;
 	float radius = 0.5f;
-
 	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 
-	// Top cap center
+	uint32_t topCenterIndex = vertices.size();
 	alglm::vec3 topCenter(0.0f, halfHeight, 0.0f);
 	vertices.push_back({topCenter, alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// Top cap vertices
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
@@ -221,11 +228,17 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		vertices.push_back({position, alglm::vec3(0.0f, 1.0f, 0.0f), texCoord});
 	}
 
-	// Bottom cap center
+	for (int32_t i = 0; i < segments; ++i)
+	{
+		indices.push_back(topCenterIndex);
+		indices.push_back(topCenterIndex + 1 + i);
+		indices.push_back(topCenterIndex + 1 + i + 1);
+	}
+
+	uint32_t bottomCenterIndex = vertices.size();
 	alglm::vec3 bottomCenter(0.0f, -halfHeight, 0.0f);
 	vertices.push_back({bottomCenter, alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// Bottom cap vertices
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
@@ -234,43 +247,50 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		vertices.push_back({position, alglm::vec3(0.0f, -1.0f, 0.0f), texCoord});
 	}
 
-	std::vector<uint32_t> indices;
-
-	// Top cap indices
-	uint32_t topCenterIndex = 0;
-	for (int32_t i = 1; i <= segments; ++i)
-	{
-		indices.push_back(topCenterIndex);
-		indices.push_back(i + 1);
-		indices.push_back(i);
-	}
-
-	// Bottom cap indices
-	uint32_t bottomCenterIndex = segments + 2;
-	for (int32_t i = 1; i <= segments; ++i)
+	for (int32_t i = 0; i < segments; ++i)
 	{
 		indices.push_back(bottomCenterIndex);
-		indices.push_back(bottomCenterIndex + i);
-		indices.push_back(bottomCenterIndex + i + 1);
+		indices.push_back(bottomCenterIndex + 1 + i + 1);
+		indices.push_back(bottomCenterIndex + 1 + i);
 	}
 
-	// Side indices
-	for (int32_t i = 1; i <= segments; ++i)
+	uint32_t sideTopStart = vertices.size();
+	for (int32_t i = 0; i <= segments; ++i)
 	{
-		uint32_t top1 = topCenterIndex + i;
-		uint32_t top2 = topCenterIndex + i + 1;
-		uint32_t bottom1 = bottomCenterIndex + i;
-		uint32_t bottom2 = bottomCenterIndex + i + 1;
+		float theta = i * angleStep;
+		float x = radius * cos(theta);
+		float z = radius * sin(theta);
+		alglm::vec3 position(x, halfHeight, z);
+		alglm::vec3 normal(cos(theta), 0.0f, sin(theta));
+		alglm::vec2 texCoord(static_cast<float>(i) / segments, 1.0f);
+		vertices.push_back({position, normal, texCoord});
+	}
+	uint32_t sideBottomStart = vertices.size();
+	for (int32_t i = 0; i <= segments; ++i)
+	{
+		float theta = i * angleStep;
+		float x = radius * cos(theta);
+		float z = radius * sin(theta);
+		alglm::vec3 position(x, -halfHeight, z);
+		alglm::vec3 normal(cos(theta), 0.0f, sin(theta));
+		alglm::vec2 texCoord(static_cast<float>(i) / segments, 0.0f);
+		vertices.push_back({position, normal, texCoord});
+	}
 
-		// First triangle
-		indices.push_back(top1);
-		indices.push_back(bottom2);
-		indices.push_back(bottom1);
+	for (int32_t i = 0; i < segments; ++i)
+	{
+		uint32_t currentTop = sideTopStart + i;
+		uint32_t nextTop = sideTopStart + i + 1;
+		uint32_t currentBottom = sideBottomStart + i;
+		uint32_t nextBottom = sideBottomStart + i + 1;
 
-		// Second triangle
-		indices.push_back(bottom2);
-		indices.push_back(top1);
-		indices.push_back(top2);
+		indices.push_back(currentTop);
+		indices.push_back(currentBottom);
+		indices.push_back(nextTop);
+
+		indices.push_back(nextTop);
+		indices.push_back(currentBottom);
+		indices.push_back(nextBottom);
 	}
 
 	return createMesh(vertices, indices);

@@ -201,6 +201,7 @@ struct RigidbodyComponent
 	float m_Damping = 0.001f;
 	float m_AngularDamping = 0.001f;
 	bool m_UseGravity = true;
+	int32_t m_TouchNum = 0;
 
 	RigidbodyComponent() = default;
 	RigidbodyComponent(const RigidbodyComponent &) = default;

@@ -52,8 +52,8 @@ class StackAllocator
 	void freeStack();
 
   private:
-	char m_data[STACK_SIZE]; /**< 스택 메모리 영역 */
-	int32_t m_index;		 /**< 현재 스택 인덱스 */
+	alignas(16) char m_data[STACK_SIZE];
+	int32_t m_index;
 
 	StackEntry m_entries[MAX_STACK_ENTRY_SIZE]; /**< 스택 할당 항목 목록 */
 	int32_t m_entryCount;						/**< 현재 스택 항목 개수 */

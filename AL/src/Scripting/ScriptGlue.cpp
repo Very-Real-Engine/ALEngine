@@ -218,6 +218,16 @@ static void ScriptComponent_deactivate(UUID entityID)
 	tc.m_selfActive = false;
 }
 
+static bool BoxCollider_IsTriggered(UUID entityID, MonoString* targetEntityName)
+{
+	Scene* scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto& bc = entity.getComponent<BoxColliderComponent>();
+	//*targetEntityName
+	return bc.m_IsTrigger;
+}
+
 // Component 별로 HasComponentFunction handle 등록.
 template <typename... Component> static void registerComponent()
 {

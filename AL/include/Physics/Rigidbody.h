@@ -295,6 +295,7 @@ class Rigidbody
 
 	/** @brief Rigidbody가 깨어 있는지 여부를 반환합니다. */
 	bool isAwake();
+	int32_t getTouchNum() const;
 
 	Rigidbody *next;
 	Rigidbody *prev;

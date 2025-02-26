@@ -30,7 +30,7 @@ BlockAllocator::BlockAllocator()
 {
 	m_chunkSpace = CHUNK_ARRAY_INCREMENT;
 	m_chunkCount = 0;
-	m_chunks = (Chunk *)malloc(m_chunkSpace * sizeof(Chunk));
+	m_chunks = (Chunk *)_aligned_malloc(m_chunkSpace * sizeof(Chunk), 16);
 
 	memset(m_chunks, 0, m_chunkSpace * sizeof(Chunk));
 	memset(m_availableBlocks, 0, sizeof(m_availableBlocks));
@@ -104,14 +104,14 @@ void *BlockAllocator::allocateBlock(int32_t size)
 			// 청크가 꽉찬 경우 크기 증가
 			Chunk *oldChunks = m_chunks;
 			m_chunkSpace += CHUNK_ARRAY_INCREMENT;
-			m_chunks = (Chunk *)malloc(m_chunkSpace * sizeof(Chunk));
+			m_chunks = (Chunk *)_aligned_malloc(m_chunkSpace * sizeof(Chunk), 16);
 			memcpy(m_chunks, oldChunks, m_chunkCount * sizeof(Chunk));
 			free(oldChunks);
 		}
 
 		// 새로운 청크 생성
 		Chunk *chunk = m_chunks + m_chunkCount;
-		chunk->blocks = (Block *)malloc(CHUNK_SIZE);
+		chunk->blocks = (Block *)_aligned_malloc(CHUNK_SIZE, 16);
 
 		// 청크 내부 블록들 생성
 		int32_t blockSize = s_blockSizes[index];

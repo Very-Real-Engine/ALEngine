@@ -71,4 +71,12 @@ namespace ALEngine
             InternalCalls.ScriptComponent_deactivate(Entity.ID);
         }
     }
+
+    public class BoxCollider : Component
+    {
+        public bool isTriggered(out string targetEntityName)
+        {
+            return InternalCalls.BoxCollider_IsTriggered(Entity.ID, out targetEntityName);
+        }
+    }
 }

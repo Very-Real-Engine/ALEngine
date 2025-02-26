@@ -64,11 +64,11 @@ class Instrumentor
 	Instrumentor(Instrumentor &&) = delete;
 
 	/**
-     * @brief 새로운 프로파일링 세션을 시작합니다.
-     *
-     * @param name 세션 이름
-     * @param filepath 결과를 저장할 파일 경로 (기본값: "results.json")
-     */
+	 * @brief 새로운 프로파일링 세션을 시작합니다.
+	 *
+	 * @param name 세션 이름
+	 * @param filepath 결과를 저장할 파일 경로 (기본값: "results.json")
+	 */
 	void beginSession(const std::string &name, const std::string &filepath = "results.json")
 	{
 		std::lock_guard lock(m_Mutex);
@@ -104,19 +104,19 @@ class Instrumentor
 	}
 
 	/**
-     * @brief 현재 진행 중인 프로파일링 세션을 종료합니다.
-     */
-	void EndSession()
+	 * @brief 현재 진행 중인 프로파일링 세션을 종료합니다.
+	 */
+	void endSession()
 	{
 		std::lock_guard lock(m_Mutex);
 		internalEndSession();
 	}
 
 	/**
-     * @brief 프로파일링 데이터를 기록합니다.
-     *
-     * @param result 프로파일링 결과 (`ProfileResult`)
-     */
+	 * @brief 프로파일링 데이터를 기록합니다.
+	 *
+	 * @param result 프로파일링 결과 (`ProfileResult`)
+	 */
 	void writeProfile(const ProfileResult &result)
 	{
 		std::stringstream json;
@@ -141,10 +141,10 @@ class Instrumentor
 	}
 
 	/**
-     * @brief 싱글톤 인스턴스를 반환합니다.
-     *
-     * @return `Instrumentor`의 전역 인스턴스
-     */
+	 * @brief 싱글톤 인스턴스를 반환합니다.
+	 *
+	 * @return `Instrumentor`의 전역 인스턴스
+	 */
 	static Instrumentor &get()
 	{
 		static Instrumentor instance;
@@ -158,12 +158,12 @@ class Instrumentor
 
 	~Instrumentor()
 	{
-		EndSession();
+		endSession();
 	}
 
 	/**
-     * @brief JSON 헤더를 작성합니다.
-     */
+	 * @brief JSON 헤더를 작성합니다.
+	 */
 	void writeHeader()
 	{
 		m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
@@ -171,8 +171,8 @@ class Instrumentor
 	}
 
 	/**
-     * @brief JSON 푸터를 작성합니다.
-     */
+	 * @brief JSON 푸터를 작성합니다.
+	 */
 	void writeFooter()
 	{
 		m_OutputStream << "]}";
@@ -180,8 +180,8 @@ class Instrumentor
 	}
 
 	/**
-     * @brief 내부적으로 세션을 종료하는 함수 (락을 이미 보유한 상태에서 호출해야 함)
-     */
+	 * @brief 내부적으로 세션을 종료하는 함수 (락을 이미 보유한 상태에서 호출해야 함)
+	 */
 	void internalEndSession()
 	{
 		if (m_CurrentSession)
@@ -209,18 +209,18 @@ class InstrumentationTimer
 {
   public:
 	/**
-     * @brief 프로파일링 타이머를 생성합니다.
-     *
-     * @param name 프로파일링할 코드 블록의 이름
-     */
+	 * @brief 프로파일링 타이머를 생성합니다.
+	 *
+	 * @param name 프로파일링할 코드 블록의 이름
+	 */
 	InstrumentationTimer(const char *name) : m_Name(name), m_Stopped(false)
 	{
 		m_StartTimepoint = std::chrono::steady_clock::now();
 	}
 
 	/**
-     * @brief 소멸자에서 자동으로 프로파일링 데이터를 기록합니다.
-     */
+	 * @brief 소멸자에서 자동으로 프로파일링 데이터를 기록합니다.
+	 */
 	~InstrumentationTimer()
 	{
 		if (!m_Stopped)
@@ -228,8 +228,8 @@ class InstrumentationTimer
 	}
 
 	/**
-     * @brief 프로파일링을 종료하고 실행 시간을 기록합니다.
-     */
+	 * @brief 프로파일링을 종료하고 실행 시간을 기록합니다.
+	 */
 	void stop()
 	{
 		auto endTimepoint = std::chrono::steady_clock::now();
@@ -300,8 +300,27 @@ template <size_t N, size_t K> constexpr auto cleanupOutputString(const char (&ex
  * @{
  */
 #if AL_PROFILE
-#define AL_PROFILE_BEGIN_SESSION(name, filepath) ::ale::Instrumentor().get().beginSession(name, filepath)
-#define AL_PROFILE_END_SESSION() ::ale::Instrumentor().get().endSession()
+#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) ||      \
+	defined(__ghs__)
+#define HZ_FUNC_SIG __PRETTY_FUNCTION__
+#elif defined(__DMC__) && (__DMC__ >= 0x810)
+#define HZ_FUNC_SIG __PRETTY_FUNCTION__
+#elif (defined(__FUNCSIG__) || (_MSC_VER))
+#define HZ_FUNC_SIG __FUNCSIG__
+#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+#define HZ_FUNC_SIG __FUNCTION__
+#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+#define HZ_FUNC_SIG __FUNC__
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+#define HZ_FUNC_SIG __func__
+#elif defined(__cplusplus) && (__cplusplus >= 201103)
+#define HZ_FUNC_SIG __func__
+#else
+#define HZ_FUNC_SIG "HZ_FUNC_SIG unknown!"
+#endif
+
+#define AL_PROFILE_BEGIN_SESSION(name, filepath) ::ale::Instrumentor::get().beginSession(name, filepath)
+#define AL_PROFILE_END_SESSION() ::ale::Instrumentor::get().endSession()
 #define AL_PROFILE_SCOPE_LINE2(name, line)                                                                             \
 	constexpr auto fixedName##line = ::ale::InstrumentorUtils::cleanupOutputString(name, "__cdecl ");                  \
 	::ale::InstrumentationTimer timer##line(fixedName##line.Data)

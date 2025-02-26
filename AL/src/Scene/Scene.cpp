@@ -350,6 +350,23 @@ void Scene::onUpdateRuntime(Timestep ts)
 				tf.m_Position = body->getTransform().position;
 				tf.m_Rotation = alglm::eulerAngles(body->getTransform().orientation);
 				tf.m_WorldTransform = tf.getTransform();
+
+				if (entity.hasComponent<BoxColliderComponent>())
+				{
+					rb.m_TouchNum = body->getTouchNum();
+				}
+				else if (entity.hasComponent<SphereColliderComponent>())
+				{
+					rb.m_TouchNum = body->getTouchNum();
+				}
+				else if (entity.hasComponent<CapsuleColliderComponent>())
+				{
+					rb.m_TouchNum = body->getTouchNum();
+				}
+				else if (entity.hasComponent<CylinderColliderComponent>())
+				{
+					rb.m_TouchNum = body->getTouchNum();
+				}
 			}
 		}
 

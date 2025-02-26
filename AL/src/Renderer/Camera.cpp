@@ -140,21 +140,17 @@ const Frustum &Camera::getFrustum()
 	alglm::vec3 nearXscale(0.0f);
 	alglm::vec3 nearYscale(0.0f);
 
-	nearPoint[0] = alglm::vec3(0.0f, 0.0f, -1.0f) * m_near;
-	farPoint[0] = alglm::vec3(0.0f, 0.0f, -1.0f) * m_far;
+	float frustumNear = m_near * 0.9f;
+	float frustumFar = m_far * 1.1f;
+	float fov = std::min(m_fov * 1.1f, 6.28f);
 
-	// AL_CORE_INFO("near: {}", m_near);
-	// AL_CORE_INFO("far: {}", m_far);
-	// AL_CORE_INFO("fov: {}", m_fov);
-	// AL_CORE_INFO("aspect: {}", m_aspect);
-	// AL_CORE_INFO("cameraPos: {}, {}, {}", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z);
-	// AL_CORE_INFO("cameraFront: {}, {}, {}", m_cameraFront.x, m_cameraFront.y, m_cameraFront.z);
-	// AL_CORE_INFO("cameraUp: {}, {}, {}", m_cameraUp.x, m_cameraUp.y, m_cameraUp.z);
+	nearPoint[0] = alglm::vec3(0.0f, 0.0f, -1.0f) * frustumNear;
+	farPoint[0] = alglm::vec3(0.0f, 0.0f, -1.0f) * frustumFar;
 
-	farYscale.y = m_far * tan(m_fov * 0.5f);
+	farYscale.y = frustumFar * tan(fov * 0.5f);
 	farXscale.x = m_aspect * farYscale.y;
 
-	nearYscale.y = m_near * tan(m_fov * 0.5f);
+	nearYscale.y = frustumNear * tan(fov * 0.5f);
 	nearXscale.x = m_aspect * nearYscale.y;
 
 	farPoint[1] = toWorldMatrix * alglm::vec4((farPoint[0] + farYscale - farXscale), 1.0f);
@@ -162,24 +158,10 @@ const Frustum &Camera::getFrustum()
 	farPoint[3] = toWorldMatrix * alglm::vec4((farPoint[0] - farYscale + farXscale), 1.0f);
 	farPoint[4] = toWorldMatrix * alglm::vec4((farPoint[0] + farYscale + farXscale), 1.0f);
 
-	// AL_CORE_INFO("\n\n\nfar!!");
-	// for (int i = 1; i < 5; i++)
-	// {
-	// 	AL_CORE_INFO("farPoint[{}]", i);
-	// 	AL_CORE_INFO("{}, {}, {}", farPoint[i].x, farPoint[i].y, farPoint[i].z);
-	// }
-
 	nearPoint[1] = toWorldMatrix * alglm::vec4((nearPoint[0] + nearYscale - nearXscale), 1.0f);
 	nearPoint[2] = toWorldMatrix * alglm::vec4((nearPoint[0] - nearYscale - nearXscale), 1.0f);
 	nearPoint[3] = toWorldMatrix * alglm::vec4((nearPoint[0] - nearYscale + nearXscale), 1.0f);
 	nearPoint[4] = toWorldMatrix * alglm::vec4((nearPoint[0] + nearYscale + nearXscale), 1.0f);
-
-	// AL_CORE_INFO("\n\n\nnear!!");
-	// for (int i = 1; i < 5; i++)
-	// {
-	// 	AL_CORE_INFO("nearPoint[{}]", i);
-	// 	AL_CORE_INFO("{}, {}, {}", nearPoint[i].x, nearPoint[i].y, nearPoint[i].z);
-	// }
 
 	m_frustum.plane[0] = FrustumPlane(nearPoint[1], nearPoint[2], nearPoint[3]);
 	m_frustum.plane[1] = FrustumPlane(farPoint[4], farPoint[3], farPoint[2]);
@@ -187,15 +169,6 @@ const Frustum &Camera::getFrustum()
 	m_frustum.plane[3] = FrustumPlane(nearPoint[4], nearPoint[3], farPoint[3]);
 	m_frustum.plane[4] = FrustumPlane(farPoint[4], farPoint[1], nearPoint[1]);
 	m_frustum.plane[5] = FrustumPlane(farPoint[2], farPoint[3], nearPoint[3]);
-
-	// AL_CORE_INFO("\n\n\nplane!!");
-	// for (int i = 0; i < 6; i++)
-	// {
-	// 	AL_CORE_INFO("plane[{}]", i);
-	// 	AL_CORE_INFO("normal : {}, {}, {}", m_frustum.plane[i].normal.x, m_frustum.plane[i].normal.y,
-	// 				 m_frustum.plane[i].normal.z);
-	// 	AL_CORE_INFO("distance: {}", m_frustum.plane[i].distance);
-	// }
 
 	return m_frustum;
 }
