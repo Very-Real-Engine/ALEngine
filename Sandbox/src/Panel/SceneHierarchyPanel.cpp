@@ -550,8 +550,7 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction uiF
 		if (!std::is_same<T, TransformComponent>::value)
 		{
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-			UUID uuid;
-			std::string label = "+##" + std::to_string((uint64_t)uuid);
+			std::string label = "+##" + std::to_string(typeid(T).hash_code());
 			if (ImGui::Button(label.c_str(), ImVec2{lineHeight, lineHeight}))
 			{
 				ImGui::OpenPopup("ComponentSettings");
@@ -711,11 +710,11 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			ImGui::Text("Animator needs MeshRenderComponent");
 			return;
 		}
-		auto& mr = entity.getComponent<MeshRendererComponent>();
+		auto &mr = entity.getComponent<MeshRendererComponent>();
 		if (!mr.m_RenderingComponent)
 		{
 			ImGui::Text("Animator needs Model on MeshRenderComponent");
-			return ;
+			return;
 		}
 
 		SAComponent *sac = (SAComponent *)component.sac.get();
@@ -892,17 +891,16 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		if (entity.hasComponent<ScriptComponent>())
 		{
 			std::shared_ptr<AnimationStateManager> stateManager = sac->getStateManager();
-			auto& states = stateManager->getStates();
-			auto& transitions = stateManager->getTransitions();
+			auto &states = stateManager->getStates();
+			auto &transitions = stateManager->getTransitions();
 
 			// current transition
 			char currentTransitionName[128];
-			snprintf(currentTransitionName, 128, "%s -> %s",
-				stateManager->prevState.stateName.c_str(),
-				stateManager->currentState.stateName.c_str());
+			snprintf(currentTransitionName, 128, "%s -> %s", stateManager->prevState.stateName.c_str(),
+					 stateManager->currentState.stateName.c_str());
 			ImGui::Button(currentTransitionName, ImVec2(200, 30));
 			ImGui::Spacing();
-			
+
 			// 좌측: State 리스트
 			ImGui::BeginChild("StatesList", ImVec2(150, 150), true);
 			static std::string selectedStateKey;
@@ -1030,8 +1028,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 				ImGui::Columns(1);
 			}
 
-			if (!selectedStateKey.empty() &&
-				selectedTransitionIndex >= 0 && selectedTransitionIndex < transitions.size())
+			if (!selectedStateKey.empty() && selectedTransitionIndex >= 0 &&
+				selectedTransitionIndex < transitions.size())
 				ImGui::Separator();
 
 			// Transition 수정창
@@ -1411,10 +1409,11 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 					{
 						char buffer[128];
 						memset(buffer, 0, sizeof(buffer));
-						MonoString* monoStr = (MonoString*)scriptInstance->getFieldValue<MonoString*>(name);
+						MonoString *monoStr = (MonoString *)scriptInstance->getFieldValue<MonoString *>(name);
 						if (monoStr)
 						{
-							strncpy_s(buffer, sizeof(buffer), utils::monoStringToString2(monoStr).c_str(), sizeof(buffer));
+							strncpy_s(buffer, sizeof(buffer), utils::monoStringToString2(monoStr).c_str(),
+									  sizeof(buffer));
 							if (ImGui::InputText(name.c_str(), buffer, sizeof(buffer)))
 							{
 								scriptInstance->setFieldValue(name, utils::stringToMonoString(std::string(buffer)));
