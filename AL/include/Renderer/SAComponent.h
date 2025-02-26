@@ -155,7 +155,7 @@ class SAComponent
 	/** @brief 현재 포즈 반환.
 	 * @return 현재 포즈 행렬 벡터.
 	 */
-	std::vector<glm::mat4>& getCurrentPose() { return m_CurrentPose; };
+	std::vector<alglm::mat4>& getCurrentPose() { return m_CurrentPose; };
 	/** @brief SAData 벡터 반환.
 	 * @return SAData 벡터.
 	 */
@@ -201,7 +201,7 @@ private:
 	std::vector<bool> m_Repeats;                                             /**< 각 애니메이션 별 반복 벡터 */
 	uint32_t m_FrameCounter;                                                 /**< 프레임 카운터 */
 	Bones m_CapturedPose;                                                    /**< 캡처된 포즈 */
-	std::vector<glm::mat4> m_CurrentPose;                                    /**< 현재 포즈 행렬 벡터 (UBO)*/
+	std::vector<alglm::mat4> m_CurrentPose;                                  /**< 현재 포즈 행렬 벡터 (UBO)*/
 	std::vector<SAData> m_Data;                                              /**< 각 애니메이션 별 키프레임 데이터(SAData) 벡터 */
 };
 

@@ -20,7 +20,7 @@ namespace ale
 		/** @brief 셰이더 데이터 구조체 */
 		struct ShaderData
 		{
-			std::vector<glm::mat4> m_FinalBonesMatrices; /**< 최종 본 행렬 벡터 */
+			std::vector<alglm::mat4> m_FinalBonesMatrices; /**< 최종 본 행렬 벡터 */
 		};
 
 		// TODO : 최적화 -> 동적/정적 데이터 분리
@@ -29,19 +29,19 @@ namespace ale
 		struct Bone
 		{
 			std::string m_Name;              /**< 본의 이름 */
-			glm::mat4 m_InverseBindMatrix;   /**< 역 바인드 행렬 */
-			glm::vec3 m_DeformedNodeTranslation{0.0f};  /**< 변형된 노드의 위치 */
-			glm::quat m_DeformedNodeRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);  /**< 변형된 노드의 회전 */
-			glm::vec3 m_DeformedNodeScale{1.0f};        /**< 변형된 노드의 스케일 */
+			alglm::mat4 m_InverseBindMatrix;   /**< 역 바인드 행렬 */
+			alglm::vec3 m_DeformedNodeTranslation{0.0f};  /**< 변형된 노드의 위치 */
+			alglm::quat m_DeformedNodeRotation = alglm::quat(1.0f, 0.0f, 0.0f, 0.0f);  /**< 변형된 노드의 회전 */
+			alglm::vec3 m_DeformedNodeScale{1.0f};        /**< 변형된 노드의 스케일 */
 
 			/** @brief 변형된 바인드 행렬 계산.
 			 * @return 계산된 변형 바인드 행렬.
 			 */
-			glm::mat4 getDeformedBindMatrix()
+			alglm::mat4 getDeformedBindMatrix()
 			{
-				return	glm::translate(glm::mat4(1.0f), m_DeformedNodeTranslation) * /**< 위치 변환 */
-						glm::mat4(m_DeformedNodeRotation) * /**< 회전 변환 */
-						glm::scale(glm::mat4(1.0f), m_DeformedNodeScale); /**< 스케일 변환 */
+				return	alglm::translate(alglm::mat4(1.0f), m_DeformedNodeTranslation) * /**< 위치 변환 */
+						alglm::mat4(m_DeformedNodeRotation) * /**< 회전 변환 */
+						alglm::scale(alglm::mat4(1.0f), m_DeformedNodeScale); /**< 스케일 변환 */
 			}
 
 			int m_ParentBone;              /**< 부모 본의 인덱스 */

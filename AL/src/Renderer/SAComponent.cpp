@@ -384,7 +384,7 @@ void SAComponent::flush()
 {
 	auto& bones = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 	for (auto b : bones)
-		b = glm::mat4(1.0f);
+		b = alglm::mat4(1.0f);
 }
 
 } //namespace ale
