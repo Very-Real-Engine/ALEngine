@@ -600,10 +600,10 @@ void Renderer::drawFrame(Scene *scene)
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
 
-	auto view = scene->getAllEntitiesWith<LightComponent, TagComponent>();
+	auto &view = scene->getAllEntitiesWith<LightComponent, TagComponent>();
 
 	uint32_t shadowMapIndex = 0;
-	for (auto entity : view)
+	for (auto &entity : view)
 	{
 		if (!view.get<TagComponent>(entity).m_isActive)
 		{
@@ -612,8 +612,14 @@ void Renderer::drawFrame(Scene *scene)
 		std::shared_ptr<Light> light = view.get<LightComponent>(entity).m_Light;
 		if (light->onShadowMap == 1 && shadowMapIndex < 4)
 		{
-			recordShadowMapCommandBuffer(scene, commandBuffers[currentFrame], *light.get(), shadowMapIndex);
-			recordShadowCubeMapCommandBuffer(scene, commandBuffers[currentFrame], *light.get(), shadowMapIndex);
+			if (light->type == 0) // 점광원
+			{
+				recordShadowCubeMapCommandBuffer(scene, commandBuffers[currentFrame], *light.get(), shadowMapIndex);
+			}
+			else
+			{
+				recordShadowMapCommandBuffer(scene, commandBuffers[currentFrame], *light.get(), shadowMapIndex);
+			}
 			shadowMapIndex++;
 		}
 	}
@@ -933,10 +939,15 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 		drawInfo.finalBonesMatrices[i] = alglm::mat4(1.0f);
 
 	// int32_t drawNum = 0;
-	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
-	for (auto entity : view)
+	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
+	for (auto &entity : view)
 	{
 		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
+		{
+			continue;
+		}
+		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
+		if (meshRendererComponent.cullState != ECullState::RENDER)
 		{
 			continue;
 		}
@@ -949,12 +960,8 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 			for (size_t i = 0; i < matrices.size(); ++i)
 				drawInfo.finalBonesMatrices[i] = matrices[i];
 		}
-		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
-		if (meshRendererComponent.cullState == ECullState::RENDER)
-		{
-			// drawNum++;
-			meshRendererComponent.m_RenderingComponent->draw(drawInfo);
-		}
+		// drawNum++;
+		meshRendererComponent.m_RenderingComponent->draw(drawInfo);
 	}
 
 	// AL_CORE_INFO("draw Num = {}", drawNum);
@@ -972,16 +979,16 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	// auto &lights = scene->getLights();
 
 	// get light component
-	auto lightView = scene->getAllEntitiesWith<TransformComponent, LightComponent>();
+	auto &lightView = scene->getAllEntitiesWith<TransformComponent, LightComponent>();
 	size_t lightSize = 0;
-	for (auto entity : lightView)
+	for (auto &entity : lightView)
 	{
 		lightSize++;
 	}
 
 	uint32_t index = 0;
 	size_t i = 0;
-	for (auto entity : lightView)
+	for (auto &entity : lightView)
 	{
 		std::shared_ptr<Light> light = lightView.get<LightComponent>(entity).m_Light;
 		alglm::vec3 lightPos = light->position;
@@ -1145,27 +1152,26 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 		lightProj[1][1] *= -1;
 	}
 
-	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
-	for (auto entity : view)
+	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
+	ShadowMapDrawInfo drawInfo;
+	drawInfo.view = lightView;
+	drawInfo.projection = lightProj;
+	drawInfo.commandBuffer = commandBuffer;
+	drawInfo.pipelineLayout = shadowMapPipelineLayout[shadowMapIndex];
+	drawInfo.currentFrame = currentFrame;
+	for (auto &entity : view)
 	{
 		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
 		{
 			continue;
 		}
-
-		ShadowMapDrawInfo drawInfo;
-		drawInfo.view = lightView;
-		drawInfo.projection = lightProj;
-		drawInfo.commandBuffer = commandBuffer;
-		drawInfo.pipelineLayout = shadowMapPipelineLayout[shadowMapIndex];
-		drawInfo.currentFrame = currentFrame;
-		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
-
 		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
-		if (meshRendererComponent.cullState == ECullState::RENDER)
+		if (meshRendererComponent.cullState != ECullState::RENDER)
 		{
-			meshRendererComponent.m_RenderingComponent->drawShadow(drawInfo, shadowMapIndex);
+			continue;
 		}
+		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
+		meshRendererComponent.m_RenderingComponent->drawShadow(drawInfo, shadowMapIndex);
 	}
 
 	// Render Pass 종료
@@ -1245,19 +1251,20 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 	drawInfo.pipelineLayout = shadowCubeMapPipelineLayout[shadowMapIndex];
 	drawInfo.currentFrame = currentFrame;
 
-	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
-	for (auto entity : view)
+	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
+	for (auto &entity : view)
 	{
 		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
 		{
 			continue;
 		}
-		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
 		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
-		if (meshRendererComponent.cullState == ECullState::RENDER)
+		if (meshRendererComponent.cullState != ECullState::RENDER)
 		{
-			meshRendererComponent.m_RenderingComponent->drawShadowCubeMap(drawInfo, shadowMapIndex);
+			continue;
 		}
+		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
+		meshRendererComponent.m_RenderingComponent->drawShadowCubeMap(drawInfo, shadowMapIndex);
 	}
 
 	// Render Pass 종료
@@ -1407,8 +1414,8 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 	ubo.proj[1][1] *= -1;
 	ubo.view = viewMatirx;
 
-	auto view = scene->getAllEntitiesWith<TransformComponent, TagComponent, SphereColliderComponent>();
-	for (auto entity : view)
+	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, SphereColliderComponent>();
+	for (auto &entity : view)
 	{
 		if (!view.get<TagComponent>(entity).m_isActive || !view.get<SphereColliderComponent>(entity).m_IsActive)
 		{
@@ -1437,8 +1444,8 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 		mesh->draw(commandBuffer);
 	}
 
-	auto view2 = scene->getAllEntitiesWith<TransformComponent, TagComponent, BoxColliderComponent>();
-	for (auto entity : view2)
+	auto &view2 = scene->getAllEntitiesWith<TransformComponent, TagComponent, BoxColliderComponent>();
+	for (auto &entity : view2)
 	{
 		if (!view2.get<TagComponent>(entity).m_isActive || !view2.get<BoxColliderComponent>(entity).m_IsActive)
 		{
@@ -1467,8 +1474,8 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 		mesh->draw(commandBuffer);
 	}
 
-	auto view3 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CapsuleColliderComponent>();
-	for (auto entity : view3)
+	auto &view3 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CapsuleColliderComponent>();
+	for (auto &entity : view3)
 	{
 		if (!view3.get<TagComponent>(entity).m_isActive || !view3.get<CapsuleColliderComponent>(entity).m_IsActive)
 		{
@@ -1498,8 +1505,8 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 		mesh->draw(commandBuffer);
 	}
 
-	auto view4 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CylinderColliderComponent>();
-	for (auto entity : view4)
+	auto &view4 = scene->getAllEntitiesWith<TransformComponent, TagComponent, CylinderColliderComponent>();
+	for (auto &entity : view4)
 	{
 		if (!view4.get<TagComponent>(entity).m_isActive || !view4.get<CylinderColliderComponent>(entity).m_IsActive)
 		{
