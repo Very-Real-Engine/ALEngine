@@ -128,10 +128,10 @@ class Timestep
 	}
 
 	/**
-	 * @brief `glm::vec3`와 `Timestep` 값을 곱하는 연산자
+	 * @brief `alglm::vec3`와 `Timestep` 값을 곱하는 연산자
 	 *
 	 * @param other 벡터 값
-	 * @return 각 요소가 `Timestep` 값과 곱해진 `glm::vec3`
+	 * @return 각 요소가 `Timestep` 값과 곱해진 `alglm::vec3`
 	 */
 	alglm::vec3 operator*(const alglm::vec3 &other) const
 	{

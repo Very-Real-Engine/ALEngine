@@ -73,7 +73,7 @@ class SkeletalAnimation
 		{
 			EInterpolationMethod	m_Interpolation; /**< 보간 방법 */
 			std::vector<float>		m_Timestamps;    /**< 키 프레임 타임스탬프 */
-			std::vector<glm::vec4>	m_TRSoutputValuesToBeInterpolated; /**< 변환 값들 */
+			std::vector<alglm::vec4>	m_TRSoutputValuesToBeInterpolated; /**< 변환 값들 */
 		};
 
 	public:

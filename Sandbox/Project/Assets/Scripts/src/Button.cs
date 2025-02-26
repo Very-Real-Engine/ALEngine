@@ -14,7 +14,6 @@ namespace Sandbox
         private RigidbodyComponent m_Rigidbody;
 
 		public bool isOn = false;
-        public bool test = true;
 
         void onCreate()
         {
