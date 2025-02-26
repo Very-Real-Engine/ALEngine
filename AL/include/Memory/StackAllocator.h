@@ -23,7 +23,7 @@ class StackAllocator
 	void freeStack();
 
   private:
-	char m_data[STACK_SIZE];
+	alignas(16) char m_data[STACK_SIZE];
 	int32_t m_index;
 
 	StackEntry m_entries[MAX_STACK_ENTRY_SIZE];
