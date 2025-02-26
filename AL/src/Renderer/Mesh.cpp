@@ -228,31 +228,48 @@ std::shared_ptr<Mesh> Mesh::createCapsule()
 std::shared_ptr<Mesh> Mesh::createCylinder()
 {
 	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
-	int32_t segments = 20.0f;
+	int32_t segments = 20; // 원주를 몇 등분할지
 	float halfHeight = 0.5f;
 	float radius = 0.5f;
-
 	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 
-	// Top cap center
+	// -----------------------
+	// Top Cap (윗면) 생성
+	// -----------------------
+	// 탑 캡의 중심 정점
+	uint32_t topCenterIndex = vertices.size();
 	alglm::vec3 topCenter(0.0f, halfHeight, 0.0f);
 	vertices.push_back({topCenter, alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// Top cap vertices
+	// 탑 캡 링 정점 (중심에서 바깥으로)
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
 		alglm::vec3 position(radius * cos(theta), halfHeight, radius * sin(theta));
+		// 텍스처 좌표는 (cos,sin)를 [0,1] 범위로 변환
 		alglm::vec2 texCoord(0.5f + 0.5f * cos(theta), 0.5f + 0.5f * sin(theta));
 		vertices.push_back({position, alglm::vec3(0.0f, 1.0f, 0.0f), texCoord});
 	}
 
-	// Bottom cap center
+	// 탑 캡 인덱스 (triangle fan)
+	for (int32_t i = 0; i < segments; ++i)
+	{
+		indices.push_back(topCenterIndex);
+		indices.push_back(topCenterIndex + 1 + i);
+		indices.push_back(topCenterIndex + 1 + i + 1);
+	}
+
+	// -----------------------
+	// Bottom Cap (아랫면) 생성
+	// -----------------------
+	// 아랫 캡의 중심 정점
+	uint32_t bottomCenterIndex = vertices.size();
 	alglm::vec3 bottomCenter(0.0f, -halfHeight, 0.0f);
 	vertices.push_back({bottomCenter, alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// Bottom cap vertices
+	// 아랫 캡 링 정점
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
@@ -261,43 +278,60 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		vertices.push_back({position, alglm::vec3(0.0f, -1.0f, 0.0f), texCoord});
 	}
 
-	std::vector<uint32_t> indices;
-
-	// Top cap indices
-	uint32_t topCenterIndex = 0;
-	for (int32_t i = 1; i <= segments; ++i)
-	{
-		indices.push_back(topCenterIndex);
-		indices.push_back(i + 1);
-		indices.push_back(i);
-	}
-
-	// Bottom cap indices
-	uint32_t bottomCenterIndex = segments + 2;
-	for (int32_t i = 1; i <= segments; ++i)
+	// 아랫 캡 인덱스 (winding order를 반대로 해서 바깥에서 보았을 때 정점 순서가 시계방향이 되도록)
+	for (int32_t i = 0; i < segments; ++i)
 	{
 		indices.push_back(bottomCenterIndex);
-		indices.push_back(bottomCenterIndex + i);
-		indices.push_back(bottomCenterIndex + i + 1);
+		indices.push_back(bottomCenterIndex + 1 + i + 1);
+		indices.push_back(bottomCenterIndex + 1 + i);
 	}
 
-	// Side indices
-	for (int32_t i = 1; i <= segments; ++i)
+	// -----------------------
+	// Side (옆면) 생성
+	// -----------------------
+	// 옆면은 캡과 별개로, 옆면용 정점은 노멀을 수평 방향(원점에서 바깥쪽)으로 계산해야 함
+	// 옆면의 윗부분 정점 (duplicated, texture v = 1.0)
+	uint32_t sideTopStart = vertices.size();
+	for (int32_t i = 0; i <= segments; ++i)
 	{
-		uint32_t top1 = topCenterIndex + i;
-		uint32_t top2 = topCenterIndex + i + 1;
-		uint32_t bottom1 = bottomCenterIndex + i;
-		uint32_t bottom2 = bottomCenterIndex + i + 1;
+		float theta = i * angleStep;
+		float x = radius * cos(theta);
+		float z = radius * sin(theta);
+		alglm::vec3 position(x, halfHeight, z);
+		alglm::vec3 normal(cos(theta), 0.0f, sin(theta));
+		alglm::vec2 texCoord(static_cast<float>(i) / segments, 1.0f);
+		vertices.push_back({position, normal, texCoord});
+	}
+	// 옆면의 아랫부분 정점 (texture v = 0.0)
+	uint32_t sideBottomStart = vertices.size();
+	for (int32_t i = 0; i <= segments; ++i)
+	{
+		float theta = i * angleStep;
+		float x = radius * cos(theta);
+		float z = radius * sin(theta);
+		alglm::vec3 position(x, -halfHeight, z);
+		alglm::vec3 normal(cos(theta), 0.0f, sin(theta));
+		alglm::vec2 texCoord(static_cast<float>(i) / segments, 0.0f);
+		vertices.push_back({position, normal, texCoord});
+	}
 
-		// First triangle
-		indices.push_back(top1);
-		indices.push_back(bottom2);
-		indices.push_back(bottom1);
+	// 옆면 인덱스 (각 쿼드를 두 개의 삼각형으로 분할)
+	for (int32_t i = 0; i < segments; ++i)
+	{
+		uint32_t currentTop = sideTopStart + i;
+		uint32_t nextTop = sideTopStart + i + 1;
+		uint32_t currentBottom = sideBottomStart + i;
+		uint32_t nextBottom = sideBottomStart + i + 1;
 
-		// Second triangle
-		indices.push_back(bottom2);
-		indices.push_back(top1);
-		indices.push_back(top2);
+		// 첫 번째 삼각형
+		indices.push_back(currentTop);
+		indices.push_back(currentBottom);
+		indices.push_back(nextTop);
+
+		// 두 번째 삼각형
+		indices.push_back(nextTop);
+		indices.push_back(currentBottom);
+		indices.push_back(nextBottom);
 	}
 
 	return createMesh(vertices, indices);
