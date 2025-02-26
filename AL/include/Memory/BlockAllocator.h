@@ -66,14 +66,14 @@ class BlockAllocator
 	void freeBlock(void *pointer, int32_t size);
 
   private:
-	Chunk *m_chunks;		/**< 전체 청크 메모리 */
-	int32_t m_chunkCount;	/**< 사용 중인 청크 수 */
-	int32_t m_chunkSpace;	/**< 전체 청크 공간 */
+	Chunk *m_chunks;	  /**< 전체 청크 메모리 */
+	int32_t m_chunkCount; /**< 사용 중인 청크 수 */
+	int32_t m_chunkSpace; /**< 전체 청크 공간 */
 
-	Block *m_availableBlocks[BLOCK_SIZE_COUNT];	/**< 사용 가능한 블록 리스트 */
+	Block *m_availableBlocks[BLOCK_SIZE_COUNT]; /**< 사용 가능한 블록 리스트 */
 
-	static int32_t s_blockSizes[BLOCK_SIZE_COUNT];			/**< 블록 크기 배열 */
-	static uint8_t s_blockSizeLookup[MAX_BLOCK_SIZE + 1];	/**< 블록 크기 조회 테이블 */
-	static bool s_blockSizeLookupInitialized;				/**< 블록 크기 조회 테이블 초기화 여부 */
+	static int32_t s_blockSizes[BLOCK_SIZE_COUNT];		  /**< 블록 크기 배열 */
+	static uint8_t s_blockSizeLookup[MAX_BLOCK_SIZE + 1]; /**< 블록 크기 조회 테이블 */
+	static bool s_blockSizeLookupInitialized;			  /**< 블록 크기 조회 테이블 초기화 여부 */
 };
 } // namespace ale
