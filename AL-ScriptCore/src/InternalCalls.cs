@@ -50,6 +50,11 @@ namespace ALEngine
 		internal extern static void ScriptComponent_deactivate(ulong entityID);
 		#endregion
 
+		#region BoxCollider
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static bool BoxCollider_IsTriggered(ulong entityID, out string targetEntityName);
+		#endregion
+
 		#region Input
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool Input_isKeyDown(KeyCode keycode);
