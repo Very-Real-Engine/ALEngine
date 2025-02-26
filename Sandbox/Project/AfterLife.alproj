@@ -1,5 +1,0 @@
-Project: 
-    Name: SandboxProject
-    StartScene: "Scenes/3DExample.ale"
-    AssetDirectory: "Assets"
-    ScriptModulePath: "Scripts/Debug/SandboxProject.dll"
