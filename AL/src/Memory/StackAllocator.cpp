@@ -18,6 +18,11 @@ StackAllocator::~StackAllocator()
 
 void *StackAllocator::allocateStack(int32_t size)
 {
+	if (size % 16 != 0)
+	{
+		size = (size / 16 + 1) * 16;
+	}
+	
 	if (m_entryCount == MAX_STACK_ENTRY_SIZE)
 	{
 		AL_CORE_ERROR("Requested size: {0}", size);
