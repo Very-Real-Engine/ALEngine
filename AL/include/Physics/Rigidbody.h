@@ -125,6 +125,7 @@ class Rigidbody
 	void setAwake();
 	void setRBComponentValue(BodyDef &bdDef);
 	bool isAwake();
+	int32_t getTouchNum() const;
 
 	Rigidbody *next;
 	Rigidbody *prev;

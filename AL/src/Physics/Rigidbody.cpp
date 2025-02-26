@@ -410,4 +410,9 @@ bool Rigidbody::isAwake()
 {
 	return m_isAwake;
 }
+
+int32_t Rigidbody::getTouchNum() const
+{
+	return m_fixtures[0].getTouchNum();
+}
 } // namespace ale
