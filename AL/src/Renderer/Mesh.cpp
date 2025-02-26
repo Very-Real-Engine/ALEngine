@@ -134,62 +134,26 @@ std::shared_ptr<Mesh> Mesh::createCapsule()
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
-	// 세그먼트 개수 설정
-	uint32_t halfLatiSegmentCount = 8;					  // 하단 반구 세로 세그먼트 (equator 포함)
-	uint32_t latiSegmentCount = halfLatiSegmentCount * 2; // 전체 세로 세그먼트 (0~16)
-	uint32_t longiSegmentCount = 20;					  // 원주 방향 세그먼트
+	uint32_t halfLatiSegmentCount = 8;
+	uint32_t latiSegmentCount = halfLatiSegmentCount * 2;
+	uint32_t longiSegmentCount = 20;
 	float radius = 0.5f;
 
-	// 하단 반구: 0 ~ halfLatiSegmentCount (총 halfLatiSegmentCount+1 행)
-	// 상단 반구: halfLatiSegmentCount+1 ~ latiSegmentCount (총 latiSegmentCount - halfLatiSegmentCount 행)
-	uint32_t bottomRows = halfLatiSegmentCount + 1;				// 9행
-	uint32_t topRows = latiSegmentCount - halfLatiSegmentCount; // 8행
-	uint32_t totalRows = bottomRows + topRows;					// 17행 전체
+	uint32_t bottomRows = halfLatiSegmentCount + 1;
+	uint32_t topRows = latiSegmentCount - halfLatiSegmentCount;
+	uint32_t totalRows = bottomRows + topRows;
 
-	uint32_t circleVertCount = longiSegmentCount + 1; // 한 행에 있는 정점 개수 (마지막 점은 wrap-around)
+	uint32_t circleVertCount = longiSegmentCount + 1;
 	vertices.resize(totalRows * circleVertCount);
 
-	// -------- 하단 반구 (바닥 극점 ~ equator) --------
-	// moveVectorBottom: 구의 중심을 (0, -radius, 0)로 이동시켜 아래쪽 위치로 배치
 	alglm::vec3 moveVectorBottom(0.0f, -radius, 0.0f);
 	for (uint32_t i = 0; i < bottomRows; i++)
 	{
-		// 전역 세로 좌표: i가 0이면 바닥 극점, i가 halfLatiSegmentCount이면 equator
-		float v = (float)i / (float)latiSegmentCount; // v ∈ [0, 0.5]
-		// 구의 극각(phi): -pi/2 ~ 0
+		float v = (float)i / (float)latiSegmentCount;
 		float phi = (v - 0.5f) * alglm::pi<float>();
 		float cosPhi = cosf(phi);
 		float sinPhi = sinf(phi);
 
-		for (uint32_t j = 0; j < circleVertCount; j++)
-		{
-			float u = (float)j / (float)longiSegmentCount; // u ∈ [0, 1]
-			float theta = u * alglm::pi<float>() * 2.0f;
-			float cosTheta = cosf(theta);
-			float sinTheta = sinf(theta);
-			// 구의 표면상 좌표 (노말 방향)
-			alglm::vec3 point(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
-			uint32_t index = i * circleVertCount + j;
-			// 정점 위치: 구의 표면 좌표 * radius에 구의 중심 이동 적용
-			vertices[index] = Vertex{point * radius + moveVectorBottom, point, alglm::vec2(u, v)};
-		}
-	}
-
-	// -------- 상단 반구 (equator ~ 상단 극점) --------
-	// moveVectorTop: 구의 중심을 (0, radius, 0)로 이동시켜 위쪽 위치로 배치
-	alglm::vec3 moveVectorTop(0.0f, radius, 0.0f);
-	// 상단 반구는 equator 정점(하단 반구의 마지막 행)을 공유하므로
-	// i를 halfLatiSegmentCount+1부터 시작하여 topRows 행을 생성
-	for (uint32_t i = halfLatiSegmentCount + 1; i <= latiSegmentCount; i++)
-	{
-		float v = (float)i / (float)latiSegmentCount; // v ∈ (0.5, 1]
-		// 구의 극각(phi): 0 ~ pi/2
-		float phi = (v - 0.5f) * alglm::pi<float>();
-		float cosPhi = cosf(phi);
-		float sinPhi = sinf(phi);
-
-		// 상단 정점의 저장 행: bottomRows행 다음부터 시작
-		uint32_t row = i - halfLatiSegmentCount; // row ∈ [1, topRows]
 		for (uint32_t j = 0; j < circleVertCount; j++)
 		{
 			float u = (float)j / (float)longiSegmentCount;
@@ -197,15 +161,32 @@ std::shared_ptr<Mesh> Mesh::createCapsule()
 			float cosTheta = cosf(theta);
 			float sinTheta = sinf(theta);
 			alglm::vec3 point(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
-			// 전체 행 인덱스: bottomRows(=하단 행 수) + (row-1)
+			uint32_t index = i * circleVertCount + j;
+			vertices[index] = Vertex{point * radius + moveVectorBottom, point, alglm::vec2(u, v)};
+		}
+	}
+
+	alglm::vec3 moveVectorTop(0.0f, radius, 0.0f);
+	for (uint32_t i = halfLatiSegmentCount + 1; i <= latiSegmentCount; i++)
+	{
+		float v = (float)i / (float)latiSegmentCount;
+		float phi = (v - 0.5f) * alglm::pi<float>();
+		float cosPhi = cosf(phi);
+		float sinPhi = sinf(phi);
+
+		uint32_t row = i - halfLatiSegmentCount;
+		for (uint32_t j = 0; j < circleVertCount; j++)
+		{
+			float u = (float)j / (float)longiSegmentCount;
+			float theta = u * alglm::pi<float>() * 2.0f;
+			float cosTheta = cosf(theta);
+			float sinTheta = sinf(theta);
+			alglm::vec3 point(cosPhi * cosTheta, sinPhi, -cosPhi * sinTheta);
 			uint32_t index = (bottomRows + row - 1) * circleVertCount + j;
 			vertices[index] = Vertex{point * radius + moveVectorTop, point, alglm::vec2(u, v)};
 		}
 	}
 
-	// -------- 인덱스 생성 (각 사각형을 두 개의 삼각형으로 분할) --------
-	// 전체 행 수: totalRows, 각 행에 circleVertCount개의 정점이 있음.
-	// (totalRows - 1) * longiSegmentCount 개의 사각형(quad)이 있음.
 	indices.resize((totalRows - 1) * longiSegmentCount * 6);
 	for (uint32_t i = 0; i < totalRows - 1; i++)
 	{
@@ -235,25 +216,18 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 	float radius = 0.5f;
 	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 
-	// -----------------------
-	// Top Cap (윗면) 생성
-	// -----------------------
-	// 탑 캡의 중심 정점
 	uint32_t topCenterIndex = vertices.size();
 	alglm::vec3 topCenter(0.0f, halfHeight, 0.0f);
 	vertices.push_back({topCenter, alglm::vec3(0.0f, 1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// 탑 캡 링 정점 (중심에서 바깥으로)
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
 		alglm::vec3 position(radius * cos(theta), halfHeight, radius * sin(theta));
-		// 텍스처 좌표는 (cos,sin)를 [0,1] 범위로 변환
 		alglm::vec2 texCoord(0.5f + 0.5f * cos(theta), 0.5f + 0.5f * sin(theta));
 		vertices.push_back({position, alglm::vec3(0.0f, 1.0f, 0.0f), texCoord});
 	}
 
-	// 탑 캡 인덱스 (triangle fan)
 	for (int32_t i = 0; i < segments; ++i)
 	{
 		indices.push_back(topCenterIndex);
@@ -261,15 +235,10 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		indices.push_back(topCenterIndex + 1 + i + 1);
 	}
 
-	// -----------------------
-	// Bottom Cap (아랫면) 생성
-	// -----------------------
-	// 아랫 캡의 중심 정점
 	uint32_t bottomCenterIndex = vertices.size();
 	alglm::vec3 bottomCenter(0.0f, -halfHeight, 0.0f);
 	vertices.push_back({bottomCenter, alglm::vec3(0.0f, -1.0f, 0.0f), alglm::vec2(0.5f, 0.5f)});
 
-	// 아랫 캡 링 정점
 	for (int32_t i = 0; i <= segments; ++i)
 	{
 		float theta = i * angleStep;
@@ -278,7 +247,6 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		vertices.push_back({position, alglm::vec3(0.0f, -1.0f, 0.0f), texCoord});
 	}
 
-	// 아랫 캡 인덱스 (winding order를 반대로 해서 바깥에서 보았을 때 정점 순서가 시계방향이 되도록)
 	for (int32_t i = 0; i < segments; ++i)
 	{
 		indices.push_back(bottomCenterIndex);
@@ -286,11 +254,6 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		indices.push_back(bottomCenterIndex + 1 + i);
 	}
 
-	// -----------------------
-	// Side (옆면) 생성
-	// -----------------------
-	// 옆면은 캡과 별개로, 옆면용 정점은 노멀을 수평 방향(원점에서 바깥쪽)으로 계산해야 함
-	// 옆면의 윗부분 정점 (duplicated, texture v = 1.0)
 	uint32_t sideTopStart = vertices.size();
 	for (int32_t i = 0; i <= segments; ++i)
 	{
@@ -302,7 +265,6 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		alglm::vec2 texCoord(static_cast<float>(i) / segments, 1.0f);
 		vertices.push_back({position, normal, texCoord});
 	}
-	// 옆면의 아랫부분 정점 (texture v = 0.0)
 	uint32_t sideBottomStart = vertices.size();
 	for (int32_t i = 0; i <= segments; ++i)
 	{
@@ -315,7 +277,6 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		vertices.push_back({position, normal, texCoord});
 	}
 
-	// 옆면 인덱스 (각 쿼드를 두 개의 삼각형으로 분할)
 	for (int32_t i = 0; i < segments; ++i)
 	{
 		uint32_t currentTop = sideTopStart + i;
@@ -323,12 +284,10 @@ std::shared_ptr<Mesh> Mesh::createCylinder()
 		uint32_t currentBottom = sideBottomStart + i;
 		uint32_t nextBottom = sideBottomStart + i + 1;
 
-		// 첫 번째 삼각형
 		indices.push_back(currentTop);
 		indices.push_back(currentBottom);
 		indices.push_back(nextTop);
 
-		// 두 번째 삼각형
 		indices.push_back(nextTop);
 		indices.push_back(currentBottom);
 		indices.push_back(nextBottom);
