@@ -47,4 +47,28 @@ namespace ALEngine
             InternalCalls.RigidbodyComponent_addForce(Entity.ID, ref force);
         }
     }
+
+    public class ScriptComponent : Component
+    {
+        public bool getFieldValue(string fieldName)
+        {
+            InternalCalls.ScriptComponent_getField(Entity.ID, fieldName, out bool ret);
+            return ret;
+        }
+
+        public void setFieldValue(string fieldName, bool boolean)
+        {
+            InternalCalls.ScriptComponent_setField(Entity.ID, fieldName, ref boolean);
+        }
+
+        public void activate()
+        {
+            InternalCalls.ScriptComponent_activate(Entity.ID);
+        }
+
+        public void deactivate()
+        {
+            InternalCalls.ScriptComponent_deactivate(Entity.ID);
+        }
+    }
 }

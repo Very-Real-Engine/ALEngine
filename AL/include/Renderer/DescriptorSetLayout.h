@@ -85,14 +85,41 @@ class DescriptorSetLayout
   private:
 	VkDescriptorSetLayout descriptorSetLayout;
 
+	/**
+	 * @brief Descriptor Set Layout 초기화
+	 */
 	void initDescriptorSetLayout();
+	/**
+	 * @brief Geometry Pass Descriptor Set Layout 초기화
+	 */
 	void initGeometryPassDescriptorSetLayout();
+	/**
+	 * @brief Lighting Pass Descriptor Set Layout 초기화
+	 */
 	void initLightingPassDescriptorSetLayout();
+	/**
+	 * @brief Shadow Map Descriptor Set Layout 초기화
+	 */
 	void initShadowMapDescriptorSetLayout();
+	/**
+	 * @brief Shadow Cube Map Descriptor Set Layout 초기화
+	 */
 	void initShadowCubeMapDescriptorSetLayout();
+	/**
+	 * @brief Viewport Descriptor Set Layout 초기화
+	 */
 	void initViewPortDescriptorSetLayout();
+	/**
+	 * @brief Spherical Map Descriptor Set Layout 초기화
+	 */
 	void initSphericalMapDescriptorSetLayout();
+	/**
+	 * @brief Background Descriptor Set Layout 초기화
+	 */
 	void initBackgroundDescriptorSetLayout();
+	/**
+	 * @brief Collider Descriptor Set Layout 초기화
+	 */
 	void initColliderDescriptorSetLayout();
 };
 } // namespace ale

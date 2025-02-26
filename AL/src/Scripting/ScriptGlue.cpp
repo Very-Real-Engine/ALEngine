@@ -156,6 +156,21 @@ static bool Input_isKeyDown(KeyCode keycode)
 	return Input::isKeyPressed(keycode);
 }
 
+static bool Input_isMouseLeftPressed()
+{
+	return Input::isMouseButtonPressed(0);
+}
+
+static bool Input_isMouseRightPressed()
+{
+	return Input::isMouseButtonPressed(1);
+}
+
+static void Input_getMousePos(glm::vec2 *pos)
+{
+	*pos = Input::getMousePosition();
+}
+
 // Physics
 static void RigidbodyComponent_addForce(UUID entityID, alglm::vec3 *force)
 {
@@ -164,6 +179,43 @@ static void RigidbodyComponent_addForce(UUID entityID, alglm::vec3 *force)
 
 	Rigidbody *body = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
 	body->registerForce(*force);
+}
+
+// ScriptComponent
+static void ScriptComponent_getField(UUID entityID, MonoString* fieldName, bool* ret)
+{
+	Scene* scene = ScriptingEngine::getSceneContext();
+
+	auto scriptInstance = ScriptingEngine::getEntityScriptInstance(entityID);
+	*ret = scriptInstance->getFieldValue<bool>(utils::monoStringToString(fieldName).c_str());
+}
+
+static void ScriptComponent_setField(UUID entityID, MonoString* fieldName, bool value)
+{
+	Scene* scene = ScriptingEngine::getSceneContext();
+
+	auto scriptInstance = ScriptingEngine::getEntityScriptInstance(entityID);
+	scriptInstance->setFieldValue<bool>(utils::monoStringToString(fieldName).c_str(), value);
+}
+
+static void ScriptComponent_activate(UUID entityID)
+{
+	Scene* scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto& tc = entity.getComponent<TagComponent>();
+	tc.m_isActive = true;
+	tc.m_selfActive = true;
+}
+
+static void ScriptComponent_deactivate(UUID entityID)
+{
+	Scene* scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto& tc = entity.getComponent<TagComponent>();
+	tc.m_isActive = false;
+	tc.m_selfActive = false;
 }
 
 // Component 별로 HasComponentFunction handle 등록.
@@ -214,8 +266,15 @@ void ScriptGlue::registerFunctions()
 	ADD_INTERNAL_CALL(TransformComponent_getRotation);
 	ADD_INTERNAL_CALL(TransformComponent_setRotation);
 
+	ADD_INTERNAL_CALL(ScriptComponent_getField);
+	ADD_INTERNAL_CALL(ScriptComponent_setField);
+	ADD_INTERNAL_CALL(ScriptComponent_activate);
+	ADD_INTERNAL_CALL(ScriptComponent_deactivate);
 	ADD_INTERNAL_CALL(RigidbodyComponent_addForce);
 
 	ADD_INTERNAL_CALL(Input_isKeyDown);
+	ADD_INTERNAL_CALL(Input_isMouseLeftPressed);
+	ADD_INTERNAL_CALL(Input_isMouseRightPressed);
+	ADD_INTERNAL_CALL(Input_getMousePos);
 }
 } // namespace ale

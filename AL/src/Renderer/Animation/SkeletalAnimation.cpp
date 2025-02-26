@@ -3,9 +3,8 @@
 
 namespace ale
 {
-SkeletalAnimation::SkeletalAnimation(std::string const &name) : m_Name(name), m_Repeat(false)
-{
-}
+
+SkeletalAnimation::SkeletalAnimation(std::string const& name) : m_Name(name), m_Repeat(false) {}
 
 void SkeletalAnimation::start()
 {
