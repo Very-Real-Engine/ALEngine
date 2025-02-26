@@ -44,7 +44,9 @@ target_compile_options(${PROJECT_NAME} PUBLIC "/utf-8")
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 WINDOW_NAME="${WINDOW_NAME}"
 WINDOW_WIDTH=${WINDOW_WIDTH}
-WINDOW_HEIGHT=${WINDOW_HEIGHT})
+WINDOW_HEIGHT=${WINDOW_HEIGHT}
+AL_PROFILE
+)
 
 # 출력 디렉토리 설정
 set_target_properties(${PROJECT_NAME} PROPERTIES
