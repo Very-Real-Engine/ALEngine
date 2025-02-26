@@ -166,7 +166,7 @@ static bool Input_isMouseRightPressed()
 	return Input::isMouseButtonPressed(1);
 }
 
-static void Input_getMousePos(glm::vec2 *pos)
+static void Input_getMousePos(alglm::vec2 *pos)
 {
 	*pos = Input::getMousePosition();
 }
