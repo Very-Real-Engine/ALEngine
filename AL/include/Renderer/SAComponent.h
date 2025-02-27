@@ -67,6 +67,11 @@ class SAComponent
 	 * @param repeats 반복 벡터.
 	 */
 	void setRepeatAll(const std::vector<bool> repeats) { m_Repeats = repeats; };
+	/** @brief 애니메이션 역재생 설정.
+	 * @param inverse 역재생 상태.
+	 * @param index 애니메이션 인덱스
+	 */
+	void setInverse(bool inverse, int index);
 	/** @brief 현재 반복 설정.
 	 * @param repeat 반복 여부.
 	 */
@@ -115,6 +120,10 @@ class SAComponent
 	 * @return 애니메이션 인덱스.
 	 */
 	int getCurrentAnimationIndex();
+	/** @brief 애니메이션 역재생 반환.
+	 * @param index 애니메이션 인덱스
+	 */
+	bool getInverse( int index);
 	/** @brief 반복 여부 반환.
 	 * @param index 애니메이션 인덱스 (기본값 -1).
 	 * @return 반복 여부.
