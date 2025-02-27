@@ -303,7 +303,7 @@ class Model
 	 * @param scene 장면
 	 * @param materials 재질
 	 */
-	void processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials);
+	void processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials, const alglm::mat4& parentTransform = alglm::mat4(1.0f));
 	/**
 	 * @brief GLTF 메시 처리
 	 * @param mesh 메시
@@ -311,7 +311,7 @@ class Model
 	 * @param material 재질
 	 * @return 메시
 	 */
-	std::shared_ptr<Mesh> processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material);
+	std::shared_ptr<Mesh> processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material, const alglm::mat4& globalTransform);
 	/**
 	 * @brief OBJ 재질 처리
 	 * @param mtl MTL

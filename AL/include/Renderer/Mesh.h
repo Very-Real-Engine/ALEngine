@@ -21,11 +21,12 @@ class Mesh
 	 * @brief Mesh 생성
 	 * @param vertices 정점 목록
 	 * @param indices 인덱스 목록
+	 * @param globalTransform 노드별 글로벌 위치, 없다면 항등행렬 설정
 	 * @return Mesh
 	 */
-	static std::shared_ptr<Mesh> createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices);
+	static std::shared_ptr<Mesh> createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const alglm::mat4& globalTransform = alglm::mat4(1.0f));
 	/**
-	 * @brief 박스 생성
+	 * @brief 박스 생치치
 	 * @return 박스
 	 */
 	static std::shared_ptr<Mesh> createBox();
@@ -87,12 +88,18 @@ class Mesh
 	 * @return 최소 위치
 	 */
 	alglm::vec3 getMinPos();
+	/**
+	 * @brief 노드 글로벌 트랜스폼 반환
+	 * @return alglm::mat4 
+	 */
+	alglm::mat4 getNodeTransform();
 
   private:
 	Mesh() = default;
 
 	alglm::vec3 m_minPos;
 	alglm::vec3 m_maxPos;
+	alglm::mat4 m_GlobalTransform;
 	std::unique_ptr<VertexBuffer> m_vertexBuffer;
 	std::unique_ptr<IndexBuffer> m_indexBuffer;
 

@@ -141,7 +141,7 @@ void Model::draw(DrawInfo &drawInfo)
 		vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0, 1,
 								&descriptorSets[index], 0, nullptr);
 		GeometryPassVertexUniformBufferObject vertexUbo{};
-		vertexUbo.model = drawInfo.model;
+		vertexUbo.model = drawInfo.model * m_meshes[i]->getNodeTransform();
 		vertexUbo.view = drawInfo.view;
 		vertexUbo.proj = drawInfo.projection;
 		for (size_t i = 0; i < MAX_BONES; ++i)
@@ -555,22 +555,25 @@ std::shared_ptr<Material> Model::processGLTFMaterial(const aiScene *scene, aiMat
 	return Material::createMaterial(albedo, normalMap, roughness, metallic, ao, heightMap);
 }
 
-void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials)
+void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials, const alglm::mat4& parentTransform)
 {
+	alglm::mat4 nodeTransform = convertMatrix(node->mTransformation);
+	alglm::mat4 globalTransform = parentTransform * nodeTransform;
+
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		uint32_t materialIndex = mesh->mMaterialIndex;
-		m_meshes.push_back(std::move(processGLTFMesh(mesh, scene, materials[materialIndex])));
+		m_meshes.push_back(std::move(processGLTFMesh(mesh, scene, materials[materialIndex], globalTransform)));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		processGLTFNode(node->mChildren[i], scene, materials);
+		processGLTFNode(node->mChildren[i], scene, materials, globalTransform);
 	}
 }
 
-std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material)
+std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material, const alglm::mat4& globalTransform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -658,6 +661,23 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 			}
 		}
 	}
+	else
+	{
+		for (unsigned int vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
+		{
+			// 더미 본 인덱스 0을 할당하고, 가중치는 1.0으로 설정
+			vertices[vertexIndex].boneIds[0] = 0;  
+			vertices[vertexIndex].weights[0] = 1.0f;
+	
+			// 나머지 본 슬롯은 사용하지 않음을 명시 (-1, 0.0)
+			vertices[vertexIndex].boneIds[1] = -1;
+			vertices[vertexIndex].weights[1] = 0.0f;
+			vertices[vertexIndex].boneIds[2] = -1;
+			vertices[vertexIndex].weights[2] = 0.0f;
+			vertices[vertexIndex].boneIds[3] = -1;
+			vertices[vertexIndex].weights[3] = 0.0f;
+		}
+	}
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
@@ -669,7 +689,7 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 	}
 
 	m_materials.push_back(material);
-	return Mesh::createMesh(vertices, indices);
+	return Mesh::createMesh(vertices, indices, globalTransform);
 }
 
 void Model::processGLTFSkeleton(const aiScene *scene)
@@ -691,6 +711,21 @@ void Model::processGLTFSkeleton(const aiScene *scene)
 
 	// unique 처리
 	buildSkeletonBoneArray(allAiBones);
+
+	// creating dummy bones
+	if (m_Skeleton->m_Bones.size() == 0)
+	{
+		AL_CORE_INFO("create dummy bones");
+		Armature::Bone dummy;
+		dummy.m_Name = "Dummy";
+		dummy.m_InverseBindMatrix = alglm::mat4(1.0f);
+		dummy.m_ParentBone = -1;
+
+		m_Skeleton->m_Bones.push_back(dummy);
+		m_Skeleton->m_NodeNameToBoneIndex[dummy.m_Name] = 0;
+
+		m_Skeleton->m_ShaderData.m_FinalBonesMatrices.resize(1, alglm::mat4(1.0f));
+	}
 
 	// 2) 노드 트리를 통해 본 계층 관계 구성
 	loadBone(scene->mRootNode, Armature::NO_PARENT);
@@ -771,6 +806,7 @@ void Model::loadAnimations(const aiScene *scene)
 		aiAnimation *aiAnim = scene->mAnimations[animationIndex];
 		std::string animationName =
 			(aiAnim->mName.length > 0 ? std::string(aiAnim->mName.C_Str()) : ("Anim" + std::to_string(animationIndex)));
+		AL_CORE_INFO("{0}", animationName);
 
 		std::shared_ptr<SkeletalAnimation> animation = std::make_shared<SkeletalAnimation>(animationName);
 
@@ -933,6 +969,7 @@ void Model::loadAnimations(const aiScene *scene)
 			// set duration
 			animation->setFirstKeyFrameTime(sampler.m_Timestamps[0]);
 			animation->setLastKeyFrameTime(sampler.m_Timestamps.back());
+			AL_CORE_INFO("{0}-{1}",sampler.m_Timestamps[0], sampler.m_Timestamps.back());
 		}
 
 		m_Animations->push(animation);

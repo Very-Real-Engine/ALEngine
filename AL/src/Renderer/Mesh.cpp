@@ -2,10 +2,11 @@
 
 namespace ale
 {
-std::shared_ptr<Mesh> Mesh::createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices)
+std::shared_ptr<Mesh> Mesh::createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const alglm::mat4& globalTransform)
 {
 	std::shared_ptr<Mesh> mesh = std::shared_ptr<Mesh>(new Mesh());
 	mesh->initMesh(vertices, indices);
+	mesh->m_GlobalTransform = globalTransform;
 	return mesh;
 }
 
@@ -409,6 +410,11 @@ alglm::vec3 Mesh::getMaxPos()
 alglm::vec3 Mesh::getMinPos()
 {
 	return m_minPos;
+}
+
+alglm::mat4 Mesh::getNodeTransform()
+{
+	return m_GlobalTransform;
 }
 
 } // namespace ale
