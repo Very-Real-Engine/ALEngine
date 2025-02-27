@@ -7,7 +7,6 @@ namespace Armature
 void Skeleton::update()
 {
 	int16_t numberOfBones = static_cast<int16_t>(m_Bones.size());
-
 	if (!m_isAnimated)
 	{
 		for (int16_t boneIndex = 0; boneIndex < numberOfBones; ++boneIndex)

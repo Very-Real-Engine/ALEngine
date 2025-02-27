@@ -53,6 +53,7 @@ void SAComponent::initKeyFrame()
 			m_Data[i].m_CurrentKeyFrameTime = 0.0f;
 			m_Data[i].m_FirstKeyFrameTime = 0.0f;
 			m_Data[i].m_LastKeyFrameTime = 0.0f;
+			m_Data[i].m_Inverse = false;
 		}
 	}
 }
@@ -160,6 +161,11 @@ void SAComponent::setCurrentRepeat(bool repeat)
 	}
 }
 
+void SAComponent::setInverse(bool inverse, int index)
+{
+	m_Data[index].m_Inverse = inverse;
+}
+
 void SAComponent::setCurrentAnimation(SkeletalAnimation *animation)
 {
 	if (animation)
@@ -186,10 +192,6 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 	}
 	else if (m_StateManager->isTransitionFinish) // AFTER BLENDING CHANGED TO CURRENT-ANIMATION
 	{
-		// m_Data[0] = m_Data[1];
-		// m_Data[1].m_CurrentKeyFrameTime = 0.0f;
-		// m_Data[1].m_FirstKeyFrameTime = 0.0f;
-		// m_Data[1].m_LastKeyFrameTime = 0.0f;
 		m_StateManager->isTransitionFinish = false;
 		m_CurrentAnimation = &(*m_Animations)[m_StateManager->currentState.animationName];
 	}
@@ -314,6 +316,7 @@ void SAComponent::setData(uint16_t currentFrame, const SAData &data, unsigned in
 	m_Data[index].m_FirstKeyFrameTime = data.m_FirstKeyFrameTime;
 	m_Data[index].m_LastKeyFrameTime = data.m_LastKeyFrameTime;
 	m_Data[index].m_CurrentKeyFrameTime = data.m_CurrentKeyFrameTime;
+	m_Data[index].m_Inverse = data.m_Inverse;
 }
 
 void SAComponent::setDataAll(std::vector<SAData> datas)
@@ -378,6 +381,11 @@ int SAComponent::getCurrentAnimationIndex()
 	if (m_CurrentAnimation)
 		return getAnimIndex(m_CurrentAnimation->getName());
 	return NON_CURRENT_ANIMATION_INT;
+}
+
+bool SAComponent::getInverse(int index)
+{
+	return m_Data[index].m_Inverse;
 }
 
 void SAComponent::flush()

@@ -9,21 +9,31 @@ SkeletalAnimation::SkeletalAnimation(std::string const& name) : m_Name(name), m_
 void SkeletalAnimation::start()
 {
 	m_CurrentKeyFrameTime = m_FirstKeyFrameTime;
+	if (m_Inverse)
+		m_CurrentKeyFrameTime = m_LastKeyFrameTime;
 }
 
 void SkeletalAnimation::stop()
 {
 	m_CurrentKeyFrameTime = m_LastKeyFrameTime + 1.0f;
+	if (m_Inverse)
+		m_CurrentKeyFrameTime = m_FirstKeyFrameTime;
 }
 
 bool SkeletalAnimation::isRunning() const
 {
-	return (m_Repeat || (m_CurrentKeyFrameTime <= m_LastKeyFrameTime));
+	if (m_Inverse)
+		return (m_Repeat || m_CurrentKeyFrameTime >= m_FirstKeyFrameTime);
+	else
+		return (m_Repeat || (m_CurrentKeyFrameTime <= m_LastKeyFrameTime));
 }
 
 bool SkeletalAnimation::willExpire(const Timestep &timestep) const
 {
-	return (!m_Repeat && ((m_CurrentKeyFrameTime + timestep) > m_LastKeyFrameTime));
+	if (m_Inverse)
+		return (!m_Repeat && ((m_CurrentKeyFrameTime - timestep) < m_FirstKeyFrameTime));
+	else
+		return (!m_Repeat && ((m_CurrentKeyFrameTime + timestep) > m_LastKeyFrameTime));
 }
 
 void SkeletalAnimation::update(const Timestep &timestep, Armature::Skeleton &skeleton)
@@ -33,11 +43,18 @@ void SkeletalAnimation::update(const Timestep &timestep, Armature::Skeleton &ske
 		// AL_INFO("SkeletalAnimation::update(): {0} Animation expired", m_Name);
 		return;
 	}
-	m_CurrentKeyFrameTime += timestep;
+
+	if (m_Inverse)
+		m_CurrentKeyFrameTime -= timestep;
+	else
+		m_CurrentKeyFrameTime += timestep;
 
 	if (m_Repeat && (m_CurrentKeyFrameTime > m_LastKeyFrameTime))
 	{
-		m_CurrentKeyFrameTime = m_FirstKeyFrameTime;
+		if (m_Inverse)
+			m_CurrentKeyFrameTime = m_LastKeyFrameTime;
+		else
+			m_CurrentKeyFrameTime = m_FirstKeyFrameTime;
 	}
 	for (auto &channel : m_Channels)
 	{
@@ -130,6 +147,7 @@ void SkeletalAnimation::uploadData(const SAData &data, bool repeat)
 	m_FirstKeyFrameTime = data.m_FirstKeyFrameTime;
 	m_LastKeyFrameTime = data.m_LastKeyFrameTime;
 	m_CurrentKeyFrameTime = data.m_CurrentKeyFrameTime;
+	m_Inverse = data.m_Inverse;
 }
 
 struct SAData SkeletalAnimation::getData() const
@@ -139,6 +157,7 @@ struct SAData SkeletalAnimation::getData() const
 	data.m_FirstKeyFrameTime = m_FirstKeyFrameTime;
 	data.m_LastKeyFrameTime = m_LastKeyFrameTime;
 	data.m_CurrentKeyFrameTime = m_CurrentKeyFrameTime;
+	data.m_Inverse = m_Inverse;
 
 	return data;
 }

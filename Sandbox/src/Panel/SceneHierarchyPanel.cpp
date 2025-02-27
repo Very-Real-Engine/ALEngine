@@ -717,6 +717,13 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			return;
 		}
 
+		auto& model = mr.m_RenderingComponent->getModel();
+		if (!model->m_SkeletalAnimations)
+		{
+			ImGui::Text("This Model doesn't contain animations/skeleton");
+			return ;
+		}
+
 		SAComponent *sac = (SAComponent *)component.sac.get();
 		// 1. 현재 애니메이션 버튼/박스
 		ImGui::Text("Current Animation:");
@@ -873,16 +880,23 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		ImGui::Spacing();
 
 		// 5. 애니메이션 속성 (테스트용: 반복 체크박스)
-		bool repeat;
+		bool repeat, inverse;
 		int index = sac->getCurrentAnimationIndex();
 		if (index != NON_CURRENT_ANIMATION_INT)
 		{
 			repeat = sac->getRepeat(index);
+			inverse = sac->getInverse(index);
 
 			ImGui::Text("Animation Properties:");
-			ImGui::Checkbox("loop", &repeat);
-
-			sac->setRepeat(repeat, index);
+			if (ImGui::Checkbox("loop", &repeat))
+			{
+				sac->setRepeat(repeat, index);
+			}
+		
+			if (ImGui::Checkbox("inverse", &inverse))
+			{
+				sac->setInverse(inverse, index);
+			}
 		}
 
 		ImGui::Separator();

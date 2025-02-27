@@ -16,6 +16,7 @@ struct SAData
 	float m_FirstKeyFrameTime;  /**< 첫 키 프레임 시간 */
 	float m_LastKeyFrameTime;   /**< 마지막 키 프레임 시간 */
 	float m_CurrentKeyFrameTime;/**< 현재 키 프레임 시간 */
+	bool m_Inverse;
 };
 
 class Timestep;
@@ -193,6 +194,7 @@ class SkeletalAnimation
 
 	private:
 		std::string m_Name;              /**< 애니메이션 이름 */
+		bool m_Inverse;                  /**< 역재생 */
 		bool m_Repeat;                   /**< 반복 실행 여부 */
 		float m_FirstKeyFrameTime;       /**< 첫 키 프레임 시간 */
 		float m_LastKeyFrameTime;        /**< 마지막 키 프레임 시간 */
