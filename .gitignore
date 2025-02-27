@@ -2,8 +2,6 @@ build/
 .vscode
 Makefile
 
-*.dll
-*.pdb
 imgui.ini
 
 docs/doxygen
