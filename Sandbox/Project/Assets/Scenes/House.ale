@@ -1,0 +1,254 @@
+Scene: Untitled
+Entities:
+  - Entity: 16115726293005992993
+    TagComponent:
+      Tag: Empty
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\door.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 13031684749665374615
+    TagComponent:
+      Tag: Directional Light
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    ScriptComponent:
+      ClassName: Sandbox.Light
+      ScriptFields:
+        []
+    LightComponent:
+      Type: 2
+      ShadowMap: 1
+      Position: [0, 0, 0]
+      Direction: [0.200000003, -5.5999999, 0]
+      Color: [1, 1, 1]
+      Intensity: 1.39999998
+      InnerCutoff: 0.976296008
+      OuterCutoff: 0.953716934
+  - Entity: 3406970704759287418
+    TagComponent:
+      Tag: Scene Camera
+    TransformComponent:
+      Position: [0, 0, 10]
+      Rotation: [0, 0, 0]
+      Scale: [0.00999999978, 0.00999999978, 0.00999999978]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    CameraComponent:
+      Camera:
+        PerspectiveFOV: 1.04719758
+        PerspectiveNear: 0.00100000005
+        PerspectiveFar: 1000
+      Primary: true
+      FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 3
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+  - Entity: 16143175189520029819
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Position: [0, -3, 0]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [30, 30, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 3
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 1225096075629322166
+    TagComponent:
+      Tag: House
+    TransformComponent:
+      Position: [0, -2.5, 0]
+      Rotation: [0, 0, -3.14159274]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\house.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 8568808022038936244
+    TagComponent:
+      Tag: LightObj
+    TransformComponent:
+      Position: [-1, 0, 2.79999995]
+      Rotation: [0, -0, -3.14159083]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 9135418313516706735
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\light.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 678350341637707400
+    TagComponent:
+      Tag: Light
+    TransformComponent:
+      Position: [-1, 0, 2.79999995]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 9135418313516706735
+      Children:
+        []
+    LightComponent:
+      Type: 1
+      ShadowMap: 1
+      Position: [-1, 0, 2.79999995]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 9.60000038
+      InnerCutoff: 1
+      OuterCutoff: 0.200000003
+  - Entity: 9135418313516706735
+    TagComponent:
+      Tag: L1
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 678350341637707400
+        - 8568808022038936244
+  - Entity: 6772400655840810239
+    TagComponent:
+      Tag: TV
+    TransformComponent:
+      Position: [6.80000019, -2.5, -0.800000012]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [1.29999995, 1.29999995, 1.29999995]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\tv.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 3636586329123718984
+    TagComponent:
+      Tag: L3
+    TransformComponent:
+      Position: [4, 0, 0.600000024]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 0
+      Position: [4, 0, 0.600000024]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 10
+      InnerCutoff: 1.10000002
+      OuterCutoff: 0.00999999978
+  - Entity: 2405146793325928866
+    TagComponent:
+      Tag: sofa
+    TransformComponent:
+      Position: [2.0999999, -2.5, -0.800000012]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\sofa.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 660462297134703696
+    TagComponent:
+      Tag: Table
+    TransformComponent:
+      Position: [4.5999999, -2.5, -0.600000024]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1.5, 1.5, 1.5]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\table.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 12232965032076959450
+    TagComponent:
+      Tag: Kitchen
+    TransformComponent:
+      Position: [-4.9000001, -2.5, -3.29999995]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.699999988, 0.699999988, 0.699999988]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\kitchen.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 17624065805638208741
+    TagComponent:
+      Tag: L2
+    TransformComponent:
+      Position: [-5.0999999, 0, -2.20000005]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 0
+      Position: [-5.0999999, 0, -2.20000005]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 6.5
+      InnerCutoff: 1
+      OuterCutoff: 1
