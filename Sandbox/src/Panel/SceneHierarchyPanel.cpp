@@ -589,18 +589,19 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction uiF
 		ImGui::PopStyleVar();
 
 		// 컴파일 타임에 타입 비교 수행
+		std::string popupId = "ComponentSettings##" + std::to_string(typeid(T).hash_code());
 		if (!std::is_same<T, TransformComponent>::value)
 		{
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			std::string label = "+##" + std::to_string(typeid(T).hash_code());
 			if (ImGui::Button(label.c_str(), ImVec2{lineHeight, lineHeight}))
 			{
-				ImGui::OpenPopup("ComponentSettings");
+				ImGui::OpenPopup(popupId.c_str());
 			}
 		}
 
 		bool removeComponent = false;
-		if (ImGui::BeginPopup("ComponentSettings"))
+		if (ImGui::BeginPopup(popupId.c_str()))
 		{
 			if (ImGui::MenuItem("Remove component"))
 				removeComponent = true;
