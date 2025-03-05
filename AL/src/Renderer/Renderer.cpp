@@ -226,6 +226,11 @@ void Renderer::init(GLFWwindow *window)
 		viewPortDescriptorSetLayout, m_noCamTexture->getImageView(), m_noCamTexture->getSampler());
 	noCamDescriptorSets = m_noCamShaderResourceManager->getDescriptorSets();
 
+	m_selectedEntityShaderResourceManager =
+		ShaderResourceManager::createColliderShaderResourceManager(colliderDescriptorSetLayout);
+	selectedEntityDescriptorSets = m_selectedEntityShaderResourceManager->getDescriptorSets();
+	selectedEntityUniformBuffers = m_selectedEntityShaderResourceManager->getUniformBuffers();
+
 	m_commandBuffers = CommandBuffers::createCommandBuffers();
 	commandBuffers = m_commandBuffers->getCommandBuffers();
 
@@ -295,6 +300,7 @@ void Renderer::cleanup()
 	m_viewPortShaderResourceManager->cleanup();
 	m_noCamShaderResourceManager->cleanup();
 	m_lightingPassShaderResourceManager->cleanup();
+	m_selectedEntityShaderResourceManager->cleanup();
 
 	// descriptorSetLayout
 	m_geometryPassDescriptorSetLayout->cleanup();
@@ -1428,6 +1434,7 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 	ubo.proj = projMatrix;
 	ubo.proj[1][1] *= -1;
 	ubo.view = viewMatirx;
+	ubo.color = alglm::vec3(1.0f, 1.0f, 0.0f);
 
 	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, SphereColliderComponent>();
 	for (auto &entity : view)
@@ -1548,6 +1555,19 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 		uniformBuffer[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
 
 		auto &mesh = m_modelsMap["cylinder"]->getMeshes()[0];
+		mesh->draw(commandBuffer);
+	}
+
+	if (scene->isSelectedEntity())
+	{
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, colliderPipelineLayout, 0, 1,
+								&selectedEntityDescriptorSets[currentFrame], 0, nullptr);
+		ubo.model = alglm::translate(alglm::mat4(1.0f), scene->getSelectedPosition());
+		ubo.model = alglm::scale(ubo.model, alglm::vec3(0.1f));
+		ubo.color = alglm::vec3(0.0f, 1.0f, 0.0f);
+		selectedEntityUniformBuffers[currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+		auto &mesh = m_modelsMap["sphere"]->getMeshes()[0];
 		mesh->draw(commandBuffer);
 	}
 

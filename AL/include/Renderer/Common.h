@@ -310,6 +310,7 @@ struct ColliderUniformBufferObject
 	alignas(16) alglm::mat4 model;
 	alignas(16) alglm::mat4 view;
 	alignas(16) alglm::mat4 proj;
+	alignas(16) alglm::vec3 color;
 };
 
 } // namespace ale

@@ -491,7 +491,6 @@ void Scene::initScene()
 	m_capsuleModel = Model::createCapsuleModel(m_defaultMaterial);
 	m_cylinderModel = Model::createCylinderModel(m_defaultMaterial);
 	m_colliderBoxModel = Model::createColliderBoxModel(m_defaultMaterial);
-
 	m_cullTree.setScene(this);
 }
 

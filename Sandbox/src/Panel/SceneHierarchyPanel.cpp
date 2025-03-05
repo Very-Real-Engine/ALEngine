@@ -71,7 +71,10 @@ void SceneHierarchyPanel::onImGuiRender()
 
 		// 왼쪽 클릭 && Hovered(마우스를 window에 올려뒀을 때)
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		{
 			m_SelectionContext = {};
+			m_Context->unsetSelectedEntity();
+		}
 
 		// 오른쪽 클릭으로 Popup 활성화
 		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
@@ -703,7 +706,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	}
 	ImGui::PopItemWidth();
 
-	drawComponent<TransformComponent>("Transform", entity, [this, entity](auto &component) mutable {
+	drawComponent<TransformComponent>("Transform", entity, [this, entity, scene = m_Context](auto &component) mutable {
 		// Update Recursively
 		drawVec3Control("Position", component.m_Position);
 		auto &rotation = alglm::degrees(component.m_Rotation);
@@ -711,6 +714,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		component.m_Rotation = alglm::radians(rotation);
 		drawVec3Control("Scale", component.m_Scale, 1.0f);
 		updateTransforms(entity);
+		auto &transform = entity.getComponent<TransformComponent>();
+		scene->setSelectedEntity(transform.m_Position);
 	});
 
 	drawComponent<CameraComponent>("Camera", entity, [](auto &component) {

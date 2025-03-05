@@ -241,6 +241,27 @@ class Scene
 
 	void removeColliderShaderResourceManager(Entity &entity);
 
+	void setSelectedEntity(alglm::vec3 &position)
+	{
+		m_isSelectedEntity = true;
+		m_selectedPosition = position;
+	}
+
+	void unsetSelectedEntity()
+	{
+		m_isSelectedEntity = false;
+	}
+
+	alglm::vec3 &getSelectedPosition()
+	{
+		return m_selectedPosition;
+	}
+
+	bool &isSelectedEntity()
+	{
+		return m_isSelectedEntity;
+	}
+
   private:
 	template <typename T> void onComponentAdded(Entity entity, T &component);
 
@@ -283,6 +304,9 @@ class Scene
 	float m_ambientStrength{0.1f};
 
 	CullTree m_cullTree;
+
+	bool m_isSelectedEntity = false;
+	alglm::vec3 m_selectedPosition = alglm::vec3(0.0f, 0.0f, 0.0f);
 
 	friend class Entity;
 	friend class SceneSerializer;
