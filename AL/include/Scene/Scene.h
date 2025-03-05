@@ -94,11 +94,11 @@ class Scene
 	/// @brief 런타임 종료 시 호출됩니다.
 	void onRuntimeStop();
 
-  /**
-   * @brief 에디터에서 추가 렌더링이 필요한 조건에 렌더링 적용합니다.
-   * @param Timestep 시간
-   */
-	void preRenderEditor(const Timestep& ts);
+	/**
+	 * @brief 에디터에서 추가 렌더링이 필요한 조건에 렌더링 적용합니다.
+	 * @param Timestep 시간
+	 */
+	void preRenderEditor(const Timestep &ts);
 	/**
 	 * @brief 에디터에서 씬을 업데이트합니다.
 	 * @param camera 에디터 카메라.
@@ -240,6 +240,27 @@ class Scene
 
 	void removeColliderShaderResourceManager(Entity &entity);
 
+	void setSelectedEntity(alglm::vec3 &position)
+	{
+		m_isSelectedEntity = true;
+		m_selectedPosition = position;
+	}
+
+	void unsetSelectedEntity()
+	{
+		m_isSelectedEntity = false;
+	}
+
+	alglm::vec3 &getSelectedPosition()
+	{
+		return m_selectedPosition;
+	}
+
+	bool &isSelectedEntity()
+	{
+		return m_isSelectedEntity;
+	}
+
   private:
 	template <typename T> void onComponentAdded(Entity entity, T &component);
 
@@ -282,6 +303,9 @@ class Scene
 	float m_ambientStrength{0.1f};
 
 	CullTree m_cullTree;
+
+	bool m_isSelectedEntity = false;
+	alglm::vec3 m_selectedPosition = alglm::vec3(0.0f, 0.0f, 0.0f);
 
 	friend class Entity;
 	friend class SceneSerializer;

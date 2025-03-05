@@ -303,9 +303,9 @@ class Renderer
 	std::unique_ptr<DescriptorSetLayout> m_colliderDescriptorSetLayout;
 	VkDescriptorSetLayout colliderDescriptorSetLayout;
 
-	std::unique_ptr<ShaderResourceManager> m_colliderShaderResourceManager;
-	std::vector<VkDescriptorSet> colliderDescriptorSets;
-	std::vector<std::shared_ptr<UniformBuffer>> colliderUniformBuffers;
+	std::unique_ptr<ShaderResourceManager> m_selectedEntityShaderResourceManager;
+	std::vector<VkDescriptorSet> selectedEntityDescriptorSets;
+	std::vector<std::shared_ptr<UniformBuffer>> selectedEntityUniformBuffers;
 
 	std::unique_ptr<Pipeline> m_colliderPipeline;
 	VkPipelineLayout colliderPipelineLayout;

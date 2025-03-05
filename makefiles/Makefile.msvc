@@ -63,10 +63,19 @@ re: fclean all
 # Shaders (예: CMD 문법)
 ###############################################################################
 shader:
-	@if not exist ".\spvs" mkdir ".\spvs"
-	@for %%f in (.\shaders\*.vert) do glslc %%f -o .\spvs\%%~nf.vert.spv
-	@for %%f in (.\shaders\*.frag) do glslc %%f -o .\spvs\%%~nf.frag.spv
-	@echo [SUCCESS] Shaders compiled (MSVC)!
+#	@if not exist ".\spvs" mkdir ".\spvs"
+#	@for %%f in (.\shaders\*.vert) do glslc %%f -o .\spvs\%%~nf.vert.spv
+#	@for %%f in (.\shaders\*.frag) do glslc %%f -o .\spvs\%%~nf.frag.spv
+#	@echo [SUCCESS] Shaders compiled (MSVC)!
+
+	@mkdir -p ./spvs
+	@for file in ./shaders/*.vert; do \
+		glslc $$file -o ./spvs/$$(basename $$file .vert).vert.spv; \
+	done
+	@for file in ./shaders/*.frag; do \
+		glslc $$file -o ./spvs/$$(basename $$file .frag).frag.spv; \
+	done
+	@echo [SUCCESS] Shaders have been compiled successfully!
 
 ###############################################################################
 # Run
