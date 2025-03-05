@@ -180,7 +180,7 @@ void Model::drawShadow(ShadowMapDrawInfo &drawInfo)
 		vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0, 1,
 								&descriptorSets[index], 0, nullptr);
 		ShadowMapUniformBufferObject shadowMapUbo{};
-		shadowMapUbo.model = drawInfo.model;
+		shadowMapUbo.model = drawInfo.model * m_meshes[i]->getNodeTransform();
 		shadowMapUbo.view = drawInfo.view;
 		shadowMapUbo.proj = drawInfo.projection;
 		uniformBuffers[index]->updateUniformBuffer(&shadowMapUbo, sizeof(shadowMapUbo));
@@ -195,7 +195,6 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 	auto &layerIndexUniformBuffers = drawInfo.shaderResourceManager->getLayerIndexUniformBuffers();
 	uint32_t currentFrame = drawInfo.currentFrame;
 	ShadowCubeMapUniformBufferObject shadowCubeMapUbo{};
-	shadowCubeMapUbo.model = drawInfo.model;
 	shadowCubeMapUbo.proj = drawInfo.projection;
 	for (uint32_t i = 0; i < 6; i++)
 	{
@@ -209,6 +208,7 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 		{
 			vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0,
 									1, &descriptorSets[index], 0, nullptr);
+			shadowCubeMapUbo.model = drawInfo.model * m_meshes[j]->getNodeTransform();
 			uniformBuffers[currentFrame]->updateUniformBuffer(&shadowCubeMapUbo, sizeof(shadowCubeMapUbo));
 			ShadowCubeMapLayerIndex layerIndexUbo{};
 			layerIndexUbo.layerIndex = i;
@@ -555,7 +555,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(const aiScene *scene, aiMat
 	return Material::createMaterial(albedo, normalMap, roughness, metallic, ao, heightMap);
 }
 
-void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials, const alglm::mat4& parentTransform)
+void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials,
+							const alglm::mat4 &parentTransform)
 {
 	alglm::mat4 nodeTransform = convertMatrix(node->mTransformation);
 	alglm::mat4 globalTransform = parentTransform * nodeTransform;
@@ -573,7 +574,8 @@ void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std:
 	}
 }
 
-std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material, const alglm::mat4& globalTransform)
+std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material,
+											 const alglm::mat4 &globalTransform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -668,7 +670,7 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 			// 더미 본 인덱스 0을 할당하고, 가중치는 1.0으로 설정
 			vertices[vertexIndex].boneIds[0] = 0;
 			vertices[vertexIndex].weights[0] = 1.0f;
-	
+
 			// 나머지 본 슬롯은 사용하지 않음을 명시 (-1, 0.0)
 			vertices[vertexIndex].boneIds[1] = -1;
 			vertices[vertexIndex].weights[1] = 0.0f;

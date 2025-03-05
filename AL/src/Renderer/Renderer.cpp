@@ -979,7 +979,7 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	// auto &lights = scene->getLights();
 
 	// get light component
-	auto &lightView = scene->getAllEntitiesWith<TransformComponent, LightComponent>();
+	auto &lightView = scene->getAllEntitiesWith<TagComponent, TransformComponent, LightComponent>();
 	size_t lightSize = 0;
 	for (auto &entity : lightView)
 	{
@@ -1044,40 +1044,55 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 
 	vkCmdEndRenderPass(commandBuffer);
 
-	for (size_t i = 0; i < shadowMapIndex; i++)
+	int idx = 0;
+	for (auto &entity : lightView)
 	{
-		VkImageMemoryBarrier barrierToDepthWrite{};
-		barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		barrierToDepthWrite.image = m_shadowMapFrameBuffers[i]->getDepthImage();
-		barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
-		barrierToDepthWrite.subresourceRange.levelCount = 1;
-		barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
-		barrierToDepthWrite.subresourceRange.layerCount = 1;
+		if (!lightView.get<TagComponent>(entity).m_isActive)
+		{
+			continue;
+		}
+		std::shared_ptr<Light> light = lightView.get<LightComponent>(entity).m_Light;
+		if (light->onShadowMap == 1 && idx < shadowMapIndex)
+		{
+			if (light->type == 0)
+			{
+				VkImageMemoryBarrier barrierToDepthWrite{};
+				barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+				barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				barrierToDepthWrite.image = m_shadowCubeMapFrameBuffers[idx]->getDepthImage();
+				barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
+				barrierToDepthWrite.subresourceRange.levelCount = 1;
+				barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
+				barrierToDepthWrite.subresourceRange.layerCount = 6;
 
-		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-							 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1,
-							 &barrierToDepthWrite);
+				vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+									 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1,
+									 &barrierToDepthWrite);
+			}
+			else
+			{
+				VkImageMemoryBarrier barrierToDepthWrite{};
+				barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+				barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+				barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+				barrierToDepthWrite.image = m_shadowMapFrameBuffers[idx]->getDepthImage();
+				barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
+				barrierToDepthWrite.subresourceRange.levelCount = 1;
+				barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
+				barrierToDepthWrite.subresourceRange.layerCount = 1;
 
-		barrierToDepthWrite.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		barrierToDepthWrite.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		barrierToDepthWrite.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		barrierToDepthWrite.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		barrierToDepthWrite.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		barrierToDepthWrite.image = m_shadowCubeMapFrameBuffers[i]->getDepthImage();
-		barrierToDepthWrite.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-		barrierToDepthWrite.subresourceRange.baseMipLevel = 0;
-		barrierToDepthWrite.subresourceRange.levelCount = 1;
-		barrierToDepthWrite.subresourceRange.baseArrayLayer = 0;
-		barrierToDepthWrite.subresourceRange.layerCount = 6;
-
-		vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-							 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1,
-							 &barrierToDepthWrite);
+				vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+									 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1,
+									 &barrierToDepthWrite);
+			}
+		}
 	}
 }
 
