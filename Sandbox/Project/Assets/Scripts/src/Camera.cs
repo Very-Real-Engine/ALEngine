@@ -26,13 +26,11 @@ namespace Sandbox
         {
             Input.UpdateMousePosition();
             // 우클릭 시 카메라 이동 멈춤
-            if (!Input.isMouseRightPressed())
+            if (Input.isMouseRightPressed())
             {
 
                 // 마우스 델타 값 가져오기
                 Vector2 mouseDelta = Input.GetMouseDelta();
-                
-                // 마우스 감도 조절 상수
                 
                 // 현재 회전값 업데이트 (Y: yaw, X: pitch)
                 Vector3 rotation = m_Transform.Rotation;
@@ -73,5 +71,4 @@ namespace Sandbox
             m_Transform.Translation = translation;
         }
     }
-
 }

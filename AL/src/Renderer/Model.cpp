@@ -666,7 +666,7 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 		for (unsigned int vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex)
 		{
 			// 더미 본 인덱스 0을 할당하고, 가중치는 1.0으로 설정
-			vertices[vertexIndex].boneIds[0] = 0;  
+			vertices[vertexIndex].boneIds[0] = 0;
 			vertices[vertexIndex].weights[0] = 1.0f;
 	
 			// 나머지 본 슬롯은 사용하지 않음을 명시 (-1, 0.0)
@@ -713,11 +713,10 @@ void Model::processGLTFSkeleton(const aiScene *scene)
 	buildSkeletonBoneArray(allAiBones);
 
 	// creating dummy bones
-	if (m_Skeleton->m_Bones.size() == 0)
+	if (m_Skeleton->m_Bones.size() == 0 && scene->HasAnimations())
 	{
-		AL_CORE_INFO("create dummy bones");
 		Armature::Bone dummy;
-		dummy.m_Name = "Dummy";
+		dummy.m_Name = scene->mName.C_Str();
 		dummy.m_InverseBindMatrix = alglm::mat4(1.0f);
 		dummy.m_ParentBone = -1;
 
@@ -969,7 +968,6 @@ void Model::loadAnimations(const aiScene *scene)
 			// set duration
 			animation->setFirstKeyFrameTime(sampler.m_Timestamps[0]);
 			animation->setLastKeyFrameTime(sampler.m_Timestamps.back());
-			AL_CORE_INFO("{0}-{1}",sampler.m_Timestamps[0], sampler.m_Timestamps.back());
 		}
 
 		m_Animations->push(animation);

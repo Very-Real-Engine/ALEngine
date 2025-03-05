@@ -17,7 +17,7 @@ namespace ALEngine
 		{
 			Vector2 currentPosition = getMousePos();
 
-            if (isMouseRightPressed())
+            if (!isMouseRightPressed())
             {
                 s_LastMousePosition = currentPosition;
                 s_CurrentMousePosition = currentPosition;
