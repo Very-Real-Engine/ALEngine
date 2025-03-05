@@ -247,25 +247,25 @@ void Scene::onRuntimeStart()
 		// init animation & start animation status:playing
 		auto viewSA = m_Registry.view<SkeletalAnimatorComponent>();
 
-		for (auto& e : viewSA)
+		for (auto &e : viewSA)
 		{
-			auto& sa = m_Registry.get<SkeletalAnimatorComponent>(e);
+			auto &sa = m_Registry.get<SkeletalAnimatorComponent>(e);
 
 			Entity entity = {e, this};
 
 			// init state manager: connect methods from scriptcomponent;
 			if (m_Registry.try_get<ScriptComponent>(entity))
 			{
-				std::shared_ptr<AnimationStateManager>& stateManager = sa.sac->getStateManager();
+				std::shared_ptr<AnimationStateManager> &stateManager = sa.sac->getStateManager();
 
 				auto methods = ScriptingEngine::getBooleanMethods(entity);
 				auto transitions = stateManager->getTransitions();
 
 				if (transitions.size() != 0)
 				{
-					for (auto& transition : transitions)
+					for (auto &transition : transitions)
 					{
-						if (!transition.conditionName.empty() && 
+						if (!transition.conditionName.empty() &&
 							methods.find(transition.conditionName) != methods.end())
 						{
 							transition.condition = methods[transition.conditionName];
@@ -288,16 +288,14 @@ void Scene::onRuntimeStop()
 	ScriptingEngine::onRuntimeStop();
 
 	// stop animation playing
-	auto& view = m_Registry.view<SkeletalAnimatorComponent>();
+	auto &view = m_Registry.view<SkeletalAnimatorComponent>();
 
-	for (auto& e : view)
+	for (auto &e : view)
 	{
-		auto& sa = m_Registry.get<SkeletalAnimatorComponent>(e);
+		auto &sa = m_Registry.get<SkeletalAnimatorComponent>(e);
 		sa.m_IsPlaying = false;
 	}
 }
-
-
 
 void Scene::onUpdateEditor(EditorCamera &camera)
 {
@@ -423,18 +421,18 @@ void Scene::onUpdateRuntime(Timestep ts)
 	// imguilayer::renderDrawData
 }
 
-void Scene::preRenderEditor(const Timestep& ts)
+void Scene::preRenderEditor(const Timestep &ts)
 {
-		// update animations
+	// update animations
 	{
 		auto view = m_Registry.view<SkeletalAnimatorComponent>();
-		
+
 		for (auto e : view)
 		{
 			Entity entity = {e, this};
-			auto& sa = entity.getComponent<SkeletalAnimatorComponent>();
+			auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-			SAComponent* sac = sa.sac.get();
+			SAComponent *sac = sa.sac.get();
 			if (sa.m_IsPlaying || sa.m_IsTimelineDrag)
 				sac->updateAnimationWithoutTransition(ts * sa.m_SpeedFactor);
 		}
@@ -664,7 +662,7 @@ void Scene::onPhysicsStart()
 			fDef.restitution = cc.m_Restitution;
 			fDef.isSensor = cc.m_IsTrigger;
 			fDef.touchNum = 0;
-			
+
 			// create fixture
 			body->createFixture(&fDef);
 		}
@@ -726,16 +724,21 @@ void Scene::insertEntityInCullTree(Entity &entity)
 	}
 
 	auto &mc = entity.getComponent<MeshRendererComponent>();
-	if (mc.m_RenderingComponent != nullptr && mc.nodeId == NULL_NODE)
+
+	if (mc.nodeId != NULL_NODE)
 	{
-		TransformComponent &tc = entity.getComponent<TransformComponent>();
-
-		CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
-						  mc.cullSphere.radius * tc.getMaxScale());
-
-		mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
-		mc.cullState = ECullState::CULL;
+		replaceEntityInCullTree(entity);
 	}
+
+	TransformComponent &tc = entity.getComponent<TransformComponent>();
+
+	mc.cullSphere = mc.m_RenderingComponent->getCullSphere();
+
+	CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
+					  mc.cullSphere.radius * tc.getMaxScale());
+
+	mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
+	mc.cullState = ECullState::CULL;
 }
 
 void Scene::printCullTree()
@@ -751,6 +754,16 @@ void Scene::removeEntityInCullTree(Entity &entity)
 		if (mc.m_RenderingComponent == nullptr)
 			return;
 		mc.m_RenderingComponent->cleanup();
+		m_cullTree.destroyNode(mc.nodeId);
+		mc.nodeId = NULL_NODE;
+	}
+}
+
+void Scene::replaceEntityInCullTree(Entity &entity)
+{
+	if (entity.hasComponent<MeshRendererComponent>())
+	{
+		auto &mc = entity.getComponent<MeshRendererComponent>();
 		m_cullTree.destroyNode(mc.nodeId);
 		mc.nodeId = NULL_NODE;
 	}
@@ -812,6 +825,12 @@ void Scene::findMoveObject()
 
 		float limit = transform.getMaxScale() * mesh.cullSphere.radius * 0.1f;
 		limit = limit * limit;
+
+		if (alglm::length2(transform.m_Scale - transform.m_LastScale) > 1e-2f)
+		{
+			transform.m_LastScale = transform.m_Scale;
+			transform.m_isMoved = true;
+		}
 
 		if (alglm::length2(transform.m_Position - transform.m_LastPosition) > limit)
 		{

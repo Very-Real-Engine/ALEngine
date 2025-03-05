@@ -2,7 +2,6 @@
 
 #include "Core/UUID.h"
 
-
 #include "Renderer/SAComponent.h"
 #include "Renderer/Texture.h"
 
@@ -57,6 +56,7 @@ struct TransformComponent
 	alglm::vec3 m_Rotation = {0.0f, 0.0f, 0.0f};
 	alglm::vec3 m_Scale = {1.0f, 1.0f, 1.0f};
 	alglm::vec3 m_LastPosition = {0.0f, 0.0f, 0.0f};
+	alglm::vec3 m_LastScale = {0.0f, 0.0f, 0.0f};
 
 	bool m_isMoved = false;
 
