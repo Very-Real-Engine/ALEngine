@@ -1481,6 +1481,9 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawFloatControl("Angular Drag", component.m_AngularDamping);
 		drawCheckBox("Gravity", component.m_UseGravity);
 
+		// collision num
+		ImGui::InputInt("Touched Num", &component.m_TouchNum, 1, 100, ImGuiInputTextFlags_ReadOnly);
+
 		const char *bodyTypeStrings[] = {"Static", "Dynamic"};
 		const char *currentBodyTypeString = bodyTypeStrings[(int)component.m_Type];
 
