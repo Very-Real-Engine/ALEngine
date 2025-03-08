@@ -306,7 +306,7 @@ std::string monoStringToString2(MonoString *string);
  * @param std::string
  * @return MonoString*
  */
-MonoString* stringToMonoString(std::string& string);
+MonoString* stringToMonoString(const std::string& string);
 
 /**
  * @brief 스크립트 필드 유형을 문자열로 변환합니다.

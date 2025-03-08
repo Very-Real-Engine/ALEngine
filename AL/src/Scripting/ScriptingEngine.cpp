@@ -80,7 +80,7 @@ std::string monoStringToString2(MonoString *string)
 	return str;
 }
 
-MonoString* stringToMonoString(std::string& string)
+MonoString* stringToMonoString(const std::string& string)
 {
 	MonoDomain* domain = mono_domain_get();
 	return mono_string_new(domain, string.c_str());
