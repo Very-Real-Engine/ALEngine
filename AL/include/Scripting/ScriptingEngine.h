@@ -170,6 +170,12 @@ class ScriptInstance
 		setFieldValueInternal(name, &value);
 	}
 
+	template<>
+	void setFieldValue(const std::string &name, MonoString* value)
+	{
+		setFieldValueInternal(name, value);
+	}
+
   private:
 	bool getFieldValueInternal(const std::string &name, void *buffer);
 	bool setFieldValueInternal(const std::string &name, const void *value);
