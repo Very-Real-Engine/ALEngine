@@ -805,7 +805,6 @@ void Model::loadAnimations(const aiScene *scene)
 		aiAnimation *aiAnim = scene->mAnimations[animationIndex];
 		std::string animationName =
 			(aiAnim->mName.length > 0 ? std::string(aiAnim->mName.C_Str()) : ("Anim" + std::to_string(animationIndex)));
-		AL_CORE_INFO("{0}", animationName);
 
 		std::shared_ptr<SkeletalAnimation> animation = std::make_shared<SkeletalAnimation>(animationName);
 
