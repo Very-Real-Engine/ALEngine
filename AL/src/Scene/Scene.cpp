@@ -723,16 +723,21 @@ void Scene::insertEntityInCullTree(Entity &entity)
 	}
 
 	auto &mc = entity.getComponent<MeshRendererComponent>();
-	if (mc.m_RenderingComponent != nullptr && mc.nodeId == NULL_NODE)
+
+	if (mc.nodeId != NULL_NODE)
 	{
-		TransformComponent &tc = entity.getComponent<TransformComponent>();
-
-		CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
-						  mc.cullSphere.radius * tc.getMaxScale());
-
-		mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
-		mc.cullState = ECullState::CULL;
+		replaceEntityInCullTree(entity);
 	}
+
+	TransformComponent &tc = entity.getComponent<TransformComponent>();
+
+	mc.cullSphere = mc.m_RenderingComponent->getCullSphere();
+
+	CullSphere sphere(tc.getTransform() * alglm::vec4(mc.cullSphere.center, 1.0f),
+					  mc.cullSphere.radius * tc.getMaxScale());
+
+	mc.nodeId = m_cullTree.createNode(sphere, static_cast<uint32_t>(entity));
+	mc.cullState = ECullState::CULL;
 }
 
 void Scene::printCullTree()
@@ -748,6 +753,16 @@ void Scene::removeEntityInCullTree(Entity &entity)
 		if (mc.m_RenderingComponent == nullptr)
 			return;
 		mc.m_RenderingComponent->cleanup();
+		m_cullTree.destroyNode(mc.nodeId);
+		mc.nodeId = NULL_NODE;
+	}
+}
+
+void Scene::replaceEntityInCullTree(Entity &entity)
+{
+	if (entity.hasComponent<MeshRendererComponent>())
+	{
+		auto &mc = entity.getComponent<MeshRendererComponent>();
 		m_cullTree.destroyNode(mc.nodeId);
 		mc.nodeId = NULL_NODE;
 	}
@@ -809,6 +824,12 @@ void Scene::findMoveObject()
 
 		float limit = transform.getMaxScale() * mesh.cullSphere.radius * 0.1f;
 		limit = limit * limit;
+
+		if (alglm::length2(transform.m_Scale - transform.m_LastScale) > 1e-2f)
+		{
+			transform.m_LastScale = transform.m_Scale;
+			transform.m_isMoved = true;
+		}
 
 		if (alglm::length2(transform.m_Position - transform.m_LastPosition) > limit)
 		{
