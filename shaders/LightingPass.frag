@@ -78,10 +78,11 @@ vec3 rotateVector(vec3 v, vec3 axis, float angle) {
 
 void generateRotatedVectors(vec3 direction) {
     vec3 rotationAxis = getRotationAxis(direction); // 회전축 계산
-    float angleStep = radians(0.02);
+    float rotationAngle = radians(360.0 / 8.0);
+    float angleStep = radians(0.1);
     for (int i = 0; i < 8; i++) {
-        float angle = angleStep * float(i);
-        rotatedVectors[i] = rotateVector(direction, rotationAxis, angle);
+        vec3 newRotationAxis = rotateVector(rotationAxis, direction, rotationAngle * float(i));
+        rotatedVectors[i] = rotateVector(direction, newRotationAxis, angleStep);
     }
 }
 
