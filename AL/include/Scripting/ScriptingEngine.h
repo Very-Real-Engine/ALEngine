@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+#include "mono/metadata/mono-gc.h"
+
 // C 스타일의 name mangling을 사용하지 않도록 지시하는 키워드
 // name mangling - 컴파일러가 변수나 함수의 고유 식별자를 생성하기 위해 사용되는 프로세스
 // MyNamespace::MyClass::myFunction(int) → _ZN11MyNamespace7MyClass10myFunctionEi
@@ -125,6 +127,7 @@ class ScriptInstance
 	/// @param scriptClass 기존에 생성한 ScriptClass 
 	/// @param entity ScriptComponent를 가지고 있는 Entity.
 	ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, Entity entity);
+	~ScriptInstance();
 
 	/// @brief ScriptInstance의 OnCreate 함수 실행.
 	void invokeOnCreate();
@@ -141,7 +144,7 @@ class ScriptInstance
 
 	MonoObject *getManagedObject()
 	{
-		return m_Instance;
+		return mono_gchandle_get_target(m_GCHandle);
 	}
 
 	/// @brief ScriptInstance의 변수 값을 가져오는 템플릿 함수.
@@ -182,6 +185,7 @@ class ScriptInstance
 
   private:
 	std::shared_ptr<ScriptClass> m_ScriptClass;
+	unsigned int m_GCHandle = 0;
 
 	MonoObject *m_Instance = nullptr;
 	MonoMethod *m_Constructor = nullptr;
@@ -212,12 +216,23 @@ struct ScriptFieldInstance
 		static_assert(sizeof(T) <= 16, "Type too large!");
 		return *(T *)m_Buffer;
 	}
+	template<>
+	std::string getValue<std::string>()
+	{
+		return *reinterpret_cast<std::string*>(m_Buffer);
+	}
 
 	template <typename T> void setValue(T value)
 	{
 		static_assert(sizeof(T) <= 16, "Type too large!");
 		memcpy(m_Buffer, &value, sizeof(T));
 	}
+	template <>
+	void setValue<std::string>(std::string value)
+	{
+		*reinterpret_cast<std::string*>(m_Buffer) = std::move(value);
+	}
+	
 
   private:
 	uint8_t m_Buffer[16];
