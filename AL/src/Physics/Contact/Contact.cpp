@@ -128,7 +128,7 @@ void Contact::evaluate(Manifold &manifold, const Transform &transformA, const Tr
 		{
 			manifold.pointsCount = 1;
 			freeConvexInfo(convexA, convexB);
-			return ;
+			return;
 		}
 
 		EpaInfo epaInfo = getEpaResult(convexA, convexB, simplexArray);
@@ -174,18 +174,18 @@ void Contact::update()
 		// 2. 충돌에 따른 manifold 생성
 		// 3. manifold의 내부 값을 impulse를 제외하고 채워줌
 		// 4. 실제 충돌이 일어나지 않은 경우 manifold.pointCount = 0인 충돌 생성
-		
+
 		// manifold의 충격량 0으로 초기화 및 old manifold 중
 		// 같은 충돌이 있는경우 Impulse 재사용
 		// id 는 충돌 도형의 type과 vertex 또는 line의 index 정보를 압축하여 결정
 		m_manifold.pointsCount = 0;
 		evaluate(m_manifold, transformA, transformB, isSensor);
 		touching = m_manifold.pointsCount > 0;
-		
+
 		for (int32_t i = 0; i < m_manifold.pointsCount; ++i)
 		{
 			ManifoldPoint &manifoldPoint = m_manifold.points[i];
-	
+
 			manifoldPoint.normalImpulse = 0.0f;
 			manifoldPoint.tangentImpulse = 0.0f;
 		}
