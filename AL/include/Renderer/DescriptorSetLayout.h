@@ -64,6 +64,17 @@ class DescriptorSetLayout
 	static std::unique_ptr<DescriptorSetLayout> createColliderDescriptorSetLayout();
 
 	/**
+	 * @brief Shadow Map Descriptor Set Layout SSBO 생성
+	 * @return Shadow Map Descriptor Set Layout SSBO
+	 */
+	static std::unique_ptr<DescriptorSetLayout> createShadowMapDescriptorSetLayoutSSBO();
+	/**
+	 * @brief Shadow Cube Map Descriptor Set Layout SSBO 생성
+	 * @return Shadow Cube Map Descriptor Set Layout SSBO
+	 */
+	static std::unique_ptr<DescriptorSetLayout> createShadowCubeMapDescriptorSetLayoutSSBO();
+
+	/**
 	 * @brief Descriptor Set Layout 소멸자
 	 */
 	~DescriptorSetLayout() = default;
@@ -121,5 +132,13 @@ class DescriptorSetLayout
 	 * @brief Collider Descriptor Set Layout 초기화
 	 */
 	void initColliderDescriptorSetLayout();
+	/**
+	 * @brief Shadow Map Descriptor Set Layout SSBO 초기화
+	 */
+	void initShadowMapDescriptorSetLayoutSSBO();
+	/**
+	 * @brief Shadow Cube Map Descriptor Set Layout SSBO 초기화
+	 */
+	void initShadowCubeMapDescriptorSetLayoutSSBO();
 };
 } // namespace ale

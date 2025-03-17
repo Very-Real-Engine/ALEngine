@@ -311,6 +311,33 @@ class Renderer
 	VkPipelineLayout colliderPipelineLayout;
 	VkPipeline colliderGraphicsPipeline;
 
+	// shadowmap ssbo 추가 부분
+	std::vector<std::map<std::string, std::vector<alglm::mat4>>> m_shadowMapModels;
+
+	std::unique_ptr<DescriptorSetLayout> m_shadowMapDescriptorSetLayoutSSBO;
+	VkDescriptorSetLayout shadowMapDescriptorSetLayoutSSBO;
+
+	std::unique_ptr<DescriptorSetLayout> m_shadowCubeMapDescriptorSetLayoutSSBO;
+	VkDescriptorSetLayout shadowCubeMapDescriptorSetLayoutSSBO;
+
+	std::vector<std::shared_ptr<StorageBuffer>> m_shadowMapSSBO;
+
+	std::vector<std::unique_ptr<ShaderResourceManager>> m_shadowMapShaderResourceManagerSSBO;
+	std::vector<std::vector<std::shared_ptr<UniformBuffer>>> shadowMapUniformBuffersSSBO;
+	std::vector<std::vector<VkDescriptorSet>> shadowMapDescriptorSetsSSBO;
+
+	std::vector<std::unique_ptr<ShaderResourceManager>> m_shadowCubeMapShaderResourceManagerSSBO;
+	std::vector<std::vector<std::shared_ptr<UniformBuffer>>> shadowCubeMapUniformBuffersSSBO;
+	std::vector<std::vector<VkDescriptorSet>> shadowCubeMapDescriptorSetsSSBO;
+
+	std::unique_ptr<Pipeline> m_shadowMapPipelineSSBO;
+	VkPipelineLayout shadowMapPipelineLayoutSSBO;
+	VkPipeline shadowMapGraphicsPipelineSSBO;
+
+	std::unique_ptr<Pipeline> m_shadowCubeMapPipelineSSBO;
+	VkPipelineLayout shadowCubeMapPipelineLayoutSSBO;
+	VkPipeline shadowCubeMapGraphicsPipelineSSBO;
+
 	bool firstFrame = true;
 
 	/**
@@ -368,5 +395,6 @@ class Renderer
 	 * @param commandBuffer 명령 버퍼
 	 */
 	void recordColliderCommandBuffer(Scene *scene, VkCommandBuffer commandBuffer);
+	void updateShadowMapSSBO(Scene *scene);
 };
 } // namespace ale

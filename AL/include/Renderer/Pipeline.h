@@ -76,6 +76,11 @@ class Pipeline
 	static std::unique_ptr<Pipeline> createColliderPipeline(VkRenderPass renderPass,
 															VkDescriptorSetLayout descriptorSetLayout);
 
+	static std::unique_ptr<Pipeline> createShadowMapPipelineSSBO(VkRenderPass renderPass,
+																 VkDescriptorSetLayout descriptorSetLayout);
+	static std::unique_ptr<Pipeline> createShadowCubeMapPipelineSSBO(VkRenderPass renderPass,
+																	 VkDescriptorSetLayout descriptorSetLayout);
+
 	/**
 	 * @brief 기하 파이프라인 초기화
 	 * @param renderPass 렌더 패스
@@ -118,6 +123,9 @@ class Pipeline
 	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
 	 */
 	void initColliderPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
+
+	void initShadowMapPipelineSSBO(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
+	void initShadowCubeMapPipelineSSBO(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 
 	~Pipeline() = default;
 

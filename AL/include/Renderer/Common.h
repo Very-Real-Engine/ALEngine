@@ -307,10 +307,32 @@ struct BackgroundUniformBufferObject
  */
 struct ColliderUniformBufferObject
 {
-	alignas(16) alglm::mat4 model;
-	alignas(16) alglm::mat4 view;
-	alignas(16) alglm::mat4 proj;
-	alignas(16) alglm::vec3 color;
+	ALIGN16 alglm::mat4 model;
+	ALIGN16 alglm::mat4 view;
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::vec3 color;
+};
+
+struct ShadowMapUBO
+{
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::mat4 view;
+};
+
+struct ShadowCubeMapUBO
+{
+	ALIGN16 alglm::mat4 proj;
+	ALIGN16 alglm::mat4 view[6];
+};
+
+struct ShadowMapSSBO
+{
+	ALIGN16 alglm::mat4 model;
+};
+
+struct ShadowCubeMapPushConstants
+{
+	ALIGN4 uint32_t layerIndex;
 };
 
 } // namespace ale

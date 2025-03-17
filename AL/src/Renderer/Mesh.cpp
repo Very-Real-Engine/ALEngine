@@ -2,7 +2,8 @@
 
 namespace ale
 {
-std::shared_ptr<Mesh> Mesh::createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const alglm::mat4& globalTransform)
+std::shared_ptr<Mesh> Mesh::createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices,
+									   const alglm::mat4 &globalTransform)
 {
 	std::shared_ptr<Mesh> mesh = std::shared_ptr<Mesh>(new Mesh());
 	mesh->initMesh(vertices, indices);
@@ -349,6 +350,13 @@ void Mesh::draw(VkCommandBuffer commandBuffer)
 	m_vertexBuffer->bind(commandBuffer);
 	m_indexBuffer->bind(commandBuffer);
 	vkCmdDrawIndexed(commandBuffer, m_indexBuffer->getIndexCount(), 1, 0, 0, 0);
+}
+
+void Mesh::drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance)
+{
+	m_vertexBuffer->bind(commandBuffer);
+	m_indexBuffer->bind(commandBuffer);
+	vkCmdDrawIndexed(commandBuffer, m_indexBuffer->getIndexCount(), instanceCount, 0, 0, firstInstance);
 }
 
 void Mesh::initMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices)
