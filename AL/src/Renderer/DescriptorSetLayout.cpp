@@ -399,4 +399,85 @@ void DescriptorSetLayout::initColliderDescriptorSetLayout()
 		throw std::runtime_error("failed to create collider descriptor set layout!");
 	}
 }
+
+std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::createShadowMapDescriptorSetLayoutSSBO()
+{
+	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout =
+		std::unique_ptr<DescriptorSetLayout>(new DescriptorSetLayout());
+	descriptorSetLayout->initShadowMapDescriptorSetLayoutSSBO();
+	return descriptorSetLayout;
+}
+
+void DescriptorSetLayout::initShadowMapDescriptorSetLayoutSSBO()
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	VkDescriptorSetLayoutBinding uboBinding{};
+	uboBinding.binding = 0;
+	uboBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboBinding.descriptorCount = 1;
+	uboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	uboBinding.pImmutableSamplers = nullptr;
+
+	VkDescriptorSetLayoutBinding ssboBinding{};
+	ssboBinding.binding = 1;
+	ssboBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	ssboBinding.descriptorCount = 1;
+	ssboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	ssboBinding.pImmutableSamplers = nullptr;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboBinding, ssboBinding};
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+	layoutInfo.pBindings = bindings.data();
+
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create SSBO shadow map descriptor set layout!");
+	}
+}
+
+std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::createShadowCubeMapDescriptorSetLayoutSSBO()
+{
+	std::unique_ptr<DescriptorSetLayout> descriptorSetLayout =
+		std::unique_ptr<DescriptorSetLayout>(new DescriptorSetLayout());
+	descriptorSetLayout->initShadowCubeMapDescriptorSetLayoutSSBO();
+	return descriptorSetLayout;
+}
+
+void DescriptorSetLayout::initShadowCubeMapDescriptorSetLayoutSSBO()
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	VkDescriptorSetLayoutBinding uboBinding{};
+	uboBinding.binding = 0;
+	uboBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboBinding.descriptorCount = 1;
+	uboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	uboBinding.pImmutableSamplers = nullptr;
+
+	VkDescriptorSetLayoutBinding ssboBinding{};
+	ssboBinding.binding = 1;
+	ssboBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	ssboBinding.descriptorCount = 1;
+	ssboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	ssboBinding.pImmutableSamplers = nullptr;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboBinding, ssboBinding};
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+	layoutInfo.pBindings = bindings.data();
+
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create SSBO shadow map descriptor set layout!");
+	}
+}
+
 } // namespace ale

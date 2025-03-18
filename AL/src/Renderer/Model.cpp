@@ -218,49 +218,65 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 	}
 }
 
+void Model::drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance)
+{
+	for (uint32_t i = 0; i < m_meshes.size(); i++)
+	{
+		m_meshes[i]->drawShadowSSBO(commandBuffer, instanceCount, firstInstance);
+	}
+}
+
 void Model::initModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = path;
 	loadModel(path, defaultMaterial);
 }
 
 void Model::initBoxModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "box";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createBox());
 }
 
 void Model::initSphereModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "sphere";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createSphere());
 }
 
 void Model::initPlaneModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "plane";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createPlane());
 }
 
 void Model::initGroundModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "ground";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createGround());
 }
 
 void Model::initCapsuleModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "capsule";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCapsule());
 }
 
 void Model::initCylinderModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "cylinder";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCylinder());
 }
 
 void Model::initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "colliderBox";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createColliderBox());
 }

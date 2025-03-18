@@ -83,6 +83,15 @@ class RenderingComponent
 		return m_materials;
 	}
 
+	/**
+	 * @brief 모델 이름 반환
+	 * @return std::string & 모델 이름
+	 */
+	std::string &getModelName()
+	{
+		return m_model->getName();
+	}
+
   public:
 	/**
 	 * @brief 원시 타입
@@ -100,8 +109,6 @@ class RenderingComponent
 	RenderingComponent() = default;
 	std::shared_ptr<Model> m_model;
 	std::unique_ptr<ShaderResourceManager> m_shaderResourceManager;
-	std::vector<std::unique_ptr<ShaderResourceManager>> m_shadowMapResourceManager;
-	std::vector<std::unique_ptr<ShaderResourceManager>> m_shadowCubeMapResourceManager;
 	std::vector<std::shared_ptr<Material>> m_materials;
 	/**
 	 * @brief 렌더링 컴포넌트 초기화

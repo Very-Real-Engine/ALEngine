@@ -349,4 +349,74 @@ class UniformBuffer : public Buffer
 	 */
 	void initUniformBuffer(VkDeviceSize buffersize);
 };
+
+class StorageBuffer : public Buffer
+{
+  public:
+	/**
+	 * @brief 스토리지 버퍼 생성
+	 * @return 스토리지 버퍼
+	 */
+	static std::shared_ptr<StorageBuffer> createStorageBuffer(VkDeviceSize bufferSize);
+	/**
+	 * @brief 스토리지 버퍼 소멸자
+	 */
+	~StorageBuffer() = default;
+	/**
+	 * @brief 스토리지 버퍼 정리
+	 */
+	void cleanup();
+	/**
+	 * @brief 스토리지 버퍼 전체 업데이트
+	 * @param data 데이터
+	 * @param size 데이터 크기
+	 */
+	void updateStorageBuffer(void *data, VkDeviceSize totalSize);
+	/**
+	 * @brief 스토리지 버퍼 인덱스 업데이트
+	 * @param index 인덱스
+	 * @param data 데이터
+	 * @param size 데이터 크기
+	 */
+	void updateStorageBufferAt(uint32_t index, void *data, VkDeviceSize structSize);
+	/**
+	 * @brief 스토리지 버퍼 반환
+	 * @return 스토리지 버퍼
+	 */
+	VkBuffer getBuffer()
+	{
+		return m_buffer;
+	}
+	/**
+	 * @brief 스토리지 버퍼 메모리 반환
+	 * @return 스토리지 버퍼 메모리
+	 */
+	VkDeviceMemory getBufferMemory()
+	{
+		return m_bufferMemory;
+	}
+	/**
+	 * @brief 스토리지 버퍼 현재 크기 반환
+	 * @return 스토리지 버퍼 현재 크기
+	 */
+	VkDeviceSize getCurrentSize()
+	{
+		return m_currentSize;
+	}
+	/**
+	 * @brief 스토리지 버퍼 크기 조정
+	 * @param size 버퍼 크기
+	 */
+	void resizeStorageBuffer(VkDeviceSize size);
+
+  private:
+	void *m_mappedMemory = nullptr;
+	VkDeviceSize m_currentSize = 0;
+	/**
+	 * @brief 스토리지 버퍼 초기화
+	 * @param size 버퍼 크기
+	 */
+	void initStorageBuffer(VkDeviceSize size);
+};
+
 } // namespace ale

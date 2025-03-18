@@ -172,6 +172,49 @@ void Renderer::init(GLFWwindow *window)
 	shadowCubeMapDescriptorSetLayout = m_shadowCubeMapDescriptorSetLayout->getDescriptorSetLayout();
 	context.setShadowCubeMapDescriptorSetLayout(shadowCubeMapDescriptorSetLayout);
 
+	// 여기서 shadowmap 다 만들고 나눕시다
+	m_shadowMapDescriptorSetLayoutSSBO = DescriptorSetLayout::createShadowMapDescriptorSetLayoutSSBO();
+	shadowMapDescriptorSetLayoutSSBO = m_shadowMapDescriptorSetLayoutSSBO->getDescriptorSetLayout();
+	m_shadowCubeMapDescriptorSetLayoutSSBO = DescriptorSetLayout::createShadowCubeMapDescriptorSetLayoutSSBO();
+	shadowCubeMapDescriptorSetLayoutSSBO = m_shadowCubeMapDescriptorSetLayoutSSBO->getDescriptorSetLayout();
+
+	// 2개 프레임 작업할거니깐 2개
+	m_shadowMapSSBO.push_back(StorageBuffer::createStorageBuffer(sizeof(ShadowMapSSBO) * 100));
+	m_shadowMapSSBO.push_back(StorageBuffer::createStorageBuffer(sizeof(ShadowMapSSBO) * 100));
+
+	m_shadowMapShaderResourceManagerSSBO.resize(4);
+	m_shadowCubeMapShaderResourceManagerSSBO.resize(4);
+	shadowMapDescriptorSetsSSBO.resize(4);
+	shadowMapUniformBuffersSSBO.resize(4);
+	shadowCubeMapDescriptorSetsSSBO.resize(4);
+	shadowCubeMapUniformBuffersSSBO.resize(4);
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		m_shadowMapShaderResourceManagerSSBO[i] = ShaderResourceManager::createShadowMapShaderResourceManagerSSBO(
+			shadowMapDescriptorSetLayoutSSBO, m_shadowMapSSBO);
+		shadowMapDescriptorSetsSSBO[i] = m_shadowMapShaderResourceManagerSSBO[i]->getDescriptorSets();
+		shadowMapUniformBuffersSSBO[i] = m_shadowMapShaderResourceManagerSSBO[i]->getUniformBuffers();
+
+		m_shadowCubeMapShaderResourceManagerSSBO[i] =
+			ShaderResourceManager::createShadowCubeMapShaderResourceManagerSSBO(shadowCubeMapDescriptorSetLayoutSSBO,
+																				m_shadowMapSSBO);
+		shadowCubeMapDescriptorSetsSSBO[i] = m_shadowCubeMapShaderResourceManagerSSBO[i]->getDescriptorSets();
+		shadowCubeMapUniformBuffersSSBO[i] = m_shadowCubeMapShaderResourceManagerSSBO[i]->getUniformBuffers();
+	}
+
+	m_shadowMapPipelineSSBO =
+		Pipeline::createShadowMapPipelineSSBO(shadowMapRenderPass[0], shadowMapDescriptorSetLayoutSSBO);
+	shadowMapPipelineLayoutSSBO = m_shadowMapPipelineSSBO->getPipelineLayout();
+	shadowMapGraphicsPipelineSSBO = m_shadowMapPipelineSSBO->getPipeline();
+
+	m_shadowCubeMapPipelineSSBO =
+		Pipeline::createShadowCubeMapPipelineSSBO(shadowCubeMapRenderPass[0], shadowCubeMapDescriptorSetLayoutSSBO);
+	shadowCubeMapPipelineLayoutSSBO = m_shadowCubeMapPipelineSSBO->getPipelineLayout();
+	shadowCubeMapGraphicsPipelineSSBO = m_shadowCubeMapPipelineSSBO->getPipeline();
+
+	m_shadowMapModels.resize(MAX_FRAMES_IN_FLIGHT);
+
 #pragma endregion
 
 #pragma region Pipeline
@@ -274,6 +317,8 @@ void Renderer::cleanup()
 	m_sphericalMapPipeline->cleanup();
 	m_backgroundPipeline->cleanup();
 	m_colliderPipeline->cleanup();
+	m_shadowMapPipelineSSBO->cleanup();
+	m_shadowCubeMapPipelineSSBO->cleanup();
 
 	// renderpass
 	m_deferredRenderPass->cleanup();
@@ -302,6 +347,18 @@ void Renderer::cleanup()
 	m_lightingPassShaderResourceManager->cleanup();
 	m_selectedEntityShaderResourceManager->cleanup();
 
+	for (size_t i = 0; i < 4; i++)
+	{
+		m_shadowMapShaderResourceManagerSSBO[i]->cleanup();
+		m_shadowCubeMapShaderResourceManagerSSBO[i]->cleanup();
+	}
+
+	// buffer
+	for (uint32_t i = 0; i < 2; i++)
+	{
+		m_shadowMapSSBO[i]->cleanup();
+	}
+
 	// descriptorSetLayout
 	m_geometryPassDescriptorSetLayout->cleanup();
 	m_lightingPassDescriptorSetLayout->cleanup();
@@ -311,6 +368,8 @@ void Renderer::cleanup()
 	m_sphericalMapDescriptorSetLayout->cleanup();
 	m_backgroundDescriptorSetLayout->cleanup();
 	m_colliderDescriptorSetLayout->cleanup();
+	m_shadowMapDescriptorSetLayoutSSBO->cleanup();
+	m_shadowCubeMapDescriptorSetLayoutSSBO->cleanup();
 
 	m_syncObjects->cleanup();
 	VulkanContext::getContext().cleanup();
@@ -606,8 +665,9 @@ void Renderer::drawFrame(Scene *scene)
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
 
-	auto &view = scene->getAllEntitiesWith<LightComponent, TagComponent>();
+	updateShadowMapSSBO(scene);
 
+	auto &view = scene->getAllEntitiesWith<LightComponent, TagComponent>();
 	uint32_t shadowMapIndex = 0;
 	for (auto &entity : view)
 	{
@@ -1098,6 +1158,7 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 									 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT, 0, 0, nullptr, 0, nullptr, 1,
 									 &barrierToDepthWrite);
 			}
+			idx++;
 		}
 	}
 }
@@ -1123,7 +1184,7 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// Shadow Map 파이프라인 바인딩
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapGraphicsPipeline[shadowMapIndex]);
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapGraphicsPipelineSSBO);
 
 	// Viewport 및 Scissor 설정
 	VkViewport viewport{};
@@ -1173,26 +1234,20 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 		lightProj[1][1] *= -1;
 	}
 
-	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
-	ShadowMapDrawInfo drawInfo;
-	drawInfo.view = lightView;
-	drawInfo.projection = lightProj;
-	drawInfo.commandBuffer = commandBuffer;
-	drawInfo.pipelineLayout = shadowMapPipelineLayout[shadowMapIndex];
-	drawInfo.currentFrame = currentFrame;
-	for (auto &entity : view)
+	ShadowMapUBO ubo{};
+	ubo.view = lightView;
+	ubo.proj = lightProj;
+
+	shadowMapUniformBuffersSSBO[shadowMapIndex][currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayoutSSBO, 0, 1,
+							&shadowMapDescriptorSetsSSBO[shadowMapIndex][currentFrame], 0, nullptr);
+
+	uint32_t modelIndex = 0;
+	for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
 	{
-		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
-		{
-			continue;
-		}
-		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
-		if (meshRendererComponent.cullState != ECullState::RENDER)
-		{
-			continue;
-		}
-		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
-		meshRendererComponent.m_RenderingComponent->drawShadow(drawInfo, shadowMapIndex);
+		auto &model = m_modelsMap[modelKeyValue.first];
+		model->drawShadowSSBO(commandBuffer, modelKeyValue.second.size(), modelIndex);
+		modelIndex += modelKeyValue.second.size();
 	}
 
 	// Render Pass 종료
@@ -1236,7 +1291,7 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// Shadow Map 파이프라인 바인딩
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowCubeMapGraphicsPipeline[shadowMapIndex]);
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowCubeMapGraphicsPipelineSSBO);
 
 	// Viewport 및 Scissor 설정
 	VkViewport viewport{};
@@ -1258,34 +1313,34 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 
 	alglm::vec3 lightPos = lightInfo.position;
 	alglm::mat4 lightProj = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
-	// lightProj[1][1] *= -1;
 
-	ShadowCubeMapDrawInfo drawInfo;
-	drawInfo.view[0] = alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[1] = alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[2] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
-	drawInfo.view[3] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
-	drawInfo.view[4] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
-	drawInfo.view[5] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
-	drawInfo.projection = lightProj;
-	drawInfo.commandBuffer = commandBuffer;
-	drawInfo.pipelineLayout = shadowCubeMapPipelineLayout[shadowMapIndex];
-	drawInfo.currentFrame = currentFrame;
+	ShadowCubeMapUBO ubo{};
+	ubo.view[0] = alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	ubo.view[1] = alglm::lookAt(lightPos, lightPos + alglm::vec3(-1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
+	ubo.view[2] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 1.0, 0.0), alglm::vec3(0.0, 0.0, 1.0));
+	ubo.view[3] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, -1.0, 0.0), alglm::vec3(0.0, 0.0, -1.0));
+	ubo.view[4] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, 1.0), alglm::vec3(0.0, -1.0, 0.0));
+	ubo.view[5] = alglm::lookAt(lightPos, lightPos + alglm::vec3(0.0, 0.0, -1.0), alglm::vec3(0.0, -1.0, 0.0));
+	ubo.proj = lightProj;
 
-	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
-	for (auto &entity : view)
+	shadowCubeMapUniformBuffersSSBO[shadowMapIndex][currentFrame]->updateUniformBuffer(&ubo, sizeof(ubo));
+
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowCubeMapPipelineLayoutSSBO, 0, 1,
+							&shadowCubeMapDescriptorSetsSSBO[shadowMapIndex][currentFrame], 0, nullptr);
+
+	ShadowCubeMapPushConstants pushConstants{};
+	for (uint32_t i = 0; i < 6; i++)
 	{
-		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
+		uint32_t modelIndex = 0;
+		pushConstants.layerIndex = i;
+		vkCmdPushConstants(commandBuffer, shadowCubeMapPipelineLayoutSSBO, VK_SHADER_STAGE_VERTEX_BIT, 0,
+						   sizeof(pushConstants), &pushConstants);
+		for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
 		{
-			continue;
+			auto &model = m_modelsMap[modelKeyValue.first];
+			model->drawShadowSSBO(commandBuffer, modelKeyValue.second.size(), modelIndex);
+			modelIndex += modelKeyValue.second.size();
 		}
-		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
-		if (meshRendererComponent.cullState != ECullState::RENDER)
-		{
-			continue;
-		}
-		drawInfo.model = view.get<TransformComponent>(entity).m_WorldTransform;
-		meshRendererComponent.m_RenderingComponent->drawShadowCubeMap(drawInfo, shadowMapIndex);
 	}
 
 	// Render Pass 종료
@@ -1572,5 +1627,54 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 	}
 
 	vkCmdEndRenderPass(commandBuffer);
+}
+
+void Renderer::updateShadowMapSSBO(Scene *scene)
+{
+	m_shadowMapModels[currentFrame].clear();
+
+	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
+
+	for (auto &entity : view)
+	{
+		if (!view.get<TagComponent>(entity).m_isActive || view.get<MeshRendererComponent>(entity).type == 0)
+		{
+			continue;
+		}
+		MeshRendererComponent &meshRendererComponent = view.get<MeshRendererComponent>(entity);
+		if (meshRendererComponent.cullState != ECullState::RENDER)
+		{
+			continue;
+		}
+		TransformComponent &transformComponent = view.get<TransformComponent>(entity);
+		alglm::mat4 &model = transformComponent.m_WorldTransform;
+		std::string &modelName = meshRendererComponent.m_RenderingComponent->getModelName();
+		m_shadowMapModels[currentFrame][modelName].push_back(model);
+	}
+
+	std::vector<ShadowMapSSBO> ssbo;
+
+	for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
+	{
+		std::vector<alglm::mat4> &modelMatrices = modelKeyValue.second;
+
+		for (auto &modelMatrix : modelMatrices)
+		{
+			ssbo.push_back(ShadowMapSSBO{modelMatrix});
+		}
+	}
+	if (m_shadowMapSSBO[currentFrame]->getCurrentSize() < ssbo.size() * sizeof(ShadowMapSSBO))
+	{
+		std::cout << "resize shadow map ssbo" << std::endl;
+		vkDeviceWaitIdle(device);
+		m_shadowMapSSBO[0]->resizeStorageBuffer(ssbo.size() * sizeof(ShadowMapSSBO));
+		m_shadowMapSSBO[1]->resizeStorageBuffer(ssbo.size() * sizeof(ShadowMapSSBO));
+		for (size_t i = 0; i < 4; i++)
+		{
+			m_shadowMapShaderResourceManagerSSBO[i]->changeShadowMapSSBO(m_shadowMapSSBO);
+			m_shadowCubeMapShaderResourceManagerSSBO[i]->changeShadowCubeMapSSBO(m_shadowMapSSBO);
+		}
+	}
+	m_shadowMapSSBO[currentFrame]->updateStorageBuffer(ssbo.data(), ssbo.size() * sizeof(ShadowMapSSBO));
 }
 } // namespace ale

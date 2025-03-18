@@ -17,14 +17,6 @@ void RenderingComponent::initRenderingComponent(std::shared_ptr<Model> model)
 	m_model = model;
 	m_materials = m_model->getMaterials();
 	m_shaderResourceManager = ShaderResourceManager::createGeometryPassShaderResourceManager(m_model.get());
-	for (size_t i = 0; i < 4; i++)
-	{
-		m_shadowMapResourceManager.push_back(ShaderResourceManager::createShadowMapShaderResourceManager());
-	}
-	for (size_t i = 0; i < 4; i++)
-	{
-		m_shadowCubeMapResourceManager.push_back(ShaderResourceManager::createShadowCubeMapShaderResourceManager());
-	}
 }
 
 void RenderingComponent::updateMaterial(std::vector<std::shared_ptr<Material>> materials)
@@ -54,13 +46,11 @@ void RenderingComponent::draw(DrawInfo &drawInfo)
 
 void RenderingComponent::drawShadow(ShadowMapDrawInfo &drawInfo, uint32_t index)
 {
-	drawInfo.shaderResourceManager = m_shadowMapResourceManager[index].get();
 	m_model->drawShadow(drawInfo);
 }
 
 void RenderingComponent::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo, uint32_t index)
 {
-	drawInfo.shaderResourceManager = m_shadowCubeMapResourceManager[index].get();
 	m_model->drawShadowCubeMap(drawInfo);
 }
 
@@ -71,20 +61,7 @@ CullSphere RenderingComponent::getCullSphere()
 
 void RenderingComponent::cleanup()
 {
-	// m_model->cleanup();
 	m_shaderResourceManager->cleanup();
-	for (size_t i = 0; i < 4; i++)
-	{
-		m_shadowMapResourceManager[i]->cleanup();
-	}
-	for (size_t i = 0; i < 4; i++)
-	{
-		m_shadowCubeMapResourceManager[i]->cleanup();
-	}
-	// for (size_t i = 0; i < m_materials.size(); i++)
-	// {
-	// 	m_materials[i]->cleanup();
-	// }
 }
 
 } // namespace ale

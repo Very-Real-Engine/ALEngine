@@ -91,6 +91,14 @@ class ShaderResourceManager
 	static std::unique_ptr<ShaderResourceManager> createColliderShaderResourceManager(
 		VkDescriptorSetLayout descriptorSetLayout);
 
+	static std::unique_ptr<ShaderResourceManager> createShadowMapShaderResourceManagerSSBO(
+		VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	static std::unique_ptr<ShaderResourceManager> createShadowCubeMapShaderResourceManagerSSBO(
+		VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+
+	void changeShadowMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	void changeShadowCubeMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+
 	/**
 	 * @brief 조명 패스 쉐이더 리소스 매니저 초기화
 	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
@@ -319,5 +327,17 @@ class ShaderResourceManager
 	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
 	 */
 	void createColliderDescriptorSets(VkDescriptorSetLayout descriptorSetLayout);
+
+	void initShadowMapShaderResourceManagerSSBO(VkDescriptorSetLayout descriptorSetLayout,
+												std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	void createShadowMapUniformBuffersSSBO();
+	void createShadowMapDescriptorSetsSSBO(VkDescriptorSetLayout descriptorSetLayout,
+										   std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+
+	void initShadowCubeMapShaderResourceManagerSSBO(VkDescriptorSetLayout descriptorSetLayout,
+													std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	void createShadowCubeMapUniformBuffersSSBO();
+	void createShadowCubeMapDescriptorSetsSSBO(VkDescriptorSetLayout descriptorSetLayout,
+											   std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
 };
 } // namespace ale

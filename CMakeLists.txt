@@ -17,7 +17,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(START_SCENE "3DExample.ale")
     set(BUILD_TYPE "Debug")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(START_SCENE "3DExample.ale")
+    set(START_SCENE "MultiObj.ale")
     set(BUILD_TYPE "Release")
 endif()
 
