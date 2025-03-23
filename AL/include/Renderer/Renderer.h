@@ -129,6 +129,11 @@ class Renderer
 		return m_modelsMap;
 	}
 
+	std::map<uint32_t, std::shared_ptr<Mesh>> &getMeshMap()
+	{
+		return m_meshMap;
+	}
+
   private:
 	Renderer() = default;
 
@@ -247,6 +252,7 @@ class Renderer
 	alglm::mat4 viewMatirx;
 
 	std::unordered_map<std::string, std::shared_ptr<Model>> m_modelsMap;
+	std::map<uint32_t, std::shared_ptr<Mesh>> m_meshMap;
 
 	// skybox
 	std::shared_ptr<Texture> m_sphericalMapTexture;
@@ -313,6 +319,7 @@ class Renderer
 
 	// shadowmap ssbo 추가 부분
 	std::vector<std::map<std::string, std::vector<alglm::mat4>>> m_shadowMapModels;
+	std::vector<std::map<uint32_t, std::vector<alglm::mat4>>> m_shadowMapMeshes;
 
 	std::unique_ptr<DescriptorSetLayout> m_shadowMapDescriptorSetLayoutSSBO;
 	VkDescriptorSetLayout shadowMapDescriptorSetLayoutSSBO;

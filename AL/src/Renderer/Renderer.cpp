@@ -214,6 +214,7 @@ void Renderer::init(GLFWwindow *window)
 	shadowCubeMapGraphicsPipelineSSBO = m_shadowCubeMapPipelineSSBO->getPipeline();
 
 	m_shadowMapModels.resize(MAX_FRAMES_IN_FLIGHT);
+	m_shadowMapMeshes.resize(MAX_FRAMES_IN_FLIGHT);
 
 #pragma endregion
 
@@ -1243,11 +1244,11 @@ void Renderer::recordShadowMapCommandBuffer(Scene *scene, VkCommandBuffer comman
 							&shadowMapDescriptorSetsSSBO[shadowMapIndex][currentFrame], 0, nullptr);
 
 	uint32_t modelIndex = 0;
-	for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
+	for (auto &meshKeyValue : m_shadowMapMeshes[currentFrame])
 	{
-		auto &model = m_modelsMap[modelKeyValue.first];
-		model->drawShadowSSBO(commandBuffer, modelKeyValue.second.size(), modelIndex);
-		modelIndex += modelKeyValue.second.size();
+		auto &mesh = m_meshMap[meshKeyValue.first];
+		mesh->drawShadowSSBO(commandBuffer, meshKeyValue.second.size(), modelIndex);
+		modelIndex += meshKeyValue.second.size();
 	}
 
 	// Render Pass 종료
@@ -1335,11 +1336,11 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 		pushConstants.layerIndex = i;
 		vkCmdPushConstants(commandBuffer, shadowCubeMapPipelineLayoutSSBO, VK_SHADER_STAGE_VERTEX_BIT, 0,
 						   sizeof(pushConstants), &pushConstants);
-		for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
+		for (auto &meshKeyValue : m_shadowMapMeshes[currentFrame])
 		{
-			auto &model = m_modelsMap[modelKeyValue.first];
-			model->drawShadowSSBO(commandBuffer, modelKeyValue.second.size(), modelIndex);
-			modelIndex += modelKeyValue.second.size();
+			auto &mesh = m_meshMap[meshKeyValue.first];
+			mesh->drawShadowSSBO(commandBuffer, meshKeyValue.second.size(), modelIndex);
+			modelIndex += meshKeyValue.second.size();
 		}
 	}
 
@@ -1631,7 +1632,7 @@ void Renderer::recordColliderCommandBuffer(Scene *scene, VkCommandBuffer command
 
 void Renderer::updateShadowMapSSBO(Scene *scene)
 {
-	m_shadowMapModels[currentFrame].clear();
+	m_shadowMapMeshes[currentFrame].clear();
 
 	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
 
@@ -1649,15 +1650,21 @@ void Renderer::updateShadowMapSSBO(Scene *scene)
 		TransformComponent &transformComponent = view.get<TransformComponent>(entity);
 		alglm::mat4 &model = transformComponent.m_WorldTransform;
 		std::string &modelName = meshRendererComponent.m_RenderingComponent->getModelName();
-		m_shadowMapModels[currentFrame][modelName].push_back(model);
+		auto &modelPtr = m_modelsMap[modelName];
+		auto &meshes = modelPtr->getMeshes();
+
+		for (auto &mesh : meshes)
+		{
+			auto modelMatrix = model * mesh->getNodeTransform();
+			m_shadowMapMeshes[currentFrame][mesh->getId()].push_back(modelMatrix);
+		}
 	}
 
 	std::vector<ShadowMapSSBO> ssbo;
 
-	for (auto &modelKeyValue : m_shadowMapModels[currentFrame])
+	for (auto &meshKeyValue : m_shadowMapMeshes[currentFrame])
 	{
-		std::vector<alglm::mat4> &modelMatrices = modelKeyValue.second;
-
+		auto &modelMatrices = meshKeyValue.second;
 		for (auto &modelMatrix : modelMatrices)
 		{
 			ssbo.push_back(ShadowMapSSBO{modelMatrix});

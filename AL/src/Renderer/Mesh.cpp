@@ -1,4 +1,5 @@
 #include "Renderer/Mesh.h"
+#include "Core/App.h"
 
 namespace ale
 {
@@ -8,6 +9,9 @@ std::shared_ptr<Mesh> Mesh::createMesh(std::vector<Vertex> &vertices, std::vecto
 	std::shared_ptr<Mesh> mesh = std::shared_ptr<Mesh>(new Mesh());
 	mesh->initMesh(vertices, indices);
 	mesh->m_GlobalTransform = globalTransform;
+	static uint32_t id = 0;
+	mesh->m_id = id++;
+	App::get().getRenderer().getMeshMap()[mesh->m_id] = mesh;
 	return mesh;
 }
 

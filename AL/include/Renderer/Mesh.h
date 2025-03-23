@@ -98,6 +98,15 @@ class Mesh
 	 */
 	alglm::mat4 getNodeTransform();
 
+	/**
+	 * @brief Mesh ID 반환
+	 * @return Mesh ID
+	 */
+	uint32_t getId()
+	{
+		return m_id;
+	}
+
   private:
 	Mesh() = default;
 
@@ -106,6 +115,7 @@ class Mesh
 	alglm::mat4 m_GlobalTransform;
 	std::unique_ptr<VertexBuffer> m_vertexBuffer;
 	std::unique_ptr<IndexBuffer> m_indexBuffer;
+	uint32_t m_id;
 
 	/**
 	 * @brief Mesh 초기화
