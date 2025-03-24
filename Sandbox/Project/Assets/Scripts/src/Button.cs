@@ -17,12 +17,17 @@ namespace Sandbox
 
         void onCreate()
         {
-			isOn = false;
+            m_Rigidbody = getComponent<RigidbodyComponent>();
+
+            Console.WriteLine($"Button.OnCreate - {ID}");
         }
 
 		void onUpdate()
 		{
-
+            if (m_Rigidbody.getTouchNum() > 0 && Input.isKeyDown(KeyCode.F))
+                isOn = true;
+            else
+                isOn = false;
 		}
     }
 }

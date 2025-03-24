@@ -51,6 +51,20 @@ namespace ALEngine
             return new Entity(entityID);
         }
 
+        public Entity[] findEntitiesByComponent<T>() where T : Component, new()
+        {
+            ulong[] uuids = InternalCalls.Entity_findEntitiesByComponent(ID, typeof(T));
+
+            // 반환된 UUID 배열을 기반으로 Entity 배열을 구성합니다.
+            Entity[] entities = new Entity[uuids.Length];
+            for (int i = 0; i < uuids.Length; i++)
+            {
+                entities[i] = new Entity(uuids[i]);
+            }
+
+            return entities;
+        }
+
         public T As<T>() where T : Entity, new()
         {
             object instance = InternalCalls.getScriptInstance(ID);
