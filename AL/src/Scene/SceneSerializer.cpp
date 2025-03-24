@@ -345,6 +345,7 @@ static void serializeEntity(YAML::Emitter &out, Entity entity, Scene *scene)
 					WRITE_SCRIPT_FIELD(VECTOR3, alglm::vec3);
 					WRITE_SCRIPT_FIELD(VECTOR4, alglm::vec4);
 					WRITE_SCRIPT_FIELD(ENTITY, UUID);
+					WRITE_SCRIPT_FIELD(STRING, std::string);
 				}
 				out << YAML::EndMap;
 			}
@@ -689,6 +690,7 @@ bool SceneSerializer::deserialize(const std::string &filepath)
 								READ_SCRIPT_FIELD(VECTOR3, alglm::vec3);
 								READ_SCRIPT_FIELD(VECTOR4, alglm::vec4);
 								READ_SCRIPT_FIELD(ENTITY, UUID);
+								READ_SCRIPT_FIELD(STRING, std::string);
 							}
 						}
 					}

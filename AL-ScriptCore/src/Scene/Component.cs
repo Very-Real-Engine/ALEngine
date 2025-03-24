@@ -42,10 +42,42 @@ namespace ALEngine
 
     public class RigidbodyComponent : Component
     {
+        public Vector3 Position
+        {
+            get
+            {
+                InternalCalls.RigidbodyComponent_getPosition(Entity.ID, out Vector3 position);
+                return position;
+            }
+            set
+            {
+                InternalCalls.RigidbodyComponent_setPosition(Entity.ID, ref value);
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get
+            {
+                InternalCalls.RigidbodyComponent_getRotation(Entity.ID, out Quaternion rotation);
+                return rotation;
+            }
+            set
+            {
+                InternalCalls.RigidbodyComponent_setRotation(Entity.ID, ref value);
+            }
+        }
         public void addForce(Vector3 force)
         {
             InternalCalls.RigidbodyComponent_addForce(Entity.ID, ref force);
         }
+
+        public int getTouchNum()
+        {
+            return InternalCalls.RigidbodyComponent_getTouchedNum(Entity.ID);
+        }
+
+        // public 
     }
 
     public class ScriptComponent : Component
