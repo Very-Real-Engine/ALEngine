@@ -22,7 +22,7 @@ namespace Sandbox
             Console.WriteLine($"Button.OnCreate - {ID}");
         }
 
-		void onUpdate()
+		void onUpdate(float ts)
 		{
             if (m_Rigidbody.getTouchNum() > 0 && Input.isKeyDown(KeyCode.F))
                 isOn = true;
