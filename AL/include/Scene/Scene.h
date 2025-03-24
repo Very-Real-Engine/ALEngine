@@ -231,7 +231,8 @@ class Scene
 
 	// frustumCulling
 	void frustumCulling(const Frustum &frustum);
-	void initFrustumDrawFlag();
+	void initFrustumDisable();
+	void initFrustumEnable();
 	void removeEntityInCullTree(Entity &entity);
 	void replaceEntityInCullTree(Entity &entity);
 	void insertEntityInCullTree(Entity &entity);
