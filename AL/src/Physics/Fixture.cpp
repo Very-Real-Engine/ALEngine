@@ -118,12 +118,12 @@ const FixtureProxy *Fixture::getFixtureProxy() const
 	return m_proxies;
 }
 
-bool Fixture::isSeonsor() const 
+bool Fixture::isSeonsor() const
 {
 	return m_isSensor;
 }
 
-int32_t Fixture::getTouchNum() const 
+int32_t Fixture::getTouchNum() const
 {
 	return m_touchNum;
 }
@@ -137,6 +137,5 @@ void Fixture::decreaseTouchNum()
 {
 	--m_touchNum;
 }
-
 
 } // namespace ale

@@ -24,7 +24,8 @@ class Mesh
 	 * @param globalTransform 노드별 글로벌 위치, 없다면 항등행렬 설정
 	 * @return Mesh
 	 */
-	static std::shared_ptr<Mesh> createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const alglm::mat4& globalTransform = alglm::mat4(1.0f));
+	static std::shared_ptr<Mesh> createMesh(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices,
+											const alglm::mat4 &globalTransform = alglm::mat4(1.0f));
 	/**
 	 * @brief 박스 생치치
 	 * @return 박스
@@ -73,6 +74,9 @@ class Mesh
 	 * @param commandBuffer 명령 버퍼
 	 */
 	void draw(VkCommandBuffer commandBuffer);
+
+	void drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance);
+
 	/**
 	 * @brief AABB 계산
 	 * @param vertices 정점 목록
@@ -90,9 +94,18 @@ class Mesh
 	alglm::vec3 getMinPos();
 	/**
 	 * @brief 노드 글로벌 트랜스폼 반환
-	 * @return alglm::mat4 
+	 * @return alglm::mat4
 	 */
 	alglm::mat4 getNodeTransform();
+
+	/**
+	 * @brief Mesh ID 반환
+	 * @return Mesh ID
+	 */
+	uint32_t getId()
+	{
+		return m_id;
+	}
 
   private:
 	Mesh() = default;
@@ -102,6 +115,7 @@ class Mesh
 	alglm::mat4 m_GlobalTransform;
 	std::unique_ptr<VertexBuffer> m_vertexBuffer;
 	std::unique_ptr<IndexBuffer> m_indexBuffer;
+	uint32_t m_id;
 
 	/**
 	 * @brief Mesh 초기화

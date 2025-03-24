@@ -71,7 +71,10 @@ void SceneHierarchyPanel::onImGuiRender()
 
 		// 왼쪽 클릭 && Hovered(마우스를 window에 올려뒀을 때)
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+		{
 			m_SelectionContext = {};
+			m_Context->unsetSelectedEntity();
+		}
 
 		// 오른쪽 클릭으로 Popup 활성화
 		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
@@ -373,6 +376,48 @@ static void drawVec3Control(const std::string &label, alglm::vec3 &values, float
 	ImGui::PopID();
 }
 
+static void drawFloatMinMaxControl(const std::string &label, float &value, float resetValue = 0.0f,
+								   float columnWidth = 100.0f, float minValue = 0.0f, float maxValue = 1.0f)
+{
+	ImGuiIO &io = ImGui::GetIO();
+	auto boldFont = io.Fonts->Fonts[0];
+
+	ImGui::PushID(label.c_str());
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2f, 0.35f, 0.9f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+	ImGui::PushFont(boldFont);
+
+	if (ImGui::Button("R", buttonSize))
+		value = resetValue;
+
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+
+	// DragFloat
+	ImGui::DragFloat("##SingleValue", &value, 0.1f, minValue, maxValue, "%.2f");
+
+	ImGui::PopStyleVar();
+
+	// 컬럼 닫기
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+}
+
 static void drawFloatControl(const std::string &label, float &value, float resetValue = 0.0f,
 							 float columnWidth = 100.0f)
 {
@@ -547,18 +592,19 @@ static void drawComponent(const std::string &name, Entity entity, UIFunction uiF
 		ImGui::PopStyleVar();
 
 		// 컴파일 타임에 타입 비교 수행
+		std::string popupId = "ComponentSettings##" + std::to_string(typeid(T).hash_code());
 		if (!std::is_same<T, TransformComponent>::value)
 		{
 			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
 			std::string label = "+##" + std::to_string(typeid(T).hash_code());
 			if (ImGui::Button(label.c_str(), ImVec2{lineHeight, lineHeight}))
 			{
-				ImGui::OpenPopup("ComponentSettings");
+				ImGui::OpenPopup(popupId.c_str());
 			}
 		}
 
 		bool removeComponent = false;
-		if (ImGui::BeginPopup("ComponentSettings"))
+		if (ImGui::BeginPopup(popupId.c_str()))
 		{
 			if (ImGui::MenuItem("Remove component"))
 				removeComponent = true;
@@ -660,7 +706,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 	}
 	ImGui::PopItemWidth();
 
-	drawComponent<TransformComponent>("Transform", entity, [this, entity](auto &component) mutable {
+	drawComponent<TransformComponent>("Transform", entity, [this, entity, scene = m_Context](auto &component) mutable {
 		// Update Recursively
 		drawVec3Control("Position", component.m_Position);
 		auto &rotation = alglm::degrees(component.m_Rotation);
@@ -668,6 +714,8 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		component.m_Rotation = alglm::radians(rotation);
 		drawVec3Control("Scale", component.m_Scale, 1.0f);
 		updateTransforms(entity);
+		auto &transform = entity.getComponent<TransformComponent>();
+		scene->setSelectedEntity(transform.m_Position);
 	});
 
 	drawComponent<CameraComponent>("Camera", entity, [](auto &component) {
@@ -717,11 +765,11 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			return;
 		}
 
-		auto& model = mr.m_RenderingComponent->getModel();
+		auto &model = mr.m_RenderingComponent->getModel();
 		if (!model->m_SkeletalAnimations)
 		{
 			ImGui::Text("This Model doesn't contain animations/skeleton");
-			return ;
+			return;
 		}
 
 		SAComponent *sac = (SAComponent *)component.sac.get();
@@ -892,7 +940,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 			{
 				sac->setRepeat(repeat, index);
 			}
-		
+
 			if (ImGui::Checkbox("inverse", &inverse))
 			{
 				sac->setInverse(inverse, index);
@@ -1375,8 +1423,12 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		ImGui::Spacing();
 		drawFloatControl("Ambient Strength", scene->getAmbientStrength());
 		drawFloatControl("Intesntiy", light->intensity);
-		drawFloatControl("Inner Cutoff", light->innerCutoff);
-		drawFloatControl("Outer Cutoff", light->outerCutoff);
+		float innerAngle = std::acos(light->innerCutoff) * (180.0f / 3.141592f); // -1~1 → 0~90도 변환
+		float outerAngle = std::acos(light->outerCutoff) * (180.0f / 3.141592f);
+		drawFloatMinMaxControl("Inner Cutoff", innerAngle, 0.0f, 100.0f, 0.0f, 45.0f);
+		drawFloatMinMaxControl("Outer Cutoff", outerAngle, 0.0f, 100.0f, 0.0f, 45.0f);
+		light->innerCutoff = std::cos(innerAngle * (3.141592f / 180.0f));
+		light->outerCutoff = std::cos(outerAngle * (3.141592f / 180.0f));
 	});
 
 	drawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto &component) mutable {

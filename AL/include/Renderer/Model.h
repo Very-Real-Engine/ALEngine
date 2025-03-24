@@ -143,6 +143,9 @@ class Model
 	 * @param drawInfo 그리기 정보
 	 */
 	void drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo);
+
+	void drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance);
+
 	/**
 	 * @brief 컬링 스피어 초기화
 	 * @return 컬링 스피어
@@ -204,11 +207,21 @@ class Model
 	std::shared_ptr<Armature::Skeleton> &getSkeleton();
 	bool m_SkeletalAnimations;
 
+	/**
+	 * @brief 모델 이름 반환
+	 * @return 모델 이름
+	 */
+	std::string &getName()
+	{
+		return m_name;
+	}
+
   private:
 	Model() = default;
 
 	std::vector<std::shared_ptr<Mesh>> m_meshes;
 	std::vector<std::shared_ptr<Material>> m_materials;
+	std::string m_name;
 
 	// animation
 	std::shared_ptr<SkeletalAnimations> m_Animations;
@@ -303,7 +316,8 @@ class Model
 	 * @param scene 장면
 	 * @param materials 재질
 	 */
-	void processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials, const alglm::mat4& parentTransform = alglm::mat4(1.0f));
+	void processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials,
+						 const alglm::mat4 &parentTransform = alglm::mat4(1.0f));
 	/**
 	 * @brief GLTF 메시 처리
 	 * @param mesh 메시
@@ -311,7 +325,8 @@ class Model
 	 * @param material 재질
 	 * @return 메시
 	 */
-	std::shared_ptr<Mesh> processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material, const alglm::mat4& globalTransform);
+	std::shared_ptr<Mesh> processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material,
+										  const alglm::mat4 &globalTransform);
 	/**
 	 * @brief OBJ 재질 처리
 	 * @param mtl MTL

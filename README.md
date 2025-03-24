@@ -64,7 +64,7 @@ AfterLife Engine 프로젝트는 **Vulkan API를 활용한 게임 엔진 개발 
 ### 빌드 및 실행 방법
 ```bash
 make
-./Sandbox_release.exe ./projects/AfterLifet.alproj
+./Sandbox_release.exe ./projects/AfterLife.alproj
 ```
 
 위의 명령어를 실행하면 프로젝트가 정상적으로 빌드되고 실행됩니다.

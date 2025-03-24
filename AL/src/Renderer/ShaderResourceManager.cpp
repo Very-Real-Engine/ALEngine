@@ -958,4 +958,239 @@ void ShaderResourceManager::createColliderDescriptorSets(VkDescriptorSetLayout d
 							   nullptr);
 	}
 }
+
+std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createShadowMapShaderResourceManagerSSBO(
+	VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	std::unique_ptr<ShaderResourceManager> shaderResourceManager =
+		std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+	shaderResourceManager->initShadowMapShaderResourceManagerSSBO(descriptorSetLayout, ssbo);
+	return shaderResourceManager;
+}
+
+void ShaderResourceManager::initShadowMapShaderResourceManagerSSBO(VkDescriptorSetLayout descriptorSetLayout,
+																   std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	createShadowMapUniformBuffersSSBO();
+	createShadowMapDescriptorSetsSSBO(descriptorSetLayout, ssbo);
+}
+
+void ShaderResourceManager::createShadowMapUniformBuffersSSBO()
+{
+	VkDeviceSize bufferSize = sizeof(ShadowMapUBO);
+	m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		m_uniformBuffers[i] = UniformBuffer::createUniformBuffer(bufferSize);
+	}
+}
+
+void ShaderResourceManager::createShadowMapDescriptorSetsSSBO(VkDescriptorSetLayout descriptorSetLayout,
+															  std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+	VkDescriptorPool descriptorPool = context.getDescriptorPool();
+
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	allocInfo.pSetLayouts = layouts.data();
+
+	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate SSBO shadow map descriptor sets!");
+	}
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(ShadowMapUBO);
+
+		VkDescriptorBufferInfo storageBufferInfo{};
+		storageBufferInfo.buffer = ssbo[i]->getBuffer();
+		storageBufferInfo.offset = 0;
+		storageBufferInfo.range = ssbo[i]->getCurrentSize();
+
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &storageBufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0,
+							   nullptr);
+	}
+}
+
+std::unique_ptr<ShaderResourceManager> ShaderResourceManager::createShadowCubeMapShaderResourceManagerSSBO(
+	VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	std::unique_ptr<ShaderResourceManager> shaderResourceManager =
+		std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+	shaderResourceManager->initShadowCubeMapShaderResourceManagerSSBO(descriptorSetLayout, ssbo);
+	return shaderResourceManager;
+}
+
+void ShaderResourceManager::initShadowCubeMapShaderResourceManagerSSBO(
+	VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	createShadowCubeMapUniformBuffersSSBO();
+	createShadowCubeMapDescriptorSetsSSBO(descriptorSetLayout, ssbo);
+}
+
+void ShaderResourceManager::createShadowCubeMapUniformBuffersSSBO()
+{
+	VkDeviceSize bufferSize = sizeof(ShadowCubeMapUBO);
+	m_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		m_uniformBuffers[i] = UniformBuffer::createUniformBuffer(bufferSize);
+	}
+}
+
+void ShaderResourceManager::createShadowCubeMapDescriptorSetsSSBO(VkDescriptorSetLayout descriptorSetLayout,
+																  std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+	VkDescriptorPool descriptorPool = context.getDescriptorPool();
+
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	allocInfo.pSetLayouts = layouts.data();
+
+	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate SSBO shadow map descriptor sets!");
+	}
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(ShadowCubeMapUBO);
+
+		VkDescriptorBufferInfo storageBufferInfo{};
+		storageBufferInfo.buffer = ssbo[i]->getBuffer();
+		storageBufferInfo.offset = 0;
+		storageBufferInfo.range = ssbo[i]->getCurrentSize();
+
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &storageBufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0,
+							   nullptr);
+	}
+}
+
+void ShaderResourceManager::changeShadowMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(ShadowMapUBO);
+
+		VkDescriptorBufferInfo storageBufferInfo{};
+		storageBufferInfo.buffer = ssbo[i]->getBuffer();
+		storageBufferInfo.offset = 0;
+		storageBufferInfo.range = ssbo[i]->getCurrentSize();
+
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &storageBufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0,
+							   nullptr);
+	}
+}
+
+void ShaderResourceManager::changeShadowCubeMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo)
+{
+	auto &context = VulkanContext::getContext();
+	VkDevice device = context.getDevice();
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = m_uniformBuffers[i]->getBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(ShadowCubeMapUBO);
+
+		VkDescriptorBufferInfo storageBufferInfo{};
+		storageBufferInfo.buffer = ssbo[i]->getBuffer();
+		storageBufferInfo.offset = 0;
+		storageBufferInfo.range = ssbo[i]->getCurrentSize();
+
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &storageBufferInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0,
+							   nullptr);
+	}
+}
+
 } // namespace ale

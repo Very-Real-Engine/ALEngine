@@ -55,16 +55,13 @@ float PCFShadow(sampler2DShadow shadowMap, vec3 shadowCoord, float currentDepth)
 
 vec3 rotatedVectors[8];
 
-
 vec3 getRotationAxis(vec3 direction) {
     vec3 worldUp = vec3(0.0, 1.0, 0.0);
     
-    // 만약 direction이 Y축과 거의 평행하면 X축을 사용
     if (abs(dot(direction, worldUp)) > 0.99) {
-        return normalize(vec3(1.0, 0.0, 0.0)); // X축을 회전축으로 설정
+        return normalize(vec3(1.0, 0.0, 0.0));
     }
 
-    // 아니라면 direction과 worldUp의 외적을 사용해 수직한 벡터를 구함
     return normalize(cross(direction, worldUp));
 }
 
@@ -77,24 +74,28 @@ vec3 rotateVector(vec3 v, vec3 axis, float angle) {
 
 
 void generateRotatedVectors(vec3 direction) {
-    vec3 rotationAxis = getRotationAxis(direction); // 회전축 계산
-    float angleStep = radians(0.02);
+    vec3 rotationAxis = getRotationAxis(direction);
+    float rotationAngle = radians(360.0 / 8.0);
+    float angleStep = radians(0.1);
     for (int i = 0; i < 8; i++) {
-        float angle = angleStep * float(i);
-        rotatedVectors[i] = rotateVector(direction, rotationAxis, angle);
+        vec3 newRotationAxis = rotateVector(rotationAxis, direction, rotationAngle * float(i));
+        rotatedVectors[i] = rotateVector(direction, newRotationAxis, angleStep);
     }
 }
 
 float PCFShadowCube(samplerCube shadowMap, vec3 fragToLight, float currentDepth) {
     float shadow = 0.0;
-    generateRotatedVectors(fragToLight); // 8개 회전된 방향 벡터 생성
+    generateRotatedVectors(fragToLight);
+
+    float closestDepth = texture(shadowMap, fragToLight).r;
+    shadow += (currentDepth - 0.005 > closestDepth) ? 0.0 : 1.0;
 
     for (int i = 0; i < 8; i++) {
-        float closestDepth = texture(shadowMap, rotatedVectors[i]).r;
+        closestDepth = texture(shadowMap, rotatedVectors[i]).r;
         shadow += (currentDepth - 0.005 > closestDepth) ? 0.0 : 1.0;
     }
-
-    return shadow / 8.0; // 평균화된 shadow factor 반환
+    
+    return shadow / 9.0;
 }
 
 

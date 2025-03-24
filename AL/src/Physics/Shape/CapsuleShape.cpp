@@ -56,6 +56,7 @@ void CapsuleShape::createCapsulePoints()
 	int32_t segments = 20;
 	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 	alglm::vec3 xAxis(1.0f, 0.0f, 0.0f);
+	m_axes[0] = alglm::vec3(0.0f, 1.0f, 0.0f);
 
 	alglm::vec4 topPoint = alglm::vec4(m_center + m_height * 0.5f * m_axes[0] + xAxis * m_radius, 1.0f);
 	alglm::vec4 bottomPoint = alglm::vec4(m_center - m_height * 0.5f * m_axes[0] + xAxis * m_radius, 1.0f);
@@ -89,6 +90,17 @@ void CapsuleShape::setShapeFeatures(const alglm::vec3 &center, float radius, flo
 	m_center = center;
 	m_radius = radius;
 	m_height = height;
+
+	// 박스의 8개 꼭짓점 계산
+	m_vertices.insert(center + alglm::vec3(-radius, -height / 2 - radius, -radius));
+	m_vertices.insert(center + alglm::vec3(radius, -height / 2 - radius, -radius));
+	m_vertices.insert(center + alglm::vec3(-radius, height / 2 + radius, -radius));
+	m_vertices.insert(center + alglm::vec3(radius, height / 2 + radius, -radius));
+	m_vertices.insert(center + alglm::vec3(-radius, -height / 2 - radius, radius));
+	m_vertices.insert(center + alglm::vec3(radius, -height / 2 - radius, radius));
+	m_vertices.insert(center + alglm::vec3(-radius, height / 2 + radius, radius));
+	m_vertices.insert(center + alglm::vec3(radius, height / 2 + radius, radius));
+
 	createCapsulePoints();
 }
 

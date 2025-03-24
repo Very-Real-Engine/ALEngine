@@ -234,12 +234,34 @@ class Scene
 	void frustumCulling(const Frustum &frustum);
 	void initFrustumDrawFlag();
 	void removeEntityInCullTree(Entity &entity);
+	void replaceEntityInCullTree(Entity &entity);
 	void insertEntityInCullTree(Entity &entity);
 	void setNoneInCullTree(Entity &entity);
 	void unsetNoneInCullTree(Entity &entity);
 	void printCullTree();
 
 	void removeColliderShaderResourceManager(Entity &entity);
+
+	void setSelectedEntity(alglm::vec3 &position)
+	{
+		m_isSelectedEntity = true;
+		m_selectedPosition = position;
+	}
+
+	void unsetSelectedEntity()
+	{
+		m_isSelectedEntity = false;
+	}
+
+	alglm::vec3 &getSelectedPosition()
+	{
+		return m_selectedPosition;
+	}
+
+	bool &isSelectedEntity()
+	{
+		return m_isSelectedEntity;
+	}
 
   private:
 	template <typename T> void onComponentAdded(Entity entity, T &component);
@@ -283,6 +305,9 @@ class Scene
 	float m_ambientStrength{0.1f};
 
 	CullTree m_cullTree;
+
+	bool m_isSelectedEntity = false;
+	alglm::vec3 m_selectedPosition = alglm::vec3(0.0f, 0.0f, 0.0f);
 
 	friend class Entity;
 	friend class SceneSerializer;

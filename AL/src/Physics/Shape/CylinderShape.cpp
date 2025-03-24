@@ -44,6 +44,8 @@ void CylinderShape::computeAABB(AABB *aabb, const Transform &xf) const
 		lower.z = std::min(lower.z, vertex.z);
 	}
 
+	// std::cout << "upper: " << upper.x << ", " << upper.y << ", " << upper.z << '\n';
+	// std::cout << "lower: " << lower.x << ", " << lower.y << ", " << lower.z << '\n';
 	aabb->upperBound = upper + alglm::vec3(0.1f);
 	aabb->lowerBound = lower - alglm::vec3(0.1f);
 }
@@ -84,6 +86,7 @@ void CylinderShape::createCylinderPoints()
 	int32_t segments = 20;
 	float angleStep = 2.0f * alglm::pi<float>() / static_cast<float>(segments);
 	alglm::vec3 xAxis(1.0f, 0.0f, 0.0f);
+	m_axes[0] = alglm::vec3(0.0f, 1.0f, 0.0f);
 
 	alglm::vec4 topPoint = alglm::vec4(m_center + m_height * 0.5f * m_axes[0] + xAxis * m_radius, 1.0f);
 	alglm::vec4 bottomPoint = alglm::vec4(m_center - m_height * 0.5f * m_axes[0] + xAxis * m_radius, 1.0f);
@@ -117,6 +120,17 @@ void CylinderShape::setShapeFeatures(const alglm::vec3 &center, float radius, fl
 	m_center = center;
 	m_radius = radius;
 	m_height = height;
+
+	// 박스의 8개 꼭짓점 계산
+	m_vertices.insert(center + alglm::vec3(-radius, -height / 2, -radius));
+	m_vertices.insert(center + alglm::vec3(radius, -height / 2, -radius));
+	m_vertices.insert(center + alglm::vec3(-radius, height / 2, -radius));
+	m_vertices.insert(center + alglm::vec3(radius, height / 2, -radius));
+	m_vertices.insert(center + alglm::vec3(-radius, -height / 2, radius));
+	m_vertices.insert(center + alglm::vec3(radius, -height / 2, radius));
+	m_vertices.insert(center + alglm::vec3(-radius, height / 2, radius));
+	m_vertices.insert(center + alglm::vec3(radius, height / 2, radius));
+
 	createCylinderPoints();
 }
 

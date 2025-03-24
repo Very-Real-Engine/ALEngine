@@ -294,7 +294,11 @@ class Rigidbody
 	void setRBComponentValue(BodyDef &bdDef);
 
 	/** @brief Rigidbody가 깨어 있는지 여부를 반환합니다. */
-	bool isAwake();
+	bool isAwake() const;
+
+	/** @brief Rigidbody가 센서인지 확인*/
+	bool isSensor() const;
+
 	int32_t getTouchNum() const;
 
 	Rigidbody *next;

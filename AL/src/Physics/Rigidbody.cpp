@@ -377,6 +377,12 @@ bool Rigidbody::shouldCollide(const Rigidbody *other) const
 	{
 		return false;
 	}
+
+	if (isSensor() != other->isSensor())
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -406,9 +412,18 @@ void Rigidbody::setRBComponentValue(BodyDef &bdDef)
 	m_useGravity = bdDef.m_useGravity;
 }
 
-bool Rigidbody::isAwake()
+bool Rigidbody::isAwake() const
 {
 	return m_isAwake;
+}
+
+bool Rigidbody::isSensor() const
+{
+	if (m_fixtures != nullptr)
+	{
+		return m_fixtures->isSeonsor();
+	}
+	return false;
 }
 
 int32_t Rigidbody::getTouchNum() const

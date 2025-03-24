@@ -180,7 +180,7 @@ void Model::drawShadow(ShadowMapDrawInfo &drawInfo)
 		vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0, 1,
 								&descriptorSets[index], 0, nullptr);
 		ShadowMapUniformBufferObject shadowMapUbo{};
-		shadowMapUbo.model = drawInfo.model;
+		shadowMapUbo.model = drawInfo.model * m_meshes[i]->getNodeTransform();
 		shadowMapUbo.view = drawInfo.view;
 		shadowMapUbo.proj = drawInfo.projection;
 		uniformBuffers[index]->updateUniformBuffer(&shadowMapUbo, sizeof(shadowMapUbo));
@@ -195,7 +195,6 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 	auto &layerIndexUniformBuffers = drawInfo.shaderResourceManager->getLayerIndexUniformBuffers();
 	uint32_t currentFrame = drawInfo.currentFrame;
 	ShadowCubeMapUniformBufferObject shadowCubeMapUbo{};
-	shadowCubeMapUbo.model = drawInfo.model;
 	shadowCubeMapUbo.proj = drawInfo.projection;
 	for (uint32_t i = 0; i < 6; i++)
 	{
@@ -209,6 +208,7 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 		{
 			vkCmdBindDescriptorSets(drawInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, drawInfo.pipelineLayout, 0,
 									1, &descriptorSets[index], 0, nullptr);
+			shadowCubeMapUbo.model = drawInfo.model * m_meshes[j]->getNodeTransform();
 			uniformBuffers[currentFrame]->updateUniformBuffer(&shadowCubeMapUbo, sizeof(shadowCubeMapUbo));
 			ShadowCubeMapLayerIndex layerIndexUbo{};
 			layerIndexUbo.layerIndex = i;
@@ -218,49 +218,65 @@ void Model::drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo)
 	}
 }
 
+void Model::drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance)
+{
+	for (uint32_t i = 0; i < m_meshes.size(); i++)
+	{
+		m_meshes[i]->drawShadowSSBO(commandBuffer, instanceCount, firstInstance);
+	}
+}
+
 void Model::initModel(std::string path, std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = path;
 	loadModel(path, defaultMaterial);
 }
 
 void Model::initBoxModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "box";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createBox());
 }
 
 void Model::initSphereModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "sphere";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createSphere());
 }
 
 void Model::initPlaneModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "plane";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createPlane());
 }
 
 void Model::initGroundModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "ground";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createGround());
 }
 
 void Model::initCapsuleModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "capsule";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCapsule());
 }
 
 void Model::initCylinderModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "cylinder";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createCylinder());
 }
 
 void Model::initColliderBoxModel(std::shared_ptr<Material> &defaultMaterial)
 {
+	m_name = "colliderBox";
 	m_materials.push_back(defaultMaterial);
 	m_meshes.push_back(Mesh::createColliderBox());
 }
@@ -555,7 +571,8 @@ std::shared_ptr<Material> Model::processGLTFMaterial(const aiScene *scene, aiMat
 	return Material::createMaterial(albedo, normalMap, roughness, metallic, ao, heightMap);
 }
 
-void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials, const alglm::mat4& parentTransform)
+void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Material>> &materials,
+							const alglm::mat4 &parentTransform)
 {
 	alglm::mat4 nodeTransform = convertMatrix(node->mTransformation);
 	alglm::mat4 globalTransform = parentTransform * nodeTransform;
@@ -573,7 +590,8 @@ void Model::processGLTFNode(aiNode *node, const aiScene *scene, std::vector<std:
 	}
 }
 
-std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material, const alglm::mat4& globalTransform)
+std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene, std::shared_ptr<Material> &material,
+											 const alglm::mat4 &globalTransform)
 {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
@@ -668,7 +686,7 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 			// 더미 본 인덱스 0을 할당하고, 가중치는 1.0으로 설정
 			vertices[vertexIndex].boneIds[0] = 0;
 			vertices[vertexIndex].weights[0] = 1.0f;
-	
+
 			// 나머지 본 슬롯은 사용하지 않음을 명시 (-1, 0.0)
 			vertices[vertexIndex].boneIds[1] = -1;
 			vertices[vertexIndex].weights[1] = 0.0f;

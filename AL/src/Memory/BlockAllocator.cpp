@@ -57,7 +57,7 @@ BlockAllocator::BlockAllocator()
 				s_blockSizeLookup[i] = static_cast<uint8_t>(j);
 			}
 		}
-		
+
 		s_blockSizeLookupInitialized = true;
 	}
 }
@@ -67,11 +67,11 @@ BlockAllocator::~BlockAllocator()
 	// 모든 청크의 블록 해제
 	for (int32_t i = 0; i < m_chunkCount; ++i)
 	{
-		free(m_chunks[i].blocks);
+		_aligned_free(m_chunks[i].blocks);
 	}
 
 	// 청크 리스트 해제
-	free(m_chunks);
+	_aligned_free(m_chunks);
 }
 
 void *BlockAllocator::allocateBlock(int32_t size)
@@ -106,7 +106,7 @@ void *BlockAllocator::allocateBlock(int32_t size)
 			m_chunkSpace += CHUNK_ARRAY_INCREMENT;
 			m_chunks = (Chunk *)_aligned_malloc(m_chunkSpace * sizeof(Chunk), 16);
 			memcpy(m_chunks, oldChunks, m_chunkCount * sizeof(Chunk));
-			free(oldChunks);
+			_aligned_free(oldChunks);
 		}
 
 		// 새로운 청크 생성

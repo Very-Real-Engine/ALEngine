@@ -783,4 +783,84 @@ bool ImageBuffer::initHDRImageBuffer(std::string path)
 	return true;
 }
 
+std::shared_ptr<StorageBuffer> StorageBuffer::createStorageBuffer(VkDeviceSize bufferSize)
+{
+	std::shared_ptr<StorageBuffer> storageBuffer = std::shared_ptr<StorageBuffer>(new StorageBuffer());
+	storageBuffer->initStorageBuffer(bufferSize);
+	return storageBuffer;
+}
+
+void StorageBuffer::cleanup()
+{
+	if (m_mappedMemory)
+	{
+		vkUnmapMemory(m_device, m_bufferMemory);
+		m_mappedMemory = nullptr;
+	}
+	if (m_buffer != VK_NULL_HANDLE)
+	{
+		vkDestroyBuffer(m_device, m_buffer, nullptr);
+		m_buffer = VK_NULL_HANDLE;
+	}
+	if (m_bufferMemory != VK_NULL_HANDLE)
+	{
+		vkFreeMemory(m_device, m_bufferMemory, nullptr);
+		m_bufferMemory = VK_NULL_HANDLE;
+	}
+	m_currentSize = 0;
+}
+
+void StorageBuffer::updateStorageBuffer(void *data, VkDeviceSize totalSize)
+{
+	if (m_mappedMemory == nullptr)
+	{
+		std::cerr << "StorageBuffer: Mapped memory is nullptr!" << std::endl;
+		return;
+	}
+	if (totalSize > m_currentSize)
+	{
+		std::cerr << "StorageBuffer: Total size is greater than current size!" << std::endl;
+		return;
+	}
+	memcpy(m_mappedMemory, data, totalSize);
+}
+
+void StorageBuffer::updateStorageBufferAt(uint32_t index, void *data, VkDeviceSize structSize)
+{
+	if (m_mappedMemory == nullptr)
+	{
+		std::cerr << "StorageBuffer: Mapped memory is nullptr!" << std::endl;
+		return;
+	}
+	if ((index + 1) * structSize > m_currentSize)
+	{
+		std::cerr << "StorageBuffer: Index out of bounds update attempted!" << std::endl;
+		return;
+	}
+	memcpy(static_cast<uint8_t *>(m_mappedMemory) + index * structSize, data, structSize);
+}
+
+void StorageBuffer::resizeStorageBuffer(VkDeviceSize size)
+{
+	if (size > m_currentSize)
+	{
+		cleanup();
+		initStorageBuffer(size);
+	}
+}
+
+void StorageBuffer::initStorageBuffer(VkDeviceSize size)
+{
+	auto &context = VulkanContext::getContext();
+	m_device = context.getDevice();
+	m_physicalDevice = context.getPhysicalDevice();
+	m_commandPool = context.getCommandPool();
+	m_graphicsQueue = context.getGraphicsQueue();
+
+	createBuffer(size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+				 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_buffer, m_bufferMemory);
+	vkMapMemory(m_device, m_bufferMemory, 0, size, 0, &m_mappedMemory);
+	m_currentSize = size;
+}
+
 } // namespace ale
