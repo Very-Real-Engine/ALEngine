@@ -1002,8 +1002,6 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 	drawInfo.projection = projMatrix;
 	// drawInfo.projection = alglm::perspective(alglm::radians(45.0f), viewPortSize.x / viewPortSize.y, 0.01f, 100.0f);
 	drawInfo.projection[1][1] *= -1;
-	for (size_t i = 0; i < MAX_BONES; ++i) // 항등행렬 초기화
-		drawInfo.finalBonesMatrices[i] = alglm::mat4(1.0f);
 
 	// int32_t drawNum = 0;
 	auto &view = scene->getAllEntitiesWith<TransformComponent, TagComponent, MeshRendererComponent>();
@@ -1026,6 +1024,11 @@ void Renderer::recordDeferredRenderPassCommandBuffer(Scene *scene, VkCommandBuff
 
 			for (size_t i = 0; i < matrices.size(); ++i)
 				drawInfo.finalBonesMatrices[i] = matrices[i];
+		}
+		else
+		{
+			for (size_t i = 0; i < MAX_BONES; ++i) // 항등행렬 초기화
+			drawInfo.finalBonesMatrices[i] = alglm::mat4(1.0f);
 		}
 		// drawNum++;
 		meshRendererComponent.m_RenderingComponent->draw(drawInfo);

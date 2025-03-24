@@ -94,11 +94,12 @@ class Scene
 	/// @brief 런타임 종료 시 호출됩니다.
 	void onRuntimeStop();
 
-	/**
-	 * @brief 에디터에서 추가 렌더링이 필요한 조건에 렌더링 적용합니다.
-	 * @param Timestep 시간
-	 */
-	void preRenderEditor(const Timestep &ts);
+  /**
+   * @brief 에디터에서 추가 렌더링이 필요한 조건에 렌더링 적용합니다.
+   * @param Timestep 시간
+   * @param bool init 초기화 기본값:false
+   */
+	void preRenderEditor(const Timestep& ts, bool init = false);
 	/**
 	 * @brief 에디터에서 씬을 업데이트합니다.
 	 * @param camera 에디터 카메라.

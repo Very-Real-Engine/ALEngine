@@ -430,6 +430,7 @@ void EditorLayer::openScene(const std::filesystem::path &path)
 
 		m_ActiveScene = m_EditorScene;
 		m_EditorScenePath = path;
+		m_ActiveScene->preRenderEditor(Timestep(), true);
 	}
 
 	// create CullTree
