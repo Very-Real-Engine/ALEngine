@@ -565,7 +565,7 @@ void Renderer::beginScene(Scene *scene, EditorCamera &camera)
 {
 	// frustum culling
 	// AL_CORE_INFO("frustum culling start");
-	if (camera.doFrustumCulling())
+	if (scene->getFrustumFlag() == true)
 	{
 		scene->initFrustumDisable();
 		scene->frustumCulling(camera.getFrustum());
@@ -596,7 +596,7 @@ void Renderer::beginScene(Scene *scene, Camera &camera)
 	projMatrix = camera.getProjection();
 	viewMatirx = camera.getView();
 
-	if (camera.doFrustumCulling())
+	if (scene->getFrustumFlag() == true)
 	{
 		scene->initFrustumDisable();
 		scene->frustumCulling(camera.getFrustum());
@@ -606,7 +606,6 @@ void Renderer::beginScene(Scene *scene, Camera &camera)
 		scene->initFrustumEnable();
 	}
 	drawFrame(scene);
-
 }
 
 void Renderer::biginNoCamScene()
