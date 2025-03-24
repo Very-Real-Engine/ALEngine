@@ -1,0 +1,413 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v3.2.43",
+    "version": "2.0"
+  },
+  "extensionsUsed": [
+    "KHR_texture_transform"
+  ],
+  "extensionsRequired": [
+    "KHR_texture_transform"
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "island_tree_02"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "island_tree_02",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "alphaCutoff": 0.5,
+      "alphaMode": "MASK",
+      "doubleSided": true,
+      "name": "island_tree_02_leaves",
+      "normalTexture": {
+        "index": 3
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 4
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 5
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "island_tree_02_branches",
+      "normalTexture": {
+        "extensions": {
+          "KHR_texture_transform": {
+            "offset": [
+              0,
+              -2.4000000953674316
+            ],
+            "scale": [
+              15,
+              3.4000000953674316
+            ]
+          }
+        },
+        "index": 6,
+        "scale": 0.5
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                -2.4000000953674316
+              ],
+              "scale": [
+                15,
+                3.4000000953674316
+              ]
+            }
+          },
+          "index": 7
+        },
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "extensions": {
+            "KHR_texture_transform": {
+              "offset": [
+                0,
+                -2.4000000953674316
+              ],
+              "scale": [
+                15,
+                3.4000000953674316
+              ]
+            }
+          },
+          "index": 8
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        },
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1
+        },
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 2
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    },
+    {
+      "sampler": 0,
+      "source": 5
+    },
+    {
+      "sampler": 0,
+      "source": 6
+    },
+    {
+      "sampler": 0,
+      "source": 7
+    },
+    {
+      "sampler": 0,
+      "source": 8
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_nor_gl",
+      "uri": "textures/island_tree_02_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_diff",
+      "uri": "textures/island_tree_02_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_rough",
+      "uri": "textures/island_tree_02_arm_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_leaves_nor_gl",
+      "uri": "textures/island_tree_02_leaves_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_leaves_diff",
+      "uri": "textures/island_tree_02_leaves_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_leaves_rough",
+      "uri": "textures/island_tree_02_leaves_arm_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_branches_nor_gl",
+      "uri": "textures/island_tree_02_branches_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_branches_diff",
+      "uri": "textures/island_tree_02_branches_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "island_tree_02_branches_rough",
+      "uri": "textures/island_tree_02_branches_arm_1k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 15219,
+      "max": [
+        1.2416797876358032,
+        2.5996620655059814,
+        2.26574444770813
+      ],
+      "min": [
+        -1.1161692142486572,
+        -0.017011718824505806,
+        -0.45452672243118286
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 15219,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 15219,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 81894,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 625401,
+      "max": [
+        2.012003183364868,
+        3.3895938396453857,
+        2.956543207168579
+      ],
+      "min": [
+        -1.8560643196105957,
+        1.2472410202026367,
+        -1.1141541004180908
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 625401,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 625401,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5125,
+      "count": 2144232,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 233874,
+      "max": [
+        2.155407428741455,
+        3.3729920387268066,
+        2.9034361839294434
+      ],
+      "min": [
+        -2.052338123321533,
+        1.2643797397613525,
+        -1.072293758392334
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 233874,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 233874,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5125,
+      "count": 990513,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 182628,
+      "byteOffset": 0
+    },
+    {
+      "buffer": 0,
+      "byteLength": 182628,
+      "byteOffset": 182628
+    },
+    {
+      "buffer": 0,
+      "byteLength": 121752,
+      "byteOffset": 365256
+    },
+    {
+      "buffer": 0,
+      "byteLength": 163788,
+      "byteOffset": 487008
+    },
+    {
+      "buffer": 0,
+      "byteLength": 7504812,
+      "byteOffset": 650796
+    },
+    {
+      "buffer": 0,
+      "byteLength": 7504812,
+      "byteOffset": 8155608
+    },
+    {
+      "buffer": 0,
+      "byteLength": 5003208,
+      "byteOffset": 15660420
+    },
+    {
+      "buffer": 0,
+      "byteLength": 8576928,
+      "byteOffset": 20663628
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2806488,
+      "byteOffset": 29240556
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2806488,
+      "byteOffset": 32047044
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1870992,
+      "byteOffset": 34853532
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3962052,
+      "byteOffset": 36724524
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 40686576,
+      "uri": "island_tree_02.bin"
+    }
+  ]
+}

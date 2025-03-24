@@ -1,311 +1,403 @@
 Scene: Untitled
 Entities:
-  - Entity: 4091229161639203787
+  - Entity: 12778414743499407505
     TagComponent:
-      Tag: Ground
+      Tag: tree
     TransformComponent:
-      Position: [0, -1, 0]
-      Rotation: [1.57079637, 0, 0]
-      Scale: [12, 8, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 6260252956798588155
-    TagComponent:
-      Tag: wineCabinet
-    TransformComponent:
-      Position: [0.75, -2.9000001, -6.0999999]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [2.49999976, 2.5, 3.49999976]
-    RelationshipComponent:
-      Parent: 13543467428980672148
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\wineCabinet.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 6301740940277613647
-    TagComponent:
-      Tag: curtain
-    TransformComponent:
-      Position: [5.80000019, -2.9000001, 2]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.899999917, 0.699999988, 0.99999994]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\2_layer_curtain_with_role_box_curtain.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 780736763726383188
-    TagComponent:
-      Tag: rightWallUp
-    TransformComponent:
-      Position: [6, -1.04999995, -1.85000002]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [2.39999986, 0.100000001, 0.99999994]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 10885714300644508460
-    TagComponent:
-      Tag: rightWallDown
-    TransformComponent:
-      Position: [6, -2.5, -1.85000002]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [2.39999986, 1, 0.99999994]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 16833906852224989838
-    TagComponent:
-      Tag: rightWallRight
-    TransformComponent:
-      Position: [6, -2, -0.349999994]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.599999964, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 2100369519327830432
-    TagComponent:
-      Tag: rightWallLeft
-    TransformComponent:
-      Position: [6, -2, -3.5]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.99999994, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 2774343277533363683
-    TagComponent:
-      Tag: frontWall
-    TransformComponent:
-      Position: [3.5, -2, 4]
-      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
-      Scale: [5, 2, 1]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 7367871459172999893
-    TagComponent:
-      Tag: frontWall
-    TransformComponent:
-      Position: [-4.5, -2, 4]
-      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
-      Scale: [3, 2, 1]
-    RelationshipComponent:
-      Parent: 4218795825376792141
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 14219994563855416
-    TagComponent:
-      Tag: leftWallLeft
-    TransformComponent:
-      Position: [-6, -1.70000005, -0.899999976]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [1.79999983, 0.600000024, 0.99999994]
-    RelationshipComponent:
-      Parent: 6472005395259509566
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 1583691236873041908
-    TagComponent:
-      Tag: leftWallUp
-    TransformComponent:
-      Position: [-6, -1.20000005, -2]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [3.99999976, 0.400000006, 0.99999994]
-    RelationshipComponent:
-      Parent: 6472005395259509566
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 4168261614653072703
-    TagComponent:
-      Tag: leftWalldown
-    TransformComponent:
-      Position: [-6, -2.5, -2]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [3.99999976, 1, 0.99999994]
-    RelationshipComponent:
-      Parent: 6472005395259509566
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 9284178301030384307
-    TagComponent:
-      Tag: backWall
-    TransformComponent:
-      Position: [3.5, -2, -4]
-      Rotation: [0, -0, 0]
-      Scale: [5, 2, 1]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 17790756957658741354
-    TagComponent:
-      Tag: backWall
-    TransformComponent:
-      Position: [-2.5, -2, -4]
-      Rotation: [0, -0, 0]
-      Scale: [7, 2, 1]
-    RelationshipComponent:
-      Parent: 6472005395259509566
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 4236131043367956055
-    TagComponent:
-      Tag: refrigerator
-    TransformComponent:
-      Position: [-3.70000005, -3, -0.300000012]
+      Position: [-8.30000019, -3.0999999, 3.9000001]
       Rotation: [0, -0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
-      Parent: 6472005395259509566
+      Parent: 16762602670578543742
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\haier_refrigerator.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\island_tree_01_1k.gltf\island_tree_01_1k.gltf
       MatPath: ""
       IsMatChanged: false
-  - Entity: 680951494029197492
+  - Entity: 2075185933507680193
     TagComponent:
-      Tag: light
+      Tag: tree
     TransformComponent:
-      Position: [-2.5, -1, -2]
+      Position: [-8.89999962, -3.0999999, -3]
       Rotation: [0, -0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
-      Parent: 6472005395259509566
-      Children:
-        []
-    LightComponent:
-      Type: 0
-      ShadowMap: 1
-      Position: [-2.5, -1, -2]
-      Direction: [0, -1, 0]
-      Color: [1, 1, 1]
-      Intensity: 1
-      InnerCutoff: 0.976296008
-      OuterCutoff: 0.953716934
-  - Entity: 4040673987884250534
-    TagComponent:
-      Tag: kitchenSet
-    TransformComponent:
-      Position: [-5.5999999, -3, -2]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [0.99999994, 0.899999976, 0.99999994]
-    RelationshipComponent:
-      Parent: 6472005395259509566
+      Parent: 16762602670578543742
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\kitchen_set.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\island_tree_02_1k.gltf\island_tree_02_1k.gltf
       MatPath: ""
       IsMatChanged: false
-  - Entity: 911654380782913653
+  - Entity: 9876652831812558946
     TagComponent:
-      Tag: lightStand
+      Tag: fence
     TransformComponent:
-      Position: [-4.5999999, -3, 3.5999999]
+      Position: [-11, -3.0999999, 7]
       Rotation: [0, -0, 0]
       Scale: [0.100000001, 0.100000001, 0.100000001]
     RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 1487995734544309568
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [-11, -3.0999999, 3]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 4279278298902224310
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [-11, -3.0999999, -1]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 480264653949502822
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [-11, -3.0999999, -5]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 5640132773293883870
+    TagComponent:
+      Tag: tree
+    TransformComponent:
+      Position: [9.69999981, -3.0999999, -4.19999981]
+      Rotation: [0, -0, 0]
+      Scale: [0.5, 0.5, 0.5]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\jacaranda_tree_1k.gltf\jacaranda_tree_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 14159156998783785905
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [11, -3.0999999, -5]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 10198417006854398761
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [11, -3.0999999, -1]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 15383352918914483595
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [11, -3.0999999, 3]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 7839623101719944126
+    TagComponent:
+      Tag: fence
+    TransformComponent:
+      Position: [11, -3.0999999, 7]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\wooden_fence.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 8137442650000340941
+    TagComponent:
+      Tag: Ground
+    TransformComponent:
+      Position: [0, -3.0999999, 0]
+      Rotation: [-1.57079542, 0, 0]
+      Scale: [24, 17.9999981, 0.99999994]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\background\texture\aerial_grass_rock_4k.gltf\aerial_grass_rock_4k.gltf
+      IsMatChanged: true
+  - Entity: 8225068969653205411
+    TagComponent:
+      Tag: rightWallDown
+    TransformComponent:
+      Position: [6, -2.95000005, 2]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [3.99999976, 0.100000001, 0.99999994]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 4809486096885623754
+    TagComponent:
+      Tag: rightWallUp
+    TransformComponent:
+      Position: [6, -1.04999995, 2]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [3.99999976, 0.100000001, 0.99999994]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 16878833405735424312
+    TagComponent:
+      Tag: window
+    TransformComponent:
+      Position: [1, -3, 2.11999989]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 0.689999998]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowLiving.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 17129340201275415178
+    TagComponent:
+      Tag: leftWallDown
+    TransformComponent:
+      Position: [-6, -2.5999999, 1.60000002]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.799999952, 0.800000012, 0.99999994]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 12966128042145111874
+    TagComponent:
+      Tag: leftWallUp
+    TransformComponent:
+      Position: [-6, -1.14999998, 1.60000002]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.800000012, 0.300000012, 0.99999994]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 2128539176322605959
+    TagComponent:
+      Tag: leftWallRight
+    TransformComponent:
+      Position: [-6, -2, 0.600000024]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [1.19999993, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 17508449963771508183
+    TagComponent:
+      Tag: leftWallLeft
+    TransformComponent:
+      Position: [-6, -2, 3]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [1.99999988, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 16557757476243764566
+    TagComponent:
+      Tag: window
+    TransformComponent:
+      Position: [-6.19999981, -2.5, 1.5]
+      Rotation: [0, -0, 0]
+      Scale: [0.00999999978, 0.0149999997, 0.0199999996]
+    RelationshipComponent:
       Parent: 4218795825376792141
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\lightStand.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowSecond.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 7549715224149298604
+  - Entity: 9296111457444620629
     TagComponent:
-      Tag: light
+      Tag: window
     TransformComponent:
-      Position: [-4.30000019, -1, 2.29999995]
+      Position: [5.9000001, -2, -3]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [0.0199999977, 0.00999999978, 0.00999999885]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowDoubleSlide.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 12286766057837523214
+    TagComponent:
+      Tag: leftWallRight
+    TransformComponent:
+      Position: [-6, -1.70000005, -3.29999995]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [1.39999986, 0.600000024, 0.99999994]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 11183910570707463533
+    TagComponent:
+      Tag: window
+    TransformComponent:
+      Position: [-5.9000001, -1.70000005, -2.20000005]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.399999976, 0.200000003, 0.199999988]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\kitchenWindow.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 13060602362028288939
+    TagComponent:
+      Tag: diningTable
+    TransformComponent:
+      Position: [-2.5, -3, -3]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.00100000005, 0.00100000005, 0.00100000005]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\simple_dining_table.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 17217129479343658965
+    TagComponent:
+      Tag: desk
+    TransformComponent:
+      Position: [-5.5, -3, 1.5]
       Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
+      Scale: [0.00300000003, 0.00300000003, 0.00300000003]
     RelationshipComponent:
       Parent: 4218795825376792141
       Children:
         []
-    LightComponent:
-      Type: 0
-      ShadowMap: 1
-      Position: [-4.30000019, -1, 2.29999995]
-      Direction: [0, -1, 0]
-      Color: [1, 1, 1]
-      Intensity: 2
-      InnerCutoff: 0.976296008
-      OuterCutoff: 0.500000179
-  - Entity: 3920357026355101402
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\desk_low-poly.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 10015202978154340783
     TagComponent:
-      Tag: bedSigngle
+      Tag: closet
     TransformComponent:
-      Position: [-3.5999999, -3, 2.9000001]
-      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Position: [-5.5, -3, 3.4000001]
+      Rotation: [0, -0, 0]
       Scale: [0.449999988, 0.449999988, 0.449999988]
     RelationshipComponent:
       Parent: 4218795825376792141
@@ -313,573 +405,101 @@ Entities:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\bedSingleBlue.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closet.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 6699117294648363075
+  - Entity: 15162531656805658719
     TagComponent:
-      Tag: lightStand
+      Tag: toilet
     TransformComponent:
-      Position: [5.4000001, -3, -2.70000005]
-      Rotation: [0, -0, 0]
-      Scale: [0.100000001, 0.100000001, 0.100000001]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\lightStand2.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 7164782688380138460
-    TagComponent:
-      Tag: closetDouble2
-    TransformComponent:
-      Position: [4.69999981, -3, -3.4000001]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.49999997, 0.449999988, 0.49999997]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closetDoubleBlue.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 14445738181504216720
-    TagComponent:
-      Tag: closetDouble
-    TransformComponent:
-      Position: [2.79999995, -3, -3.4000001]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.49999997, 0.449999988, 0.49999997]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closetDoubleBlue.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 4200337901994953470
-    TagComponent:
-      Tag: light
-    TransformComponent:
-      Position: [3.5, -1, -2]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    LightComponent:
-      Type: 0
-      ShadowMap: 1
-      Position: [3.5, -1, -2]
-      Direction: [0, -1, 0]
-      Color: [1, 1, 1]
-      Intensity: 2
-      InnerCutoff: 0.866025448
-      OuterCutoff: 0.173648447
-  - Entity: 10430000212575402824
-    TagComponent:
-      Tag: bedDoubleWhite
-    TransformComponent:
-      Position: [4.5, -3, -1.20000005]
-      Rotation: [0, -1.57045054, 0]
-      Scale: [0.49999997, 0.5, 0.49999997]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\bedDoubleWhite.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 8539595349784967074
-    TagComponent:
-      Tag: shower
-    TransformComponent:
-      Position: [-2.5, -2.29999995, 3.9000001]
-      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\shower_high_poly.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 4676280590977387821
-    TagComponent:
-      Tag: sink
-    TransformComponent:
-      Position: [-1.5, -3, 3.9000001]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [0.399999976, 0.400000006, 0.399999976]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\sink.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 17418703157509580641
-    TagComponent:
-      Tag: Ground
-    TransformComponent:
-      Position: [-1.5, -2.98000002, 3]
-      Rotation: [-1.57079542, 0, 0]
-      Scale: [3, 1.99999988, 0.99999994]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
-      IsMatChanged: true
-  - Entity: 8242082153510191493
-    TagComponent:
-      Tag: tv
-    TransformComponent:
-      Position: [3.5, -3, 0.400000006]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [0.249999985, 0.25, 0.249999985]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\tv.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 9335659446680918042
-    TagComponent:
-      Tag: rightWall
-    TransformComponent:
-      Position: [0.949999988, -2, 3.5]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [0.99999994, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 13543467428980672148
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 7178435859033112626
-    TagComponent:
-      Tag: frontWall
-    TransformComponent:
-      Position: [-2, -2, 1.95000005]
-      Rotation: [0, 3.14159274, 0]
-      Scale: [2, 2, 1]
-    RelationshipComponent:
-      Parent: 13543467428980672148
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 14000534983746536330
-    TagComponent:
-      Tag: leftWall
-    TransformComponent:
-      Position: [-2.95000005, -2, 1.5]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [1, 2, 1]
-    RelationshipComponent:
-      Parent: 13543467428980672148
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 7748696208530886723
-    TagComponent:
-      Tag: light
-    TransformComponent:
-      Position: [3.5, -1, 2]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    LightComponent:
-      Type: 0
-      ShadowMap: 1
-      Position: [3.5, -1, 2]
-      Direction: [0, -1, 0]
-      Color: [1, 1, 1]
-      Intensity: 2
-      InnerCutoff: 0.866025448
-      OuterCutoff: 0.173648447
-  - Entity: 1731061364976349595
-    TagComponent:
-      Tag: leftWall
-    TransformComponent:
-      Position: [-2.95000005, -2, 3]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [2, 2, 1]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 3
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
-      IsMatChanged: true
-  - Entity: 4218795825376792141
-    TagComponent:
-      Tag: secondRoom
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        - 12775534720779955695
-        - 7819076459109560949
-        - 7549715224149298604
-        - 3920357026355101402
-        - 911654380782913653
-        - 10015202978154340783
-        - 17217129479343658965
-        - 7367871459172999893
-        - 16557757476243764566
-        - 17508449963771508183
-        - 2128539176322605959
-        - 12966128042145111874
-        - 17129340201275415178
-  - Entity: 13543467428980672148
-    TagComponent:
-      Tag: hallway
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        - 14000534983746536330
-        - 7178435859033112626
-        - 9335659446680918042
-        - 6260252956798588155
-  - Entity: 256946563235024238
-    TagComponent:
-      Tag: rightWall
-    TransformComponent:
-      Position: [-0.0500000007, -2, 3]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [2, 2, 1]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 3
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
-      IsMatChanged: true
-  - Entity: 8948757968615919538
-    TagComponent:
-      Tag: bathRoom
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        - 13864419146007071075
-        - 256946563235024238
-        - 1731061364976349595
-        - 17418703157509580641
-        - 17058125263192761278
-        - 393252832074073227
-        - 4676280590977387821
-        - 7194413838066270822
-        - 15162531656805658719
-        - 8539595349784967074
-  - Entity: 17672048000232220814
-    TagComponent:
-      Tag: backWall
-    TransformComponent:
-      Position: [3.5, -2, 0.0500000007]
-      Rotation: [0, -0, 0]
-      Scale: [5, 2, 1]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 2876866745356606971
-    TagComponent:
-      Tag: livingRoom
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        - 17672048000232220814
-        - 5378707395944383845
-        - 4668445930636569645
-        - 8242082153510191493
-        - 7748696208530886723
-        - 15130027918965791675
-        - 5830034989955847795
-        - 11013772891069024823
-        - 11614014448445519484
-        - 2774343277533363683
-        - 6301740940277613647
-        - 16878833405735424312
-        - 4809486096885623754
-        - 8225068969653205411
-  - Entity: 18108197421700853077
-    TagComponent:
-      Tag: bedRoom
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        - 46513102315907103
-        - 7635909137274202137
-        - 10430000212575402824
-        - 4200337901994953470
-        - 14445738181504216720
-        - 7164782688380138460
-        - 6699117294648363075
-        - 9284178301030384307
-        - 2100369519327830432
-        - 9296111457444620629
-        - 16833906852224989838
-        - 10885714300644508460
-        - 780736763726383188
-  - Entity: 5378707395944383845
-    TagComponent:
-      Tag: leftWall
-    TransformComponent:
-      Position: [1.04999995, -2, 3.5]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [0.99999994, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 4668445930636569645
-    TagComponent:
-      Tag: leftleftWall
-    TransformComponent:
-      Position: [0.0500000007, -2, 3]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [1.99999988, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 13864419146007071075
-    TagComponent:
-      Tag: backWall
-    TransformComponent:
-      Position: [-2, -2, 2.04999995]
-      Rotation: [0, -0, 0]
-      Scale: [2, 2, 1]
-    RelationshipComponent:
-      Parent: 8948757968615919538
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 3
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
-      IsMatChanged: true
-  - Entity: 12775534720779955695
-    TagComponent:
-      Tag: rightWall
-    TransformComponent:
-      Position: [-3.04999995, -2, 2.5]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [2.99999976, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 4218795825376792141
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 11013772891069024823
-    TagComponent:
-      Tag: table
-    TransformComponent:
-      Position: [3.5, -3, 2.20000005]
+      Position: [-0.5, -3, 3.45000005]
       Rotation: [0, 1.57045054, 0]
-      Scale: [1.19999993, 1, 1.49999988]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\modern_coffee_table_01_1k.gltf\modern_coffee_table_01_1k.gltf
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 11614014448445519484
-    TagComponent:
-      Tag: plant
-    TransformComponent:
-      Position: [5.0999999, -3, 0.400000006]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 2876866745356606971
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\potted_plant_01_1k.gltf\potted_plant_01_1k.gltf
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 3406970704759287418
-    TagComponent:
-      Tag: Scene Camera
-    TransformComponent:
-      Position: [0, 0, 10]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    CameraComponent:
-      Camera:
-        PerspectiveFOV: 0.785398185
-        PerspectiveNear: 0.00100000005
-        PerspectiveFar: 1000
-      Primary: true
-      FixedAspectRatio: false
-    ScriptComponent:
-      ClassName: Sandbox.Camera
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 10
-  - Entity: 393252832074073227
-    TagComponent:
-      Tag: light
-    TransformComponent:
-      Position: [-1.5, -1.10000002, 3]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
+      Scale: [0.99999994, 1, 0.99999994]
     RelationshipComponent:
       Parent: 8948757968615919538
       Children:
         []
-    LightComponent:
-      Type: 1
-      ShadowMap: 0
-      Position: [-1.5, -1.10000002, 3]
-      Direction: [0, -1, 0.100000001]
-      Color: [1, 1, 1]
-      Intensity: 2
-      InnerCutoff: 0.819152117
-      OuterCutoff: 0.500000179
-  - Entity: 16143175189520029819
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\toilet.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 7194413838066270822
     TagComponent:
-      Tag: floor
+      Tag: toiletpaper
     TransformComponent:
-      Position: [0, -3, 0]
-      Rotation: [-1.57079637, 0, 0]
-      Scale: [12, 8, 1]
+      Position: [-0.200000003, -2.5, 3]
+      Rotation: [0, 3.14159274, 0]
+      Scale: [0.00100000005, 0.00100000005, 0.00100000005]
     RelationshipComponent:
-      Parent: 0
+      Parent: 8948757968615919538
       Children:
         []
     MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\FloorTexture\laminate_floor_02_1k.gltf
-      IsMatChanged: true
-  - Entity: 7635909137274202137
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\toilet_paper_roll_holder_with_cover.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 17058125263192761278
     TagComponent:
       Tag: frontWall
     TransformComponent:
-      Position: [3.5, -2, -0.0500000007]
-      Rotation: [0, 3.14159274, 0]
-      Scale: [5, 2, 1]
-    RelationshipComponent:
-      Parent: 18108197421700853077
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 7819076459109560949
-    TagComponent:
-      Tag: backWall
-    TransformComponent:
-      Position: [-4.5, -2, 0.0500000007]
-      Rotation: [0, -0, 0]
+      Position: [-1.5, -2, 3.95000005]
+      Rotation: [-3.14159083, -0, 0]
       Scale: [3, 2, 1]
     RelationshipComponent:
-      Parent: 4218795825376792141
+      Parent: 8948757968615919538
       Children:
         []
     MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      MeshType: 3
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
       IsMatChanged: true
-  - Entity: 46513102315907103
+  - Entity: 15130027918965791675
     TagComponent:
-      Tag: leftWall
+      Tag: sofaDouble
     TransformComponent:
-      Position: [1.04999995, -2, -2.5]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [2.99999976, 2, 0.99999994]
+      Position: [2.70000005, -3, 3.4000001]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [0.300000012, 0.300000012, 0.300000012]
     RelationshipComponent:
-      Parent: 18108197421700853077
+      Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 10075908342738820388
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\sofaDoubleWhite.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 6472005395259509566
     TagComponent:
-      Tag: rightWall
+      Tag: kitchen
     TransformComponent:
-      Position: [0.949999988, -2, -2.5]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [2.99999952, 2, 0.999999881]
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 18054152083284829616
+        - 4040673987884250534
+        - 680951494029197492
+        - 13060602362028288939
+        - 4236131043367956055
+        - 10075908342738820388
+        - 17790756957658741354
+        - 4168261614653072703
+        - 11183910570707463533
+        - 1583691236873041908
+        - 14219994563855416
+        - 12286766057837523214
+  - Entity: 18054152083284829616
+    TagComponent:
+      Tag: frontWall
+    TransformComponent:
+      Position: [-4.5, -2, -0.0500000007]
+      Rotation: [0, 3.14159274, 0]
+      Scale: [3, 2, 1]
     RelationshipComponent:
       Parent: 6472005395259509566
       Children:
@@ -904,13 +524,13 @@ Entities:
       Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\sofaSingleWhite.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 18054152083284829616
+  - Entity: 10075908342738820388
     TagComponent:
-      Tag: frontWall
+      Tag: rightWall
     TransformComponent:
-      Position: [-4.5, -2, -0.0500000007]
-      Rotation: [0, 3.14159274, 0]
-      Scale: [3, 2, 1]
+      Position: [0.949999988, -2, -2.5]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [2.99999952, 2, 0.999999881]
     RelationshipComponent:
       Parent: 6472005395259509566
       Children:
@@ -919,51 +539,164 @@ Entities:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
-  - Entity: 6472005395259509566
+  - Entity: 46513102315907103
     TagComponent:
-      Tag: kitchen
+      Tag: leftWall
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [1.04999995, -2, -2.5]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [2.99999976, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 7819076459109560949
+    TagComponent:
+      Tag: backWall
+    TransformComponent:
+      Position: [-4.5, -2, 0.0500000007]
+      Rotation: [0, -0, 0]
+      Scale: [3, 2, 1]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 7635909137274202137
+    TagComponent:
+      Tag: frontWall
+    TransformComponent:
+      Position: [3.5, -2, -0.0500000007]
+      Rotation: [0, 3.14159274, 0]
+      Scale: [5, 2, 1]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 16143175189520029819
+    TagComponent:
+      Tag: floor
+    TransformComponent:
+      Position: [0, -3, 0]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [12, 8, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\FloorTexture\laminate_floor_02_1k.gltf
+      IsMatChanged: true
+  - Entity: 393252832074073227
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [-1.5, -1.10000002, 3]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    LightComponent:
+      Type: 1
+      ShadowMap: 0
+      Position: [-1.5, -1.10000002, 3]
+      Direction: [0, -1, 0.100000001]
+      Color: [1, 1, 1]
+      Intensity: 2
+      InnerCutoff: 0.819152117
+      OuterCutoff: 0.500000179
+  - Entity: 3406970704759287418
+    TagComponent:
+      Tag: Scene Camera
+    TransformComponent:
+      Position: [0, 0, 10]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     RelationshipComponent:
       Parent: 0
       Children:
-        - 18054152083284829616
-        - 4040673987884250534
-        - 680951494029197492
-        - 13060602362028288939
-        - 4236131043367956055
-        - 10075908342738820388
-        - 17790756957658741354
-        - 4168261614653072703
-        - 11183910570707463533
-        - 1583691236873041908
-        - 14219994563855416
-        - 12286766057837523214
-  - Entity: 15130027918965791675
+        []
+    CameraComponent:
+      Camera:
+        PerspectiveFOV: 0.785398185
+        PerspectiveNear: 0.00100000005
+        PerspectiveFar: 1000
+      Primary: true
+      FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 10
+  - Entity: 11614014448445519484
     TagComponent:
-      Tag: sofaDouble
+      Tag: plant
     TransformComponent:
-      Position: [2.70000005, -3, 3.4000001]
-      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
-      Scale: [0.300000012, 0.300000012, 0.300000012]
+      Position: [5.0999999, -3, 0.400000006]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
     RelationshipComponent:
       Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\sofaDoubleWhite.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\potted_plant_01_1k.gltf\potted_plant_01_1k.gltf
       MatPath: ""
       IsMatChanged: false
-  - Entity: 17058125263192761278
+  - Entity: 11013772891069024823
     TagComponent:
-      Tag: frontWall
+      Tag: table
     TransformComponent:
-      Position: [-1.5, -2, 3.95000005]
-      Rotation: [-3.14159083, -0, 0]
-      Scale: [3, 2, 1]
+      Position: [3.5, -3, 2.20000005]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [1.19999993, 1, 1.49999988]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\modern_coffee_table_01_1k.gltf\modern_coffee_table_01_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 12775534720779955695
+    TagComponent:
+      Tag: rightWall
+    TransformComponent:
+      Position: [-3.04999995, -2, 2.5]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [2.99999976, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 13864419146007071075
+    TagComponent:
+      Tag: backWall
+    TransformComponent:
+      Position: [-2, -2, 2.04999995]
+      Rotation: [0, -0, 0]
+      Scale: [2, 2, 1]
     RelationshipComponent:
       Parent: 8948757968615919538
       Children:
@@ -972,44 +705,403 @@ Entities:
       MeshType: 3
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
       IsMatChanged: true
-  - Entity: 7194413838066270822
+  - Entity: 4668445930636569645
     TagComponent:
-      Tag: toiletpaper
+      Tag: leftleftWall
     TransformComponent:
-      Position: [-0.200000003, -2.5, 3]
-      Rotation: [0, 3.14159274, 0]
-      Scale: [0.00100000005, 0.00100000005, 0.00100000005]
+      Position: [0.0500000007, -2, 3]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1.99999988, 2, 0.99999994]
     RelationshipComponent:
-      Parent: 8948757968615919538
+      Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\toilet_paper_roll_holder_with_cover.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 15162531656805658719
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 5378707395944383845
     TagComponent:
-      Tag: toilet
+      Tag: leftWall
     TransformComponent:
-      Position: [-0.5, -3, 3.45000005]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [0.99999994, 1, 0.99999994]
+      Position: [1.04999995, -2, 3.5]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.99999994, 2, 0.99999994]
     RelationshipComponent:
-      Parent: 8948757968615919538
+      Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\toilet.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 10015202978154340783
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 18108197421700853077
     TagComponent:
-      Tag: closet
+      Tag: bedRoom
     TransformComponent:
-      Position: [-5.5, -3, 3.4000001]
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 46513102315907103
+        - 7635909137274202137
+        - 10430000212575402824
+        - 4200337901994953470
+        - 14445738181504216720
+        - 7164782688380138460
+        - 6699117294648363075
+        - 9284178301030384307
+        - 2100369519327830432
+        - 9296111457444620629
+        - 16833906852224989838
+        - 10885714300644508460
+        - 780736763726383188
+  - Entity: 2876866745356606971
+    TagComponent:
+      Tag: livingRoom
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 17672048000232220814
+        - 5378707395944383845
+        - 4668445930636569645
+        - 8242082153510191493
+        - 7748696208530886723
+        - 15130027918965791675
+        - 5830034989955847795
+        - 11013772891069024823
+        - 11614014448445519484
+        - 2774343277533363683
+        - 6301740940277613647
+        - 16878833405735424312
+        - 4809486096885623754
+        - 8225068969653205411
+  - Entity: 17672048000232220814
+    TagComponent:
+      Tag: backWall
+    TransformComponent:
+      Position: [3.5, -2, 0.0500000007]
       Rotation: [0, -0, 0]
+      Scale: [5, 2, 1]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 8948757968615919538
+    TagComponent:
+      Tag: bathRoom
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 13864419146007071075
+        - 256946563235024238
+        - 1731061364976349595
+        - 17418703157509580641
+        - 17058125263192761278
+        - 393252832074073227
+        - 4676280590977387821
+        - 7194413838066270822
+        - 15162531656805658719
+        - 8539595349784967074
+  - Entity: 256946563235024238
+    TagComponent:
+      Tag: rightWall
+    TransformComponent:
+      Position: [-0.0500000007, -2, 3]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [2, 2, 1]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 3
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
+      IsMatChanged: true
+  - Entity: 13543467428980672148
+    TagComponent:
+      Tag: hallway
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 14000534983746536330
+        - 7178435859033112626
+        - 9335659446680918042
+        - 6260252956798588155
+  - Entity: 4218795825376792141
+    TagComponent:
+      Tag: secondRoom
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 12775534720779955695
+        - 7819076459109560949
+        - 7549715224149298604
+        - 3920357026355101402
+        - 911654380782913653
+        - 10015202978154340783
+        - 17217129479343658965
+        - 7367871459172999893
+        - 16557757476243764566
+        - 17508449963771508183
+        - 2128539176322605959
+        - 12966128042145111874
+        - 17129340201275415178
+  - Entity: 1731061364976349595
+    TagComponent:
+      Tag: leftWall
+    TransformComponent:
+      Position: [-2.95000005, -2, 3]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [2, 2, 1]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 3
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
+      IsMatChanged: true
+  - Entity: 7748696208530886723
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [3.5, -1, 2]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [3.5, -1, 2]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 2
+      InnerCutoff: 0.866025448
+      OuterCutoff: 0.173648447
+  - Entity: 14000534983746536330
+    TagComponent:
+      Tag: leftWall
+    TransformComponent:
+      Position: [-2.95000005, -2, 1.5]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1, 2, 1]
+    RelationshipComponent:
+      Parent: 13543467428980672148
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 7178435859033112626
+    TagComponent:
+      Tag: frontWall
+    TransformComponent:
+      Position: [-2, -2, 1.95000005]
+      Rotation: [0, 3.14159274, 0]
+      Scale: [2, 2, 1]
+    RelationshipComponent:
+      Parent: 13543467428980672148
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 9335659446680918042
+    TagComponent:
+      Tag: rightWall
+    TransformComponent:
+      Position: [0.949999988, -2, 3.5]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [0.99999994, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 13543467428980672148
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 8242082153510191493
+    TagComponent:
+      Tag: tv
+    TransformComponent:
+      Position: [3.5, -3, 0.400000006]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [0.249999985, 0.25, 0.249999985]
+    RelationshipComponent:
+      Parent: 2876866745356606971
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\tv.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 17418703157509580641
+    TagComponent:
+      Tag: Ground
+    TransformComponent:
+      Position: [-1.5, -2.98000002, 3]
+      Rotation: [-1.57079542, 0, 0]
+      Scale: [3, 1.99999988, 0.99999994]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\toiletTileTexture\granite_tile_1k.gltf
+      IsMatChanged: true
+  - Entity: 4676280590977387821
+    TagComponent:
+      Tag: sink
+    TransformComponent:
+      Position: [-1.5, -3, 3.9000001]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [0.399999976, 0.400000006, 0.399999976]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\sink.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 8539595349784967074
+    TagComponent:
+      Tag: shower
+    TransformComponent:
+      Position: [-2.5, -2.29999995, 3.9000001]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 8948757968615919538
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\shower_high_poly.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 10430000212575402824
+    TagComponent:
+      Tag: bedDoubleWhite
+    TransformComponent:
+      Position: [4.5, -3, -1.20000005]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.49999997, 0.5, 0.49999997]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\bedDoubleWhite.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 4200337901994953470
+    TagComponent:
+      Tag: light
+    TransformComponent:
+      Position: [3.5, -1, -2]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [3.5, -1, -2]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 2
+      InnerCutoff: 0.866025448
+      OuterCutoff: 0.173648447
+  - Entity: 14445738181504216720
+    TagComponent:
+      Tag: closetDouble
+    TransformComponent:
+      Position: [2.79999995, -3, -3.4000001]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.49999997, 0.449999988, 0.49999997]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closetDoubleBlue.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 7164782688380138460
+    TagComponent:
+      Tag: closetDouble2
+    TransformComponent:
+      Position: [4.69999981, -3, -3.4000001]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.49999997, 0.449999988, 0.49999997]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closetDoubleBlue.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 6699117294648363075
+    TagComponent:
+      Tag: lightStand
+    TransformComponent:
+      Position: [5.4000001, -3, -2.70000005]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\lightStand2.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 3920357026355101402
+    TagComponent:
+      Tag: bedSigngle
+    TransformComponent:
+      Position: [-3.5999999, -3, 2.9000001]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
       Scale: [0.449999988, 0.449999988, 0.449999988]
     RelationshipComponent:
       Parent: 4218795825376792141
@@ -1017,64 +1109,104 @@ Entities:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\closet.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\bedSingleBlue.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 17217129479343658965
+  - Entity: 7549715224149298604
     TagComponent:
-      Tag: desk
+      Tag: light
     TransformComponent:
-      Position: [-5.5, -3, 1.5]
+      Position: [-4.30000019, -1, 2.29999995]
       Rotation: [0, -0, 0]
-      Scale: [0.00300000003, 0.00300000003, 0.00300000003]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 4218795825376792141
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [-4.30000019, -1, 2.29999995]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 2
+      InnerCutoff: 0.976296008
+      OuterCutoff: 0.500000179
+  - Entity: 911654380782913653
+    TagComponent:
+      Tag: lightStand
+    TransformComponent:
+      Position: [-4.5999999, -3, 3.5999999]
+      Rotation: [0, -0, 0]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
     RelationshipComponent:
       Parent: 4218795825376792141
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\desk_low-poly.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\split_output_baked\lightStand.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 13060602362028288939
+  - Entity: 4040673987884250534
     TagComponent:
-      Tag: diningTable
+      Tag: kitchenSet
     TransformComponent:
-      Position: [-2.5, -3, -3]
+      Position: [-5.5999999, -3, -2]
       Rotation: [0, 1.57079637, 0]
-      Scale: [0.00100000005, 0.00100000005, 0.00100000005]
+      Scale: [0.99999994, 0.899999976, 0.99999994]
     RelationshipComponent:
       Parent: 6472005395259509566
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\simple_dining_table.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\kitchen_set.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 11183910570707463533
+  - Entity: 680951494029197492
     TagComponent:
-      Tag: window
+      Tag: light
     TransformComponent:
-      Position: [-5.9000001, -1.70000005, -2.20000005]
-      Rotation: [0, 1.57079637, 0]
-      Scale: [0.399999976, 0.200000003, 0.199999988]
+      Position: [-2.5, -1, -2]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    LightComponent:
+      Type: 0
+      ShadowMap: 1
+      Position: [-2.5, -1, -2]
+      Direction: [0, -1, 0]
+      Color: [1, 1, 1]
+      Intensity: 1
+      InnerCutoff: 0.976296008
+      OuterCutoff: 0.953716934
+  - Entity: 4236131043367956055
+    TagComponent:
+      Tag: refrigerator
+    TransformComponent:
+      Position: [-3.70000005, -3, -0.300000012]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
     RelationshipComponent:
       Parent: 6472005395259509566
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\kitchenWindow.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\haier_refrigerator.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 12286766057837523214
+  - Entity: 17790756957658741354
     TagComponent:
-      Tag: leftWallRight
+      Tag: backWall
     TransformComponent:
-      Position: [-6, -1.70000005, -3.29999995]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [1.39999986, 0.600000024, 0.99999994]
+      Position: [-2.5, -2, -4]
+      Rotation: [0, -0, 0]
+      Scale: [7, 2, 1]
     RelationshipComponent:
       Parent: 6472005395259509566
       Children:
@@ -1083,75 +1215,73 @@ Entities:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
-  - Entity: 9296111457444620629
+  - Entity: 9284178301030384307
     TagComponent:
-      Tag: window
+      Tag: backWall
     TransformComponent:
-      Position: [5.9000001, -2, -3]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [0.0199999977, 0.00999999978, 0.00999999885]
+      Position: [3.5, -2, -4]
+      Rotation: [0, -0, 0]
+      Scale: [5, 2, 1]
     RelationshipComponent:
       Parent: 18108197421700853077
       Children:
         []
     MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowDoubleSlide.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 16557757476243764566
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 4168261614653072703
     TagComponent:
-      Tag: window
+      Tag: leftWalldown
     TransformComponent:
-      Position: [-6.19999981, -2.5, 1.5]
-      Rotation: [0, -0, 0]
-      Scale: [0.00999999978, 0.0149999997, 0.0199999996]
+      Position: [-6, -2.5, -2]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [3.99999976, 1, 0.99999994]
     RelationshipComponent:
-      Parent: 4218795825376792141
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowSecond.glb
-      MatPath: ""
-      IsMatChanged: false
-  - Entity: 17508449963771508183
-    TagComponent:
-      Tag: leftWallLeft
-    TransformComponent:
-      Position: [-6, -2, 3]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [1.99999988, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 4218795825376792141
+      Parent: 6472005395259509566
       Children:
         []
     MeshRendererComponent:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
-  - Entity: 2128539176322605959
-    TagComponent:
-      Tag: leftWallRight
-    TransformComponent:
-      Position: [-6, -2, 0.600000024]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [1.19999993, 2, 0.99999994]
-    RelationshipComponent:
-      Parent: 4218795825376792141
-      Children:
-        []
-    MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 12966128042145111874
+  - Entity: 1583691236873041908
     TagComponent:
       Tag: leftWallUp
     TransformComponent:
-      Position: [-6, -1.14999998, 1.60000002]
+      Position: [-6, -1.20000005, -2]
       Rotation: [0, 1.57045054, 0]
-      Scale: [0.800000012, 0.300000012, 0.99999994]
+      Scale: [3.99999976, 0.400000006, 0.99999994]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 14219994563855416
+    TagComponent:
+      Tag: leftWallLeft
+    TransformComponent:
+      Position: [-6, -1.70000005, -0.899999976]
+      Rotation: [0, 1.57079637, 0]
+      Scale: [1.79999983, 0.600000024, 0.99999994]
+    RelationshipComponent:
+      Parent: 6472005395259509566
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 7367871459172999893
+    TagComponent:
+      Tag: frontWall
+    TransformComponent:
+      Position: [-4.5, -2, 4]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [3, 2, 1]
     RelationshipComponent:
       Parent: 4218795825376792141
       Children:
@@ -1160,64 +1290,215 @@ Entities:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
-  - Entity: 17129340201275415178
+  - Entity: 2774343277533363683
     TagComponent:
-      Tag: leftWallDown
+      Tag: frontWall
     TransformComponent:
-      Position: [-6, -2.5999999, 1.60000002]
-      Rotation: [0, 1.57045054, 0]
-      Scale: [0.799999952, 0.800000012, 0.99999994]
+      Position: [3.5, -2, 4]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [5, 2, 1]
     RelationshipComponent:
-      Parent: 4218795825376792141
+      Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
-  - Entity: 16878833405735424312
+  - Entity: 2100369519327830432
     TagComponent:
-      Tag: window
+      Tag: rightWallLeft
     TransformComponent:
-      Position: [1, -3, 2.11999989]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 0.689999998]
+      Position: [6, -2, -3.5]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.99999994, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 16833906852224989838
+    TagComponent:
+      Tag: rightWallRight
+    TransformComponent:
+      Position: [6, -2, -0.349999994]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.599999964, 2, 0.99999994]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 10885714300644508460
+    TagComponent:
+      Tag: rightWallDown
+    TransformComponent:
+      Position: [6, -2.5, -1.85000002]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [2.39999986, 1, 0.99999994]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 780736763726383188
+    TagComponent:
+      Tag: rightWallUp
+    TransformComponent:
+      Position: [6, -1.04999995, -1.85000002]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [2.39999986, 0.100000001, 0.99999994]
+    RelationshipComponent:
+      Parent: 18108197421700853077
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 4
+      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
+      IsMatChanged: true
+  - Entity: 6301740940277613647
+    TagComponent:
+      Tag: curtain
+    TransformComponent:
+      Position: [5.80000019, -2.9000001, 2]
+      Rotation: [0, -1.57045054, 0]
+      Scale: [0.899999917, 0.699999988, 0.99999994]
     RelationshipComponent:
       Parent: 2876866745356606971
       Children:
         []
     MeshRendererComponent:
       MeshType: 7
-      Path: ./projects\..\Sandbox\Project\Assets\Models\House\windowLiving.glb
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\2_layer_curtain_with_role_box_curtain.glb
       MatPath: ""
       IsMatChanged: false
-  - Entity: 4809486096885623754
+  - Entity: 6260252956798588155
     TagComponent:
-      Tag: rightWallUp
+      Tag: wineCabinet
     TransformComponent:
-      Position: [6, -1.04999995, 2]
+      Position: [0.75, -2.9000001, -6.0999999]
       Rotation: [0, -1.57045054, 0]
-      Scale: [3.99999976, 0.100000001, 0.99999994]
+      Scale: [2.49999976, 2.5, 3.49999976]
     RelationshipComponent:
-      Parent: 2876866745356606971
+      Parent: 13543467428980672148
       Children:
         []
     MeshRendererComponent:
-      MeshType: 4
-      MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
-      IsMatChanged: true
-  - Entity: 8225068969653205411
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\wineCabinet.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 4091229161639203787
     TagComponent:
-      Tag: rightWallDown
+      Tag: Ground
     TransformComponent:
-      Position: [6, -2.95000005, 2]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [3.99999976, 0.100000001, 0.99999994]
+      Position: [0, -1, 0]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [12, 8, 1]
     RelationshipComponent:
-      Parent: 2876866745356606971
+      Parent: 0
       Children:
         []
     MeshRendererComponent:
       MeshType: 4
       MatPath: ./projects\..\Sandbox\Project\Assets\Models\House\sandy_gravel_1k.gltf\sandy_gravel_1k.gltf
       IsMatChanged: true
+  - Entity: 1858641735582850041
+    TagComponent:
+      Tag: grass
+    TransformComponent:
+      Position: [8.60000038, -3.0999999, 0]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\fern_02_1k.gltf\fern_02_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 16762602670578543742
+    TagComponent:
+      Tag: background
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 8137442650000340941
+        - 12942312252660914891
+        - 1858641735582850041
+        - 2452340873559164432
+        - 4059780562527641610
+        - 7839623101719944126
+        - 15383352918914483595
+        - 10198417006854398761
+        - 14159156998783785905
+        - 5640132773293883870
+        - 480264653949502822
+        - 4279278298902224310
+        - 1487995734544309568
+        - 9876652831812558946
+        - 2075185933507680193
+        - 12778414743499407505
+  - Entity: 12942312252660914891
+    TagComponent:
+      Tag: grass
+    TransformComponent:
+      Position: [7, -3.0999999, 0.600000024]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\fern_02_1k.gltf\fern_02_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 2452340873559164432
+    TagComponent:
+      Tag: grass
+    TransformComponent:
+      Position: [10.5, -3.0999999, 2.5]
+      Rotation: [3.14159274, -8.74227695e-08, 3.14159274]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\fern_02_1k.gltf\fern_02_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 4059780562527641610
+    TagComponent:
+      Tag: tree
+    TransformComponent:
+      Position: [9.69999981, -3.0999999, 3.0999999]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 16762602670578543742
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\tree_small_02_1k.gltf\tree_small_02_1k.gltf
+      MatPath: ""
+      IsMatChanged: false
