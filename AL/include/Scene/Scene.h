@@ -232,7 +232,8 @@ class Scene
 
 	// frustumCulling
 	void frustumCulling(const Frustum &frustum);
-	void initFrustumDrawFlag();
+	void initFrustumDisable();
+	void initFrustumEnable();
 	void removeEntityInCullTree(Entity &entity);
 	void replaceEntityInCullTree(Entity &entity);
 	void insertEntityInCullTree(Entity &entity);
@@ -251,6 +252,16 @@ class Scene
 	void unsetSelectedEntity()
 	{
 		m_isSelectedEntity = false;
+	}
+
+	bool getFrustumFlag()
+	{
+		return m_frustumFlag;
+	}
+
+	void setFrustumFlag(bool flag)
+	{
+		m_frustumFlag = flag;
 	}
 
 	alglm::vec3 &getSelectedPosition()
@@ -285,6 +296,7 @@ class Scene
 	alglm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
 	bool m_IsPaused = false;
 	bool m_IsRunning = false;
+	bool m_frustumFlag = true;
 	int32_t m_StepFrames = 0;
 
 	std::unordered_map<UUID, entt::entity> m_EntityMap;

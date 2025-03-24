@@ -804,12 +804,21 @@ void Scene::frustumCulling(const Frustum &frustum)
 	}
 }
 
-void Scene::initFrustumDrawFlag()
+void Scene::initFrustumDisable()
 {
 	int32_t root = m_cullTree.getRootNodeId();
 	if (root != NULL_NODE)
 	{
 		m_cullTree.setRenderDisable(root);
+	}
+}
+
+void Scene::initFrustumEnable()
+{
+	int32_t root = m_cullTree.getRootNodeId();
+	if (root != NULL_NODE)
+	{
+		m_cullTree.setRenderEnable(root);
 	}
 }
 

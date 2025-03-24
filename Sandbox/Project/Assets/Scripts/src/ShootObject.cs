@@ -27,22 +27,30 @@ namespace Sandbox
         {
             Vector3 velocity = Vector3.Zero;
 
-            if (Input.isKeyDown(KeyCode.W))
+            if (Input.isKeyDown(KeyCode.Right))
             {
                 velocity.Z = -1.0f;
             }
-            else if (Input.isKeyDown(KeyCode.S))
+            else if (Input.isKeyDown(KeyCode.Left))
             {
                 velocity.Z = 1.0f;
             }
 
-            if (Input.isKeyDown(KeyCode.A))
+            if (Input.isKeyDown(KeyCode.Up))
             {
                 velocity.X = -1.0f;
             }
-            else if (Input.isKeyDown(KeyCode.D))
+            else if (Input.isKeyDown(KeyCode.Down))
             {
                 velocity.X = 1.0f;
+            }
+			else if (Input.isKeyDown(KeyCode.E))
+            {
+                velocity.Y = 1.0f;
+            }
+			else if (Input.isKeyDown(KeyCode.Q))
+            {
+                velocity.Y = -1.0f;
             }
 
             velocity *= force;
@@ -51,28 +59,28 @@ namespace Sandbox
 
         bool isMoveForward()
         {
-            if (Input.isKeyDown(KeyCode.W))
+            if (Input.isKeyDown(KeyCode.Right))
                 return true;
             return false;
         }
 
         bool isMoveBackward()
         {
-            if (Input.isKeyDown(KeyCode.S))
+            if (Input.isKeyDown(KeyCode.Left))
                 return true;
             return false;
         }
 
         bool isMoveRight()
         {
-            if (Input.isKeyDown(KeyCode.D))
+            if (Input.isKeyDown(KeyCode.Down))
                 return true;
             return false;
         }
 
         bool isMoveLeft()
         {
-            if (Input.isKeyDown(KeyCode.A))
+            if (Input.isKeyDown(KeyCode.Up))
                 return true;
             return false;
         }
