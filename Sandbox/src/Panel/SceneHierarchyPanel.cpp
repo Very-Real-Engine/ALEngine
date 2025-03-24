@@ -98,6 +98,14 @@ void SceneHierarchyPanel::onImGuiRender()
 					m_Context->createPrimitiveMeshEntity("Cylinder", 6);
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Frustum Culling"))
+			{
+				if (ImGui::MenuItem("True"))
+					m_Context->setFrustumFlag(true);
+				if (ImGui::MenuItem("False"))
+					m_Context->setFrustumFlag(false);
+				ImGui::EndMenu();
+			}
 			ImGui::EndPopup();
 		}
 
