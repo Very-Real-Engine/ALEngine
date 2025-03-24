@@ -1433,6 +1433,10 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 								scriptInstance->setFieldValue(name, utils::stringToMonoString(std::string(buffer)));
 							}
 						}
+						else
+						{
+							scriptInstance->setFieldValue(name, utils::stringToMonoString(""));
+						}
 					}
 				}
 			}
@@ -1482,7 +1486,7 @@ void SceneHierarchyPanel::drawComponents(Entity entity)
 		drawCheckBox("Gravity", component.m_UseGravity);
 
 		// collision num
-		ImGui::InputInt("Touched Num", &component.m_TouchNum, 1, 100, ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputInt("Touched Num", &component.m_TouchNum, 0, 0, ImGuiInputTextFlags_ReadOnly);
 
 		const char *bodyTypeStrings[] = {"Static", "Dynamic"};
 		const char *currentBodyTypeString = bodyTypeStrings[(int)component.m_Type];
