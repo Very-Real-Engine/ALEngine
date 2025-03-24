@@ -553,6 +553,8 @@ MonoObject *ScriptClass::invokeMethod(MonoObject *instance, MonoMethod *method, 
 ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, Entity entity) : m_ScriptClass(scriptClass)
 {
 	m_Instance = scriptClass->instantiate();
+	// GC에 의해 수집되지 않도록 GCHandle로 핀 고정
+	m_GCHandle = mono_gchandle_new(m_Instance, false);
 
 	// Mono Runtime에서 생성자는 내부적으로 .ctor라는 이름으로 처리됨.
 	m_Constructor = s_Data->entityClass.getMethod(".ctor", 1);
@@ -562,13 +564,22 @@ ScriptInstance::ScriptInstance(std::shared_ptr<ScriptClass> scriptClass, Entity 
 	// 생성자 실행 - UUID Parmaeter needed.
 	UUID entityID = entity.getUUID();
 	void *param = &entityID;
-	m_ScriptClass->invokeMethod(m_Instance, m_Constructor, &param);
+	MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+	m_ScriptClass->invokeMethod(currentInstance, m_Constructor, &param);
+}
+
+ScriptInstance::~ScriptInstance()
+{
+	mono_gchandle_free(m_GCHandle);
 }
 
 void ScriptInstance::invokeOnCreate()
 {
 	if (m_OnCreateMethod)
-		m_ScriptClass->invokeMethod(m_Instance, m_OnCreateMethod);
+	{
+		MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+		m_ScriptClass->invokeMethod(currentInstance, m_OnCreateMethod);
+	}
 }
 
 void ScriptInstance::invokeOnUpdate(float ts)
@@ -576,7 +587,8 @@ void ScriptInstance::invokeOnUpdate(float ts)
 	if (m_OnUpdateMethod)
 	{
 		void *param = &ts;
-		m_ScriptClass->invokeMethod(m_Instance, m_OnUpdateMethod, &param);
+		MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+		m_ScriptClass->invokeMethod(currentInstance, m_OnUpdateMethod, &param);
 	}
 }
 
@@ -588,7 +600,8 @@ bool ScriptInstance::getFieldValueInternal(const std::string &name, void *buffer
 		return false;
 
 	const ScriptField &field = it->second;
-	mono_field_get_value(m_Instance, field.m_ClassField, buffer);
+	MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+	mono_field_get_value(currentInstance, field.m_ClassField, buffer);
 	return true;
 }
 
@@ -600,7 +613,8 @@ bool ScriptInstance::setFieldValueInternal(const std::string &name, const void *
 		return false;
 
 	const ScriptField &field = it->second;
-	mono_field_set_value(m_Instance, field.m_ClassField, (void *)value);
+	MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+	mono_field_set_value(currentInstance, field.m_ClassField, (void *)value);
 	return true;
 }
 
@@ -629,7 +643,8 @@ std::map<std::string, std::function<bool()>> ScriptInstance::getAllBooleanMethod
 		{
 			method = m_ScriptClass->getMethod(name, 0);
 			std::function<bool()> func = [this, method]() -> bool {
-				MonoObject* result = m_ScriptClass->invokeMethod(m_Instance, method);
+				MonoObject* currentInstance = mono_gchandle_get_target(m_GCHandle);
+				MonoObject* result = m_ScriptClass->invokeMethod(currentInstance, method);
 				
 				bool value = *(bool *)mono_object_unbox(result);
 				return value;
