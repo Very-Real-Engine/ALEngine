@@ -67,7 +67,9 @@ namespace Sandbox
 
             // 현재 위치에 이동 적용
             Vector3 translation = m_Transform.Translation;
+            float y = translation.Y;
             translation += moveDir * Speed * ts;
+            translation.Y = y;
             m_Transform.Translation = translation;
         }
     }
