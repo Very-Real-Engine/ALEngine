@@ -1313,7 +1313,7 @@ void Renderer::recordShadowCubeMapCommandBuffer(Scene *scene, VkCommandBuffer co
 	vkCmdSetDepthBias(commandBuffer, 1.25f, 0.0f, 1.75f);
 
 	alglm::vec3 lightPos = lightInfo.position;
-	alglm::mat4 lightProj = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+	alglm::mat4 lightProj = alglm::perspective(alglm::radians(90.0f), 1.0f, 0.1f, 50.0f);
 
 	ShadowCubeMapUBO ubo{};
 	ubo.view[0] = alglm::lookAt(lightPos, lightPos + alglm::vec3(1.0, 0.0, 0.0), alglm::vec3(0.0, -1.0, 0.0));
