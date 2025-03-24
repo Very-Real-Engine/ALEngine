@@ -143,7 +143,12 @@ class Model
 	 * @param drawInfo 그리기 정보
 	 */
 	void drawShadowCubeMap(ShadowCubeMapDrawInfo &drawInfo);
-
+	/**
+	 * @brief 그림자 SSBO 그리기
+	 * @param commandBuffer 명령 버퍼
+	 * @param instanceCount 인스턴스 수
+	 * @param firstInstance 첫 번째 인스턴스
+	 */
 	void drawShadowSSBO(VkCommandBuffer commandBuffer, uint32_t instanceCount, uint32_t firstInstance);
 
 	/**

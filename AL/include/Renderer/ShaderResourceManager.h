@@ -91,12 +91,32 @@ class ShaderResourceManager
 	static std::unique_ptr<ShaderResourceManager> createColliderShaderResourceManager(
 		VkDescriptorSetLayout descriptorSetLayout);
 
+	/**
+	 * @brief 그림자 맵 쉐이더 리소스 매니저 SSBO 생성
+	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
+	 * @param ssbo 스토리지 버퍼
+	 * @return std::unique_ptr<ShaderResourceManager> 그림자 맵 쉐이더 리소스 매니저 SSBO
+	 */
 	static std::unique_ptr<ShaderResourceManager> createShadowMapShaderResourceManagerSSBO(
 		VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	/**
+	 * @brief 그림자 큐브 맵 쉐이더 리소스 매니저 SSBO 생성
+	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
+	 * @param ssbo 스토리지 버퍼
+	 * @return std::unique_ptr<ShaderResourceManager> 그림자 큐브 맵 쉐이더 리소스 매니저 SSBO
+	 */
 	static std::unique_ptr<ShaderResourceManager> createShadowCubeMapShaderResourceManagerSSBO(
 		VkDescriptorSetLayout descriptorSetLayout, std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
 
+	/**
+	 * @brief 그림자 맵 쉐이더 리소스 매니저 SSBO 변경
+	 * @param ssbo 스토리지 버퍼
+	 */
 	void changeShadowMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
+	/**
+	 * @brief 그림자 큐브 맵 쉐이더 리소스 매니저 SSBO 변경
+	 * @param ssbo 스토리지 버퍼
+	 */
 	void changeShadowCubeMapSSBO(std::vector<std::shared_ptr<StorageBuffer>> &ssbo);
 
 	/**

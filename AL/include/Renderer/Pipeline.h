@@ -124,7 +124,17 @@ class Pipeline
 	 */
 	void initColliderPipeline(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 
+	/**
+	 * @brief 그림자 맵 파이프라인 SSBO 초기화
+	 * @param renderPass 렌더 패스
+	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
+	 */
 	void initShadowMapPipelineSSBO(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
+	/**
+	 * @brief 그림자 큐브 맵 파이프라인 SSBO 초기화
+	 * @param renderPass 렌더 패스
+	 * @param descriptorSetLayout 디스크립터 세트 레이아웃
+	 */
 	void initShadowCubeMapPipelineSSBO(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout);
 
 	~Pipeline() = default;
