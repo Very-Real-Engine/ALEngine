@@ -565,7 +565,15 @@ void Renderer::beginScene(Scene *scene, EditorCamera &camera)
 {
 	// frustum culling
 	// AL_CORE_INFO("frustum culling start");
-	scene->frustumCulling(camera.getFrustum());
+	if (camera.doFrustumCulling())
+	{
+		scene->initFrustumDisable();
+		scene->frustumCulling(camera.getFrustum());
+	}
+	else
+	{
+		scene->initFrustumEnable();
+	}
 	// AL_CORE_INFO("frustum culling finish");
 
 	camera.setAspectRatio(viewPortSize.x / viewPortSize.y);
@@ -576,7 +584,6 @@ void Renderer::beginScene(Scene *scene, EditorCamera &camera)
 
 	// AL_CORE_INFO("before init Frustum");
 	// scene->printCullTree();
-	scene->initFrustumDrawFlag();
 	// AL_CORE_INFO("after init Frustum");
 	// scene->printCullTree();
 }
@@ -589,10 +596,17 @@ void Renderer::beginScene(Scene *scene, Camera &camera)
 	projMatrix = camera.getProjection();
 	viewMatirx = camera.getView();
 
-	scene->frustumCulling(camera.getFrustum());
+	if (camera.doFrustumCulling())
+	{
+		scene->initFrustumDisable();
+		scene->frustumCulling(camera.getFrustum());
+	}
+	else
+	{
+		scene->initFrustumEnable();
+	}
 	drawFrame(scene);
 
-	scene->initFrustumDrawFlag();
 }
 
 void Renderer::biginNoCamScene()
