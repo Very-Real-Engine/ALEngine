@@ -421,7 +421,8 @@ void Scene::onUpdateRuntime(Timestep ts)
 	// imguilayer::renderDrawData
 }
 
-void Scene::preRenderEditor(const Timestep &ts)
+
+void Scene::preRenderEditor(const Timestep& ts, bool init)
 {
 	// update animations
 	{
@@ -432,8 +433,8 @@ void Scene::preRenderEditor(const Timestep &ts)
 			Entity entity = {e, this};
 			auto &sa = entity.getComponent<SkeletalAnimatorComponent>();
 
-			SAComponent *sac = sa.sac.get();
-			if (sa.m_IsPlaying || sa.m_IsTimelineDrag)
+			SAComponent* sac = sa.sac.get();
+			if (sa.m_IsPlaying || sa.m_IsTimelineDrag || init)
 				sac->updateAnimationWithoutTransition(ts * sa.m_SpeedFactor);
 		}
 	}

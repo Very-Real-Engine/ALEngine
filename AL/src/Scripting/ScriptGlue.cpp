@@ -10,8 +10,13 @@
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
 
+#include "mono/jit/jit.h"
 #include "mono/metadata/object.h"
 #include "mono/metadata/reflection.h"
+#include "mono/metadata/assembly.h"
+#include "mono/metadata/attrdefs.h"
+#include "mono/metadata/mono-debug.h"
+#include "mono/metadata/threads.h"
 
 #include "Physics/Rigidbody.h"
 
@@ -31,6 +36,8 @@ std::string monoStringToString(MonoString *string)
 } // namespace utils
 
 static std::unordered_map<MonoType *, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
+static std::unordered_map<MonoType *, std::function<std::vector<uint64_t>(Scene*)>> s_EntityViewComponentsFuncs;
+
 // static std::unordered_map<std::pair<UUID, MonoType *>, MonoObject *> s_EntityComponentInstanceMap;
 
 #define ADD_INTERNAL_CALL(Name) mono_add_internal_call("ALEngine.InternalCalls::" #Name, Name)
@@ -108,6 +115,40 @@ static uint64_t Entity_findEntityByName(MonoString *name)
 	return entity.getUUID();
 }
 
+static MonoArray* Entity_findEntitiesByComponent(UUID entityID, MonoReflectionType *componentType)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	MonoType *managedType = mono_reflection_type_get_type(componentType);
+	auto it = s_EntityViewComponentsFuncs.find(managedType);
+	if(it == s_EntityViewComponentsFuncs.end())
+	{
+		// 매핑에 해당 타입이 없다면, 빈 배열 반환
+		MonoDomain* domain = mono_domain_get();
+		MonoClass* ulongClass = mono_class_from_name(mono_get_corlib(), "System", "UInt64");
+		return mono_array_new(domain, ulongClass, 0);
+	}
+
+	// 람다 호출: 해당 컴포넌트를 가진 모든 엔티티의 UUID 벡터를 얻습니다.
+	std::vector<uint64_t> uuids = it->second(scene);
+
+	// Mono 도메인과 System.UInt64 (C#의 ulong) 클래스를 얻습니다.
+	MonoDomain* domain = mono_domain_get();
+	MonoClass* ulongClass = mono_class_from_name(mono_get_corlib(), "System", "UInt64");
+
+	// UUID 개수에 맞춰 MonoArray 생성 (System.UInt64[])
+	MonoArray* array = mono_array_new(domain, ulongClass, static_cast<int>(uuids.size()));
+
+	// 각 UUID 값을 배열에 채워 넣습니다.
+	for (int i = 0; i < static_cast<int>(uuids.size()); ++i)
+	{
+		mono_array_set(array, uint64_t, i, uuids[i]);
+	}
+
+	return array;
+}
+
 static MonoObject *getScriptInstance(UUID entityID)
 {
 	return ScriptingEngine::getManagedInstance(entityID);
@@ -181,6 +222,51 @@ static void RigidbodyComponent_addForce(UUID entityID, alglm::vec3 *force)
 	body->registerForce(*force);
 }
 
+static void RigidbodyComponent_getPosition(UUID entityID, alglm::vec3 *outPosition)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto* rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
+	*outPosition = rb->getPosition();
+}
+
+static void RigidbodyComponent_setPosition(UUID entityID, alglm::vec3 *position)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto* rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
+	rb->setPosition(*position);
+}
+
+static void RigidbodyComponent_getRotation(UUID entityID, alglm::quat *outRotation)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto* rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
+	*outRotation = rb->getOrientation();
+}
+
+static void RigidbodyComponent_setRotation(UUID entityID, alglm::quat *rotation)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	auto* rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
+	rb->setOrientation(*rotation);
+}
+
+static int RigidbodyComponent_getTouchedNum(UUID entityID)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	Rigidbody *rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
+	return rb->getTouchNum();
+}
+
 // ScriptComponent
 static void ScriptComponent_getField(UUID entityID, MonoString* fieldName, bool* ret)
 {
@@ -238,6 +324,8 @@ template <typename... Component> static void registerComponent()
 			std::string_view structName = typeName.substr(pos + 1);
 			std::string managedTypename = fmt::format("ALEngine.{}", structName);
 
+			Scene* scene = ScriptingEngine::getSceneContext();
+
 			MonoType *managedType =
 				mono_reflection_type_from_name(managedTypename.data(), ScriptingEngine::getCoreAssemblyImage());
 			if (!managedType)
@@ -246,6 +334,16 @@ template <typename... Component> static void registerComponent()
 				return;
 			}
 			s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.hasComponent<Component>(); };
+			s_EntityViewComponentsFuncs[managedType] = [](Scene* scene) -> std::vector<uint64_t> { 
+				std::vector<uint64_t> uuids;
+				// entt view를 통해 MyComponent를 가진 엔티티들을 순회
+				auto &view = scene->getAllEntitiesWith<IDComponent, Component>();
+				for(auto &entity : view)
+				{
+					uuids.push_back(view.get<IDComponent>(entity).m_ID);
+				}
+				return uuids;
+			};
 		}(),
 		...);
 }
@@ -269,6 +367,7 @@ void ScriptGlue::registerFunctions()
 	ADD_INTERNAL_CALL(Entity_hasComponent);
 	// ADD_INTERNAL_CALL(Entity_getComponent);
 	ADD_INTERNAL_CALL(Entity_findEntityByName);
+	ADD_INTERNAL_CALL(Entity_findEntitiesByComponent);
 	ADD_INTERNAL_CALL(getScriptInstance);
 
 	ADD_INTERNAL_CALL(TransformComponent_getPosition);
@@ -280,7 +379,13 @@ void ScriptGlue::registerFunctions()
 	ADD_INTERNAL_CALL(ScriptComponent_setField);
 	ADD_INTERNAL_CALL(ScriptComponent_activate);
 	ADD_INTERNAL_CALL(ScriptComponent_deactivate);
+
+	ADD_INTERNAL_CALL(RigidbodyComponent_getPosition);
+	ADD_INTERNAL_CALL(RigidbodyComponent_setPosition);
+	ADD_INTERNAL_CALL(RigidbodyComponent_getRotation);
+	ADD_INTERNAL_CALL(RigidbodyComponent_setRotation);
 	ADD_INTERNAL_CALL(RigidbodyComponent_addForce);
+	ADD_INTERNAL_CALL(RigidbodyComponent_getTouchedNum);
 
 	ADD_INTERNAL_CALL(Input_isKeyDown);
 	ADD_INTERNAL_CALL(Input_isMouseLeftPressed);

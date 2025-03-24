@@ -11,10 +11,23 @@ namespace ALEngine
 
         public Quaternion(float x, float y, float z, float w)
         {
+            W = w;
             X = x;
             Y = y;
             Z = z;
-            W = w;
+        }
+
+        // 축(axis)과 각도(angle, 라디안)를 받아 Quaternion 생성
+        public static Quaternion FromAxisAngle(Vector3 axis, float angle)
+        {
+            float halfAngle = angle * 0.5f;
+            float sinHalf = (float)Math.Sin(halfAngle);
+            float cosHalf = (float)Math.Cos(halfAngle);
+            return new Quaternion(
+                axis.X * sinHalf,
+                axis.Y * sinHalf,
+                axis.Z * sinHalf,
+                cosHalf);
         }
 
         // Euler 각도 (라디안 단위, pitch=X, yaw=Y, roll=Z)를 Quaternion으로 변환합니다.

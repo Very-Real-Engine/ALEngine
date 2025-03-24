@@ -20,6 +20,8 @@ namespace ALEngine
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static ulong Entity_findEntityByName(string name);
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static ulong[] Entity_findEntitiesByComponent(ulong entityID, Type componentType);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static object getScriptInstance(ulong entityID);
 		#endregion
 
@@ -36,7 +38,17 @@ namespace ALEngine
 
 		#region RigidbodyComponent
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void RigidbodyComponent_getPosition(ulong entityID, out Vector3 position);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void RigidbodyComponent_setPosition(ulong entityID, ref Vector3 position);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void RigidbodyComponent_getRotation(ulong entityID, out Quaternion rotation);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void RigidbodyComponent_setRotation(ulong entityID, ref Quaternion rotation);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static void RigidbodyComponent_addForce(ulong entityID, ref Vector3 force);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static int RigidbodyComponent_getTouchedNum(ulong entityID);
 		#endregion
 
 		#region ScriptComponent
