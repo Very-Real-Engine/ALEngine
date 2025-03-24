@@ -61,7 +61,7 @@ void SkeletalAnimations::start(size_t index)
 {
 	if (!(index < m_AnimationsVector.size()))
 	{
-		std::cout << "invalid animation index\n";
+		AL_CORE_INFO("invalid animation index: {0}", index);
 		return;
 	}
 	SkeletalAnimation* currentAnimation = m_AnimationsVector[index].get();
