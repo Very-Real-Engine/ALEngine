@@ -253,6 +253,16 @@ class Scene
 		m_isSelectedEntity = false;
 	}
 
+	bool getFrustumFlag()
+	{
+		return m_frustumFlag;
+	}
+
+	void setFrustumFlag(bool flag)
+	{
+		m_frustumFlag = flag;
+	}
+
 	alglm::vec3 &getSelectedPosition()
 	{
 		return m_selectedPosition;
@@ -285,6 +295,7 @@ class Scene
 	alglm::vec3 m_CameraPos{0.0f, 0.0f, 10.0f};
 	bool m_IsPaused = false;
 	bool m_IsRunning = false;
+	bool m_frustumFlag = true;
 	int32_t m_StepFrames = 0;
 
 	std::unordered_map<UUID, entt::entity> m_EntityMap;
