@@ -5,6 +5,7 @@ namespace ale
 {
 Camera::Camera()
 {
+	m_frustumFlag = true;
 	updateProjMatrix();
 	setViewMatrix(m_cameraPos, m_cameraFront, m_cameraUp);
 }
@@ -171,6 +172,21 @@ const Frustum &Camera::getFrustum()
 	m_frustum.plane[5] = FrustumPlane(farPoint[2], farPoint[3], nearPoint[3]);
 
 	return m_frustum;
+}
+
+bool Camera::doFrustumCulling()
+{
+	return m_frustumFlag;
+}
+
+void Camera::offFrustumCulling()
+{
+	m_frustumFlag = false;
+}
+
+void Camera::onFrustumCulling()
+{
+	m_frustumFlag = true;
 }
 
 } // namespace ale

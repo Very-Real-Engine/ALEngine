@@ -138,6 +138,15 @@ class Camera
 	/// @brief 카메라의 뷰 행렬을 갱신합니다.
 	void updateViewMatrix();
 
+	/// @brief 프러스텀 컬링 여부 반환.
+	bool doFrustumCulling();
+
+	/// @brief 프러스텀 컬링 오프.
+	void offFrustumCulling();
+
+	/// @brief 프러스텀 컬링 온.
+	void onFrustumCulling();
+
   protected:
 	alglm::mat4 m_projection = alglm::mat4(1.0f);
 	alglm::mat4 m_view;
@@ -148,6 +157,7 @@ class Camera
 
 	float m_CameraPitch{0.0f};
 	float m_CameraYaw{0.0f};
+	bool m_frustumFlag;
 
 	Frustum m_frustum;
 	float m_fov = alglm::radians(45.0f);
