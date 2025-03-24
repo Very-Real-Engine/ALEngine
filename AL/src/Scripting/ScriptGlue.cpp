@@ -191,6 +191,75 @@ static void TransformComponent_setRotation(UUID entityID, alglm::vec3 *outRotati
 	tc.m_WorldTransform = tc.getTransform();
 }
 
+static void Animator_getAnimations(UUID entityID, MonoArray* outAnimations)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	SkeletalAnimatorComponent& sac = entity.getComponent<SkeletalAnimatorComponent>();
+	auto sa = sac.sac;
+
+	auto& animations = sa->getAnimations();
+
+	MonoDomain* domain = mono_domain_get();
+	MonoClass* stringClass = mono_class_from_name(mono_get_corlib(), "System", "String");
+	int length = static_cast<int>((*animations).size());
+
+	AL_CORE_INFO("ANIMATIONSIZE:{0}", length);
+
+	outAnimations = mono_array_new(domain, stringClass, length);
+
+	for (int i = 0; i < length; ++i)
+	{
+		MonoString* monoStr = mono_string_new(domain, (*animations)[i].getName().c_str());
+		mono_array_set(outAnimations, MonoString*, i, monoStr);
+	}
+}
+
+static void Animator_runAnimation(UUID entityID, int index)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	SkeletalAnimatorComponent& sac = entity.getComponent<SkeletalAnimatorComponent>();
+	auto sa = sac.sac;
+
+	sa->start(index);
+}
+
+static void Animator_setRepeat(UUID entityID, bool repeat, int index)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	SkeletalAnimatorComponent& sac = entity.getComponent<SkeletalAnimatorComponent>();
+	auto sa = sac.sac;
+
+	sa->setRepeat(repeat, index);
+}
+
+static void Animator_onInverse(UUID entityID)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	SkeletalAnimatorComponent& sac = entity.getComponent<SkeletalAnimatorComponent>();
+	auto sa = sac.sac;
+
+	sa->setInverse(true, sa->getCurrentAnimationIndex());
+}
+
+static void Animator_offInverse(UUID entityID)
+{
+	Scene *scene = ScriptingEngine::getSceneContext();
+	Entity entity = scene->getEntityByUUID(entityID);
+
+	SkeletalAnimatorComponent& sac = entity.getComponent<SkeletalAnimatorComponent>();
+	auto sa = sac.sac;
+
+	sa->setInverse(false, sa->getCurrentAnimationIndex());
+}
+
 // Input
 static bool Input_isKeyDown(KeyCode keycode)
 {
@@ -386,6 +455,12 @@ void ScriptGlue::registerFunctions()
 	ADD_INTERNAL_CALL(RigidbodyComponent_setRotation);
 	ADD_INTERNAL_CALL(RigidbodyComponent_addForce);
 	ADD_INTERNAL_CALL(RigidbodyComponent_getTouchedNum);
+
+	ADD_INTERNAL_CALL(Animator_getAnimations);
+	ADD_INTERNAL_CALL(Animator_runAnimation);
+	ADD_INTERNAL_CALL(Animator_setRepeat);
+	ADD_INTERNAL_CALL(Animator_onInverse);
+	ADD_INTERNAL_CALL(Animator_offInverse);
 
 	ADD_INTERNAL_CALL(Input_isKeyDown);
 	ADD_INTERNAL_CALL(Input_isMouseLeftPressed);
