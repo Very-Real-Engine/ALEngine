@@ -243,6 +243,12 @@ class Rigidbody
 	void setPosition(alglm::vec3 &position);
 
 	/**
+	 * @brief Rigidbody의 위치를 설정합니다 (No Freezed).
+	 * @param position 설정할 위치.
+	 */
+	void setPositionNoFreeze(alglm::vec3 &position);
+
+	/**
 	 * @brief Rigidbody의 아일랜드 인덱스를 설정합니다.
 	 * @param idx 설정할 아일랜드 인덱스.
 	 */

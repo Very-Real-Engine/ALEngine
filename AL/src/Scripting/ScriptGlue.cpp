@@ -306,7 +306,7 @@ static void RigidbodyComponent_setPosition(UUID entityID, alglm::vec3 *position)
 	Entity entity = scene->getEntityByUUID(entityID);
 
 	auto* rb = (Rigidbody *)entity.getComponent<RigidbodyComponent>().body;
-	rb->setPosition(*position);
+	rb->setPositionNoFreeze(*position);
 }
 
 static void RigidbodyComponent_getRotation(UUID entityID, alglm::quat *outRotation)
