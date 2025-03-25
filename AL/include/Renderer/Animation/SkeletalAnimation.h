@@ -191,6 +191,7 @@ class SkeletalAnimation
 		 * @param lastKeyFrameTime 마지막 키 프레임 시간
 		 */
 		void setLastKeyFrameTime(float lastKeyFrameTime) { m_LastKeyFrameTime = lastKeyFrameTime; }
+		void flush();
 
 	private:
 		std::string m_Name;              /**< 애니메이션 이름 */

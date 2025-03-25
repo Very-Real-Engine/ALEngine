@@ -155,6 +155,14 @@ void SkeletalAnimation::uploadData(const SAData &data, bool repeat)
 	m_Inverse = data.m_Inverse;
 }
 
+void SkeletalAnimation::flush()
+{
+	m_FirstKeyFrameTime = 0;
+	m_LastKeyFrameTime = 0;
+	m_CurrentKeyFrameTime = 0;
+	m_Inverse = false;
+}
+
 struct SAData SkeletalAnimation::getData() const
 {
 	struct SAData data{};
