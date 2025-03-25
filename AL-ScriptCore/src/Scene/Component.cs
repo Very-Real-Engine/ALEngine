@@ -104,6 +104,35 @@ namespace ALEngine
         }
     }
 
+    public class SkeletalAnimatorComponent : Component
+    {
+        public string[] getAnimations()
+        {
+            InternalCalls.Animator_getAnimations(Entity.ID, out string[] outAnimations);
+            return outAnimations;
+        }
+
+        public void run(int index)
+        {
+            InternalCalls.Animator_runAnimation(Entity.ID, index);
+        }
+
+        public void setRepeat(bool repeat, int index)
+        {
+            InternalCalls.Animator_setRepeat(Entity.ID, ref repeat, index);
+        }
+
+        public void onInverse()
+        {
+            InternalCalls.Animator_onInverse(Entity.ID);
+        }
+
+        public void offInverse()
+        {
+            InternalCalls.Animator_offInverse(Entity.ID);
+        }
+    }
+
     public class BoxCollider : Component
     {
         public bool isTriggered(out string targetEntityName)

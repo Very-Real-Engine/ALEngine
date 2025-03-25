@@ -267,6 +267,11 @@ int32_t Rigidbody::getBodyId() const
 	return m_bodyID;
 }
 
+void Rigidbody::setPositionNoFreeze(alglm::vec3 &position)
+{
+	m_xf.position = position;
+}
+
 void Rigidbody::setPosition(alglm::vec3 &position)
 {
 	position -= m_xf.position;

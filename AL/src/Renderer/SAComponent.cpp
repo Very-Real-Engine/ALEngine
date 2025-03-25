@@ -193,6 +193,7 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 	else if (m_StateManager->isTransitionFinish) // AFTER BLENDING CHANGED TO CURRENT-ANIMATION
 	{
 		m_StateManager->isTransitionFinish = false;
+		m_CurrentAnimation->flush();
 		m_CurrentAnimation = &(*m_Animations)[m_StateManager->currentState.animationName];
 	}
 	else if (m_CurrentAnimation && m_Model->m_SkeletalAnimations) // SINGLE-ANIMATION
@@ -209,6 +210,7 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 		flush();
 		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), animIndex);
+		m_CurrentAnimation->flush();
 	}
 	m_StateManager->update(timestep);
 }
@@ -228,6 +230,7 @@ void SAComponent::updateAnimationWithoutTransition(const Timestep& timestep)
 		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
 		flush();
 		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), animIndex);
+		m_CurrentAnimation->flush();
 	}
 }
 
@@ -391,7 +394,7 @@ bool SAComponent::getInverse(int index)
 void SAComponent::flush()
 {
 	auto& bones = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
-	for (auto b : bones)
+	for (auto& b : bones)
 		b = alglm::mat4(1.0f);
 }
 

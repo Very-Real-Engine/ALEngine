@@ -62,6 +62,19 @@ namespace ALEngine
 		internal extern static void ScriptComponent_deactivate(ulong entityID);
 		#endregion
 
+		#region Animator
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Animator_getAnimations(ulong entityID, out string[] outAnimations);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Animator_runAnimation(ulong entityID, int index);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Animator_setRepeat(ulong entityID, ref bool repeat, int index);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Animator_onInverse(ulong entityID);
+		[MethodImplAttribute(MethodImplOptions.InternalCall)]
+		internal extern static void Animator_offInverse(ulong entityID);
+		#endregion
+
 		#region BoxCollider
 		[MethodImplAttribute(MethodImplOptions.InternalCall)]
 		internal extern static bool BoxCollider_IsTriggered(ulong entityID, out string targetEntityName);

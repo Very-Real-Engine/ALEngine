@@ -1,5 +1,94 @@
 Scene: Untitled
 Entities:
+  - Entity: 4360893343295885948
+    TagComponent:
+      Tag: FrontDoor
+    TransformComponent:
+      Position: [0.899999976, -4.0999999, 3.70000005]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\door.gltf
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.Door
+      ScriptFields:
+        []
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [-0.400000006, 1.79999995, 0.100000001]
+      Size: [1, 2, 0.800000012]
+      IsTrigger: true
+    SkeletalAnimatorComponent:
+      SpeedFactor: 1
+      Repeats:
+        - false
+      AnimationStateManager:
+        AnimationStates:
+          All:
+            stateName: All
+            animationName: All
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          DoorAction.002:
+            stateName: DoorAction.002
+            animationName: DoorAction.002
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+        AnimationTransitions:
+          []
+  - Entity: 1128202365732394954
+    TagComponent:
+      Tag: Follower
+    TransformComponent:
+      Position: [0, 1.70000005, -10]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    ScriptComponent:
+      ClassName: Sandbox.Follower
+      ScriptFields:
+        []
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [0, 0, 0]
+      Size: [1, 1, 1]
+      IsTrigger: true
+  - Entity: 1628913170524946816
+    TagComponent:
+      Tag: FrontDoorFrame
+    TransformComponent:
+      Position: [0.5, -3.20000005, 3.79999995]
+      Rotation: [0, -0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 12608274527441300536
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\doorFrame.gltf
+      MatPath: ""
+      IsMatChanged: false
   - Entity: 4590134417811986843
     TagComponent:
       Tag: tree
@@ -72,7 +161,7 @@ Entities:
       IsMatChanged: false
   - Entity: 4091229161639203787
     TagComponent:
-      Tag: Ground
+      Tag: Roof
     TransformComponent:
       Position: [0, -1, 0]
       Rotation: [1.57079637, 0, 0]
@@ -841,7 +930,7 @@ Entities:
       IsMatChanged: false
   - Entity: 3406970704759287418
     TagComponent:
-      Tag: Scene Camera
+      Tag: SceneCamera
     TransformComponent:
       Position: [0, -1.70000005, 10]
       Rotation: [0, 0, 0]
@@ -1432,5 +1521,213 @@ Entities:
     MeshRendererComponent:
       MeshType: 7
       Path: ./projects\..\Sandbox\Project\Assets\Models\House\background\truck.glb
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 12608274527441300536
+    TagComponent:
+      Tag: Doors
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        - 1628913170524946816
+        - 18901132405052336
+        - 1294356993325318914
+  - Entity: 18081937492112413324
+    TagComponent:
+      Tag: BedRoomDoor
+    TransformComponent:
+      Position: [0.899999976, -4.0999999, -0.899999976]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.99999994, 1, 0.99999994]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\door.gltf
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.Door
+      ScriptFields:
+        []
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [0.100000001, 1.89999998, 0.5]
+      Size: [1, 2, 0.800000012]
+      IsTrigger: true
+    SkeletalAnimatorComponent:
+      SpeedFactor: 1
+      Repeats:
+        - false
+      AnimationStateManager:
+        AnimationStates:
+          All:
+            stateName: All
+            animationName: All
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          DoorAction.002:
+            stateName: DoorAction.002
+            animationName: DoorAction.002
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+        AnimationTransitions:
+          []
+  - Entity: 18901132405052336
+    TagComponent:
+      Tag: BedRoomDoorFrame
+    TransformComponent:
+      Position: [1, -3.20000005, -0.5]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.99999994, 1, 0.99999994]
+    RelationshipComponent:
+      Parent: 12608274527441300536
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\doorFrame.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 4554783395709104148
+    TagComponent:
+      Tag: SecondRoomDoor
+    TransformComponent:
+      Position: [-3.0999999, -4.0999999, 0.100000001]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.99999994, 1, 0.99999994]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\door.gltf
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.Door
+      ScriptFields:
+        []
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [0.100000001, 1.70000005, 0.400000006]
+      Size: [1, 2, 0.800000012]
+      IsTrigger: true
+    SkeletalAnimatorComponent:
+      SpeedFactor: 1
+      Repeats:
+        - false
+      AnimationStateManager:
+        AnimationStates:
+          All:
+            stateName: All
+            animationName: All
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          DoorAction.002:
+            stateName: DoorAction.002
+            animationName: DoorAction.002
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+        AnimationTransitions:
+          []
+  - Entity: 1294356993325318914
+    TagComponent:
+      Tag: SecondRoomDoorFrame
+    TransformComponent:
+      Position: [-3, -3.20000005, 0.5]
+      Rotation: [0, 1.57045054, 0]
+      Scale: [0.99999994, 1, 0.99999994]
+    RelationshipComponent:
+      Parent: 12608274527441300536
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\doorFrame.gltf
+      MatPath: ""
+      IsMatChanged: false
+  - Entity: 7297105095827475814
+    TagComponent:
+      Tag: BathRoomDoor
+    TransformComponent:
+      Position: [-0.100000001, -4.0999999, 1.89999998]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\door.gltf
+      MatPath: ""
+      IsMatChanged: false
+    ScriptComponent:
+      ClassName: Sandbox.Door
+      ScriptFields:
+        []
+    RigidbodyComponent:
+      Mass: 1
+      Drag: 0.00100000005
+      AngularDrag: 0.00100000005
+      UseGravity: false
+    BoxColliderComponent:
+      Center: [-0.300000012, 2, 0.200000003]
+      Size: [1, 2, 1]
+      IsTrigger: true
+    SkeletalAnimatorComponent:
+      SpeedFactor: 1
+      Repeats:
+        - false
+      AnimationStateManager:
+        AnimationStates:
+          All:
+            stateName: All
+            animationName: All
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+          DoorAction.002:
+            stateName: DoorAction.002
+            animationName: DoorAction.002
+            looping: false
+            interruptible: false
+            defaultBlendTime: 0.5
+        AnimationTransitions:
+          []
+  - Entity: 12085338679568469605
+    TagComponent:
+      Tag: BathRoomDoorFrame
+    TransformComponent:
+      Position: [-0.5, -3.20000005, 2]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    MeshRendererComponent:
+      MeshType: 7
+      Path: ./projects\..\Sandbox\Project\Assets\Models\InteractiveHouse\Interaction\doorFrame.gltf
       MatPath: ""
       IsMatChanged: false
