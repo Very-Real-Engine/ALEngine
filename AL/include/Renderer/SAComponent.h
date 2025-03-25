@@ -205,7 +205,7 @@ private:
 	SkeletalAnimation* m_CurrentAnimation;                                   /**< 현재 애니메이션 */
 	std::shared_ptr<AnimationStateManager> m_StateManager;                   /**< 상태 관리자 */
 	std::shared_ptr<SkeletalAnimations> m_Animations;                        /**< 애니메이션들 */
-	std::shared_ptr<Armature::Skeleton> m_Skeleton;                          /**< 스켈레톤 */
+	Armature::Skeleton m_Skeleton;                          /**< 스켈레톤 */
 	std::shared_ptr<Model> m_Model;                                          /**< 모델 */
 	std::vector<bool> m_Repeats;                                             /**< 각 애니메이션 별 반복 벡터 */
 	uint32_t m_FrameCounter;                                                 /**< 프레임 카운터 */

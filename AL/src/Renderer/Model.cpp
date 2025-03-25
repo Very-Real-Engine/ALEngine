@@ -634,8 +634,8 @@ std::shared_ptr<Mesh> Model::processGLTFMesh(aiMesh *mesh, const aiScene *scene,
 		{
 			std::string boneName(mesh->mBones[boneIndex]->mName.C_Str());
 
-			auto it = m_Skeleton->m_NodeNameToBoneIndex.find(boneName);
-			if (it == m_Skeleton->m_NodeNameToBoneIndex.end())
+			auto it = m_Skeleton.m_NodeNameToBoneIndex.find(boneName);
+			if (it == m_Skeleton.m_NodeNameToBoneIndex.end())
 			{
 				AL_INFO("Model::processGLTFMesh: bone not found: boneName: {0}", boneName);
 				continue;
@@ -721,7 +721,7 @@ void Model::processGLTFSkeleton(const aiScene *scene)
 
 	m_SkeletalAnimations = true;
 	m_Animations = std::make_shared<SkeletalAnimations>();
-	m_Skeleton = std::make_shared<Armature::Skeleton>();
+	m_Skeleton = Armature::Skeleton();
 
 	// 1) 본 정보 수집
 	std::vector<aiBone *> allAiBones;
@@ -731,17 +731,17 @@ void Model::processGLTFSkeleton(const aiScene *scene)
 	buildSkeletonBoneArray(allAiBones);
 
 	// creating dummy bones
-	if (m_Skeleton->m_Bones.size() == 0 && scene->HasAnimations())
+	if (m_Skeleton.m_Bones.size() == 0 && scene->HasAnimations())
 	{
 		Armature::Bone dummy;
 		dummy.m_Name = scene->mName.C_Str();
 		dummy.m_InverseBindMatrix = alglm::mat4(1.0f);
 		dummy.m_ParentBone = -1;
 
-		m_Skeleton->m_Bones.push_back(dummy);
-		m_Skeleton->m_NodeNameToBoneIndex[dummy.m_Name] = 0;
+		m_Skeleton.m_Bones.push_back(dummy);
+		m_Skeleton.m_NodeNameToBoneIndex[dummy.m_Name] = 0;
 
-		m_Skeleton->m_ShaderData.m_FinalBonesMatrices.resize(1, alglm::mat4(1.0f));
+		m_Skeleton.m_ShaderData.m_FinalBonesMatrices.resize(1, alglm::mat4(1.0f));
 	}
 
 	// 2) 노드 트리를 통해 본 계층 관계 구성
@@ -778,13 +778,13 @@ void Model::buildSkeletonBoneArray(const std::vector<aiBone *> &allAiBones)
 			newBone.m_Name = boneName;
 			newBone.m_InverseBindMatrix = convertMatrix(bone->mOffsetMatrix);
 
-			m_Skeleton->m_Bones.emplace_back(newBone);
-			boneNameToIndex[boneName] = static_cast<int>(m_Skeleton->m_Bones.size() - 1);
+			m_Skeleton.m_Bones.emplace_back(newBone);
+			boneNameToIndex[boneName] = static_cast<int>(m_Skeleton.m_Bones.size() - 1);
 		}
 	}
 
-	m_Skeleton->m_ShaderData.m_FinalBonesMatrices.resize(m_Skeleton->m_Bones.size());
-	m_Skeleton->m_NodeNameToBoneIndex = boneNameToIndex;
+	m_Skeleton.m_ShaderData.m_FinalBonesMatrices.resize(m_Skeleton.m_Bones.size());
+	m_Skeleton.m_NodeNameToBoneIndex = boneNameToIndex;
 }
 
 void Model::loadBone(aiNode *node, int parentBoneIndex)
@@ -796,19 +796,19 @@ void Model::loadBone(aiNode *node, int parentBoneIndex)
 
 	// 해당 노드가 본 목록(m_Skeleton->m_NodeNameToBoneIndex) 에 있다면,
 	// 해당 본의 부모/자식 연결
-	auto it = m_Skeleton->m_NodeNameToBoneIndex.find(nodeName);
+	auto it = m_Skeleton.m_NodeNameToBoneIndex.find(nodeName);
 	int currentBoneIndex = -1;
 
-	if (it != m_Skeleton->m_NodeNameToBoneIndex.end())
+	if (it != m_Skeleton.m_NodeNameToBoneIndex.end())
 	{
 		currentBoneIndex = it->second;
 
-		auto &bone = m_Skeleton->m_Bones[currentBoneIndex];
+		auto &bone = m_Skeleton.m_Bones[currentBoneIndex];
 
 		bone.m_ParentBone = parentBoneIndex;
 
-		if (parentBoneIndex >= 0 && parentBoneIndex < static_cast<int>(m_Skeleton->m_Bones.size()))
-			m_Skeleton->m_Bones[parentBoneIndex].m_Children.emplace_back(currentBoneIndex);
+		if (parentBoneIndex >= 0 && parentBoneIndex < static_cast<int>(m_Skeleton.m_Bones.size()))
+			m_Skeleton.m_Bones[parentBoneIndex].m_Children.emplace_back(currentBoneIndex);
 	}
 
 	for (size_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
@@ -1005,7 +1005,7 @@ std::shared_ptr<SkeletalAnimations> &Model::getAnimations()
 {
 	return m_Animations;
 }
-std::shared_ptr<Armature::Skeleton> &Model::getSkeleton()
+Armature::Skeleton Model::getSkeleton()
 {
 	return m_Skeleton;
 }

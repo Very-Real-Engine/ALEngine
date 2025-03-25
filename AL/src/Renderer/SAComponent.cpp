@@ -188,7 +188,7 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 				m_CurrentAnimation->start();
 			setData(m_FrameCounter, m_CurrentAnimation->getData(), getAnimIndex(m_CurrentAnimation->getName()));
 		}
-		blendUpdate(timestep, *m_Skeleton, currentFrame);
+		blendUpdate(timestep, m_Skeleton, currentFrame);
 	}
 	else if (m_StateManager->isTransitionFinish) // AFTER BLENDING CHANGED TO CURRENT-ANIMATION
 	{
@@ -204,10 +204,10 @@ void SAComponent::updateAnimation(const Timestep& timestep, uint32_t currentFram
 		m_CurrentAnimation->uploadData(this->getData(animIndex),
 			m_Repeats[animIndex]);
 		m_Animations->uploadData(m_CurrentAnimation, m_FrameCounter);
-		m_Animations->update(timestep, *m_Skeleton, currentFrame);
-		m_Skeleton->update();
+		m_Animations->update(timestep, m_Skeleton, currentFrame);
+		m_Skeleton.update();
 
-		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
+		m_CurrentPose = m_Skeleton.m_ShaderData.m_FinalBonesMatrices;
 		flush();
 		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), animIndex);
 		m_CurrentAnimation->flush();
@@ -224,10 +224,10 @@ void SAComponent::updateAnimationWithoutTransition(const Timestep& timestep)
 		m_CurrentAnimation->uploadData(this->getData(animIndex),
 			m_Repeats[animIndex]);
 		m_Animations->uploadData(m_CurrentAnimation, m_FrameCounter);
-		m_Animations->update(timestep, *m_Skeleton, 0); // disable currentframe
-		m_Skeleton->update();
+		m_Animations->update(timestep, m_Skeleton, 0); // disable currentframe
+		m_Skeleton.update();
 		
-		m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
+		m_CurrentPose = m_Skeleton.m_ShaderData.m_FinalBonesMatrices;
 		flush();
 		this->setData(m_Animations->getCurrentFrame() ,m_CurrentAnimation->getData(), animIndex);
 		m_CurrentAnimation->flush();
@@ -257,8 +257,8 @@ void SAComponent::blendUpdate(
 	if (animA.isRunning())
 	{
 		m_Animations->uploadData(&animA, m_FrameCounter);
-		m_Animations->update(timestep, *m_Skeleton, currentFrame);
-		poseFrom = m_Skeleton->m_Bones;
+		m_Animations->update(timestep, m_Skeleton, currentFrame);
+		poseFrom = m_Skeleton.m_Bones;
 		this->setData(m_FrameCounter, animA.getData(), animAIndex); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
 	}
 	else
@@ -266,22 +266,22 @@ void SAComponent::blendUpdate(
 		if (m_StateManager->transitionTime == 0.0f)
 		{
 			m_Animations->uploadData(&animA, m_FrameCounter);
-			m_Animations->update(timestep, *m_Skeleton, currentFrame);
-			m_CapturedPose = m_Skeleton->m_Bones;
+			m_Animations->update(timestep, m_Skeleton, currentFrame);
+			m_CapturedPose = m_Skeleton.m_Bones;
 			this->setData(m_FrameCounter, animA.getData(), animAIndex); // prevState 애니메이션이 기존 애니메이션이므로 기존 애니메이션의 키프레임 데이터를 유지
 		}
 		poseFrom = m_CapturedPose;
 	}
 
 	m_Animations->uploadData(&animB, m_FrameCounter);
-	m_Animations->update(timestep, *m_Skeleton, currentFrame);
-	poseTo = m_Skeleton->m_Bones;
+	m_Animations->update(timestep, m_Skeleton, currentFrame);
+	poseTo = m_Skeleton.m_Bones;
 	this->setData(currentFrame, animB.getData(), animBIndex);
 
-	m_Skeleton->m_Bones = blendBones(poseTo, poseFrom, blendFactor);
-	m_Skeleton->update();
+	m_Skeleton.m_Bones = blendBones(poseTo, poseFrom, blendFactor);
+	m_Skeleton.update();
 
-	m_CurrentPose = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
+	m_CurrentPose = m_Skeleton.m_ShaderData.m_FinalBonesMatrices;
 	flush();
 }
 
@@ -393,7 +393,7 @@ bool SAComponent::getInverse(int index)
 
 void SAComponent::flush()
 {
-	auto& bones = m_Skeleton->m_ShaderData.m_FinalBonesMatrices;
+	auto& bones = m_Skeleton.m_ShaderData.m_FinalBonesMatrices;
 	for (auto& b : bones)
 		b = alglm::mat4(1.0f);
 }

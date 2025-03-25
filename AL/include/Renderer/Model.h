@@ -209,7 +209,7 @@ class Model
 	 * @brief 스켈레톤 반환
 	 * @return 스켈레톤
 	 */
-	std::shared_ptr<Armature::Skeleton> &getSkeleton();
+	Armature::Skeleton getSkeleton();
 	bool m_SkeletalAnimations;
 
 	/**
@@ -230,7 +230,7 @@ class Model
 
 	// animation
 	std::shared_ptr<SkeletalAnimations> m_Animations;
-	std::shared_ptr<Armature::Skeleton> m_Skeleton;
+	Armature::Skeleton m_Skeleton;
 	Armature::ShaderData m_ShaderData;
 
 	struct VertexBoneData
