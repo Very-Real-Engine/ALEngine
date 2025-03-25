@@ -31,7 +31,7 @@ namespace Sandbox
 		{
 			bool isFDown = Input.isKeyDown(KeyCode.F);
 
-			bool shouldToggle = isFDown && !fkeyWasDown;
+			bool shouldToggle = isFDown && !fkeyWasDown && m_Rigidbody.getTouchNum() > 0;
 
 			fkeyWasDown = isFDown;
 
